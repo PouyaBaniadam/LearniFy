@@ -1,0 +1,30 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" x-bind:class="darkMode ? 'dark' : ''" x-data="{ darkMode: false }">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% include 'includes/header_links.html' %}
+
+    <title>آزمون</title>
+</head>
+
+<body>
+
+{% include 'includes/messages_handler.html' %}
+
+{% block content %}
+
+
+{% endblock %}
+
+
+{% include 'includes/footer_links.html' %}
+
+</body>
+
+</html>

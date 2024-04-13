@@ -1,0 +1,19 @@
+.advert-banner {
+    padding: 20px 0;
+}
+
+
+.advert-banner-item img {
+    will-change: transform, filter;
+    float: none;
+    transition: all 0.15s ease-out;
+    overflow: hidden;
+    display: block;
+    margin: 0 auto;
+    transform: rotateX(0deg) rotateY(0deg) scale(1);
+    perspective-origin: 0 0;
+}
+
+.advert-banner-item img {
+    border-radius: 15px;
+}

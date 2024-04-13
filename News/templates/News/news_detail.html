@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% load static %}
+{% load ratings %}
+{% load hitcount_tags %}
+
+{% block content %}
+    <div class="flex flex-col min-h-screen bg-background">
+        {% include 'includes/header.html' %}
+
+        <main class="flex-auto py-5">
+            <!-- container -->
+            <div class="max-w-7xl space-y-14 px-4 mx-auto">
+                <div class="flex md:flex-nowrap flex-wrap items-start gap-5">
+                    <div class="md:w-8/12 w-full">
+                        <div class="relative">
+                            <div class="relative z-10">
+                                <!-- course:thumbnail -->
+                                <div>
+                                    <img src="{{ news.cover_image.url }}" class="max-w-full rounded-3xl"
+                                         alt="..."/>
+                                </div>
+                                <!-- end course:thumbnail -->
+                            </div>
+                            <div class="-mt-12 pt-12">
+                                <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
+                                    <h1 class="font-bold text-xl text-foreground">{{ news.title }}</h1>
+                                </div>
+                                <div class="space-y-10 py-5">
+                                    <div class="grid lg:grid-cols-2 grid-cols-2 gap-5">
+                                        <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                            <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                     fill="currentColor" class="w-5 h-5">
+                                                    <path fill-rule="evenodd"
+                                                          d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
+                                                          clip-rule="evenodd"></path>
+                                                </svg>
+                                            </span>
+                                            <div class="flex flex-col items-center justify-center text-center space-y-1">
+                                                <span class="font-bold text-xs text-muted line-clamp-1">تاریخ ایجاد</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ news.created_at|j_date_formatter }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                            <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                     fill="currentColor" class="w-5 h-5">
+                                                    <path fill-rule="evenodd"
+                                                          d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z"
+                                                          clip-rule="evenodd"></path>
+                                                </svg>
+                                            </span>
+                                            <div class="flex flex-col items-center justify-center text-center space-y-1">
+                                                <span class="font-bold text-xs text-muted line-clamp-1">آخرین به‌روز‌رسانی</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ news.updated_at|j_date_formatter }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                        <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"></path>
+                                            </svg>
+                                        </span>
+                                            <div class="flex flex-col items-center justify-center text-center space-y-1">
+                                                <span class="font-bold text-xs text-muted line-clamp-1">نویسنده</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ news.author.full_name }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                        <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24 "
+                                                 fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd"
+                                                                                           d="M12.015 7c4.751 0 8.063 3.012 9.504 4.636-1.401 1.837-4.713 5.364-9.504 5.364-4.42 0-7.93-3.536-9.478-5.407 1.493-1.647 4.817-4.593 9.478-4.593zm0-2c-7.569 0-12.015 6.551-12.015 6.551s4.835 7.449 12.015 7.449c7.733 0 11.985-7.449 11.985-7.449s-4.291-6.551-11.985-6.551zm-.015 7l-3.36-2.171c-.405.625-.64 1.371-.64 2.171 0 2.209 1.791 4 4 4s4-1.791 4-4-1.791-4-4-4c-.742 0-1.438.202-2.033.554l2.033 3.446z"
+                                                                                           clip-rule="evenodd">
+                                            </path>
+
+                                            </svg>
+                                        </span>
+                                            <div class="flex flex-col items-center justify-center text-center space-y-1">
+                                                <span class="font-bold text-xs text-muted line-clamp-1">تعداد بازدید</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{% get_hit_count for news %}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- tabs container -->
+                                    <div class="space-y-5"
+                                         x-data="{ activeTab: 'tabOne', scroll: function() { document.getElementById(this.activeTab).scrollIntoView({ behavior: 'smooth' }) } }">
+                                        <!-- tabs:contents -->
+                                        <div class="space-y-8">
+                                            <!-- tabs:contents:tabOne -->
+                                            <div class="bg-background rounded-3xl p-5" id="tabOne">
+                                                <!-- course:description -->
+                                                <div class="description">
+                                                    {{ news.content|safe }}
+                                                </div>
+                                                <!-- end course:description -->
+                                            </div>
+                                            <!-- end tabs:contents:tabOne -->
+
+                                            <div class="slider-parent-2 text-center">
+                                                <div class="blog-single-rating-post text-center">
+                                                    <h3 class="h2">این خبر چقدر براتون مفید بود؟</h3>
+                                                    <div class="blog-single-rating-post-rating">
+                                                        {% ratings news %}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <!-- tabs:contents:tabThree -->
+                                            <div class="bg-background rounded-3xl p-5" id="tabThree">
+                                                <!-- section:title -->
+                                                <div id="reply_section" class="flex items-center gap-3 mb-5">
+                                                    <div class="flex items-center gap-1">
+                                                        <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                                        <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                                    </div>
+                                                    <div class="font-black text-foreground">دیدگاه و پرسش</div>
+                                                </div>
+                                                <!-- end section:title -->
+
+                                                <!-- course:comments:form:wrapper -->
+                                                <div class="bg-background border border-border rounded-3xl p-5 mb-5">
+                                                    <div class="flex items-center gap-3 mb-5">
+                                                        <div class="flex items-center gap-1">
+                                                            <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                                            <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                                        </div>
+                                                        <div class="font-black text-xs text-foreground">
+                                                            ارسال دیدگاه یا پرسش
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex flex-wrap items-center gap-3 mb-5">
+                                                        <div class="flex items-center gap-3 sm:w-auto w-full">
+                                                            <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                     class="w-full h-full object-cover" alt="..."/>
+                                                            </div>
+                                                            <div class="flex flex-col items-start space-y-1">
+                                                                <p class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ request.user.username }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <span class="block w-1 h-1 bg-border rounded-full"></span>
+                                                        <span id="cancel_reply_to?" style="display: none"
+                                                              class="font-semibold text-xs text-muted">در پاسخ به</span>
+                                                        <span class="block w-1 h-1 bg-border rounded-full"></span>
+                                                        <p id="reply_comment_id"
+                                                           class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary"></p>
+
+                                                        <button id="cancel_reply_btn" type="button"
+                                                                style="display: none"
+                                                                class="line-clamp-1 font-semibold text-sm text-red-500 mr-auto"
+                                                                onclick="cancelReply()">لغو پاسخ
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- course:comments:form -->
+                                                    <form method="post"
+                                                          action="{% url 'news:add_comment' news.slug %}"
+                                                          class="flex flex-col space-y-5">
+                                                        {% csrf_token %}
+
+                                                        <input type="hidden" id="parent_id" name="parent_id" value="">
+
+                                                        <textarea required name="text" id="text" rows="10"
+                                                                  class="form-textarea w-full !ring-0 !ring-offset-0 bg-secondary border-0 focus:border-border border-border rounded-xl text-sm text-foreground p-5"
+                                                                  placeholder="متن مورد نظر خود را وارد کنید ..."></textarea>
+                                                        <button type="submit"
+                                                                class="h-10 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4 mr-auto">
+                                                            <span class="font-semibold text-sm">ثبت دیدگاه</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                                 fill="currentColor" class="w-5 h-5">
+                                                                <path fill-rule="evenodd"
+                                                                      d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                                      clip-rule="evenodd"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                    <!-- end course:comments:form -->
+                                                </div>
+                                                <!-- end course:comments:form:wrapper -->
+
+                                                <!-- course:comments:wrapper -->
+                                                <div class="space-y-3">
+                                                    <!-- course:comment -->
+                                                    <div class="space-y-3">
+
+                                                        {% for comment in comments %}
+                                                            {% if comment.parent == None %}
+                                                                <div class="comment-container bg-background border border-border rounded-3xl space-y-3 p-5">
+                                                                    <div class="flex sm:flex-nowrap flex-wrap sm:flex-row flex-col sm:items-center sm:justify-between gap-5 border-b border-border pb-3">
+                                                                        <div class="flex items-center gap-3">
+                                                                            <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                                {% if comment.user.image %}
+                                                                                    <img src="{{ comment.user.image.url }}"
+                                                                                         class="w-full h-full object-cover"
+                                                                                         alt="تصویر پروفایل"/>
+                                                                                {% else %}
+                                                                                    <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                                         class="w-full h-full object-cover"
+                                                                                         alt="تصویر پروفایل"/>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                            <div class="flex flex-col items-start space-y-1">
+                                                                                <a href="{% url 'account:owner_profile' comment.user.username %}"
+                                                                                   class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ comment.user.username }}</a>
+                                                                                <span class="text-xs text-muted">{{ comment.created_at|j_date_formatter }}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex items-center gap-3 sm:mr-0 mr-auto">
+                                                                            {% if request.user == comment.user %}
+                                                                                <button onclick="submit_deletion('{{ comment.id }}', 'news')"
+                                                                                        class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-red-700 px-4">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         fill="none" viewBox="0 0 24 24"
+                                                                                         stroke-width="1.5"
+                                                                                         stroke="currentColor"
+                                                                                         class="w-5 h-5">
+                                                                                        <path stroke-linecap="round"
+                                                                                              stroke-linejoin="round"
+                                                                                              d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+                                                                                    </svg>
+                                                                                </button>
+
+                                                                            {% else %}
+                                                                                <button onclick="setValue('{{ comment.id }}', '{{ comment.user.username }}')"
+                                                                                        class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
+                                                                                    <span class="text-xs">پاسخ</span>
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         viewBox="0 0 20 20"
+                                                                                         fill="currentColor"
+                                                                                         class="w-5 h-5">
+                                                                                        <path fill-rule="evenodd"
+                                                                                              d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z"
+                                                                                              clip-rule="evenodd"></path>
+                                                                                    </svg>
+                                                                                    <span id="likeCount-{{ comment.id }}"
+                                                                                          class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ comment.likes.count }}
+                                                                                    </span>
+                                                                                </button>
+                                                                            {% endif %}
+
+                                                                            {% if request.user.is_authenticated %}
+                                                                                {% if comment.id in user_likes %}
+                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'news')"
+                                                                                            id="likeBtn-{{ comment.id }}"
+                                                                                            type="button"
+                                                                                            class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                             viewBox="0 0 20 20"
+                                                                                             fill="currentColor"
+                                                                                             class="w-5 h-5">
+                                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                            </path>
+                                                                                        </svg>
+                                                                                        <span id="likeCount-{{ comment.id }}"
+                                                                                              class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ comment.likes.count }}
+                                                                                    </span>
+                                                                                    </button>
+                                                                                {% else %}
+                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'news')"
+                                                                                            id="likeBtn-{{ comment.id }}"
+                                                                                            type="button"
+                                                                                            class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                             viewBox="0 0 20 20"
+                                                                                             fill="currentColor"
+                                                                                             class="w-5 h-5">
+                                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                            </path>
+                                                                                        </svg>
+                                                                                        <span id="likeCount-{{ comment.id }}"
+                                                                                              class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ comment.likes.count }}
+                                                                                    </span>
+                                                                                    </button>
+                                                                                {% endif %}
+                                                                            {% else %}
+                                                                                <button type="button"
+                                                                                        class="login-first flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         viewBox="0 0 20 20"
+                                                                                         fill="currentColor"
+                                                                                         class="w-5 h-5">
+                                                                                        <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                        </path>
+                                                                                    </svg>
+                                                                                    <span id="likeCount-{{ comment.id }}"
+                                                                                          class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ comment.likes.count }}
+                                                                                    </span>
+                                                                                </button>
+                                                                            {% endif %}
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <p class="text-sm text-muted">{{ comment.text }}
+                                                                    </p>
+                                                                </div>
+                                                                {% for reply in comment.replies.all %}
+                                                                    <!-- course:comment replies -->
+                                                                    <div class="relative before:content-[''] before:absolute before:-top-3 before:right-8 before:w-px before:h-[calc(100%-24px)] before:bg-border after:content-[''] after:absolute after:bottom-9 after:right-8 after:w-8 after:h-px after:bg-border space-y-3 pr-16">
+                                                                        <!-- course:comment reply -->
+                                                                        <div class="bg-background border border-border rounded-3xl space-y-3 p-5">
+                                                                            <div class="flex sm:flex-nowrap flex-wrap sm:flex-row flex-col sm:items-center sm:justify-between gap-5 border-b border-border pb-3">
+                                                                                <div class="flex items-center gap-3">
+                                                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                                        {% if reply.user.image %}
+                                                                                            <img src="{{ reply.user.image.url }}"
+                                                                                                 class="w-full h-full object-cover"
+                                                                                                 alt="تصویر پروفایل"/>
+                                                                                        {% else %}
+                                                                                            <img src="{% static "images/avatars/default_user.JPG" %}"
+                                                                                                 class="w-full h-full object-cover"
+                                                                                                 alt="تصویر پروفایل"/>
+                                                                                        {% endif %}
+                                                                                    </div>
+                                                                                    <div class="flex flex-col items-start space-y-1">
+                                                                                        <a href="{% url 'account:owner_profile' reply.user.username %}"
+                                                                                           class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ reply.user.username }}</a>
+                                                                                        <span class="text-xs text-muted">{{ reply.created_at|j_date_formatter }}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="flex items-center gap-3 sm:mr-0 mr-auto">
+                                                                                    {% if request.user == comment.user %}
+                                                                                        <button onclick="submit_deletion('{{ comment.id }}', 'news')"
+                                                                                                class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-red-700 px-4">
+                                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                 fill="none"
+                                                                                                 viewBox="0 0 24 24"
+                                                                                                 stroke-width="1.5"
+                                                                                                 stroke="currentColor"
+                                                                                                 class="w-5 h-5">
+                                                                                                <path stroke-linecap="round"
+                                                                                                      stroke-linejoin="round"
+                                                                                                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+                                                                                            </svg>
+                                                                                        </button>
+                                                                                    {% endif %}
+
+                                                                                    {% if request.user.is_authenticated %}
+                                                                                        {% if reply.id in user_likes %}
+                                                                                            <button onclick="toggleLike('{{ comment.id }}', 'news')"
+                                                                                                    id="likeBtn-{{ reply.id }}"
+                                                                                                    type="button"
+                                                                                                    class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                     viewBox="0 0 20 20"
+                                                                                                     fill="currentColor"
+                                                                                                     class="w-5 h-5">
+                                                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                                    </path>
+                                                                                                </svg>
+                                                                                                <span id="likeCount-{{ reply.id }}"
+                                                                                                      class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ reply.likes.count }}
+                                                                                                </span>
+                                                                                            </button>
+                                                                                        {% else %}
+                                                                                            <button onclick="toggleLike('{{ comment.id }}', 'news')"
+                                                                                                    id="likeBtn-{{ reply.id }}"
+                                                                                                    type="button"
+                                                                                                    class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                     viewBox="0 0 20 20"
+                                                                                                     fill="currentColor"
+                                                                                                     class="w-5 h-5">
+                                                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                                    </path>
+                                                                                                </svg>
+                                                                                                <span id="likeCount-{{ reply.id }}"
+                                                                                                      class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ reply.likes.count }}
+                                                                                                </span>
+                                                                                            </button>
+                                                                                        {% endif %}
+                                                                                    {% else %}
+                                                                                        <button type="button"
+                                                                                                class="login-first flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
+                                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                 viewBox="0 0 20 20"
+                                                                                                 fill="currentColor"
+                                                                                                 class="w-5 h-5">
+                                                                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                            <span id="likeCount-{{ reply.id }}"
+                                                                                                  class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ reply.likes.count }}
+                                                                                                </span>
+                                                                                        </button>
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                            </div>
+                                                                            <p class="text-sm text-muted">{{ reply.text }}
+                                                                            </p>
+                                                                        </div>
+                                                                        <!-- end course:comment reply -->
+                                                                    </div>
+                                                                    <!-- end course:comment replies -->
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <!-- end course:comment -->
+                                                </div>
+                                                <!-- course:comments:wrapper -->
+                                            </div>
+                                            <!-- end tabs:contents:tabThree -->
+                                        </div>
+                                        <!-- end tabs:contents -->
+                                    </div>
+                                    <!-- end tabs container -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-4/12 w-full md:sticky md:top-24 space-y-8">
+                        <div class="space-y-5">
+                            <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
+                                <span class="font-black text-xl py-2">اخبار مشابه</span>
+
+                                {% for news in related_news %}
+                                    <li>
+                                        <a href="{% url 'news:detail' news.slug %}"
+                                           class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                            <span class="font-semibold text-xs">{{ news.title }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                        <div class="space-y-5">
+                            <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
+                                <span class="font-black text-xl py-2">اخبار اخیر</span>
+
+                                {% for news in latest_news %}
+                                    <li>
+                                        <a href="{% url 'news:detail' news.slug %}"
+                                           class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                            <span class="font-semibold text-xs">{{ news.title }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end container -->
+        </main>
+    </div>
+
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'js/like_unlike_comment_ajax.js' %}"></script>
+    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/reply_comment.js' %}"></script>
+
+{% endblock %}

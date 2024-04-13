@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <div class="flex flex-col min-h-screen bg-background">
+        {% include 'includes/header.html' %}
+
+        <main class="flex-auto py-5">
+            <div class="max-w-7xl space-y-14 px-4 mx-auto">
+                <div class="justify-center items-center gap-5">
+                    <div class="lg:col-span-9 md:col-span-8">
+                        <div class="space-y-10 ">
+                            <div class="space-y-5">
+                                <!-- section:title -->
+                                <div class="flex items-center gap-3 justify-center ">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                        <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                    </div>
+                                    <div class="font-black text-foreground">ارتباط با ما</div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                        <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                    </div>
+                                </div>
+                                <!-- end section:title -->
+                                <!-- tabs container -->
+                                <div class="space-y-5">
+                                    <!-- tabs:contents -->
+                                    <div class="bg-background rounded-3xl p-5">
+                                        <!-- tabs:contents:tabOne -->
+                                        <div class="space-y-5">
+                                            <form method="post" class="space-y-5">
+                                                {% csrf_token %}
+                                                <div class="text-red-500">
+                                                    {{ form.non_field_errors }}
+                                                </div>
+
+                                                <div class="grid sm:grid-cols-3 gap-5">
+                                                    <div class="space-y-1">
+                                                        <label for="fullname"
+                                                               class="font-medium text-xs text-muted">{{ form.full_name.label }}</label>
+                                                        {{ form.full_name|attr:"class:form-input w-full h-11 !ring-0 !ring-offset-0 bg-secondary border-border focus:border-border rounded-xl text-sm text-foreground px-5" }}
+                                                    </div>
+                                                    <div class="space-y-1">
+                                                        <label for="fullname"
+                                                               class="font-medium text-xs text-muted">{{ form.mobile_phone.label }}</label>
+                                                        {{ form.mobile_phone|attr:"type:number"|attr:"class:form-input w-full h-11 !ring-0 !ring-offset-0 bg-secondary border-border focus:border-border rounded-xl text-sm text-foreground px-5" }}
+                                                    </div>
+                                                    <div class="space-y-1">
+                                                        <label for="fullname"
+                                                               class="font-medium text-xs text-muted">{{ form.email.label }}</label>
+                                                        {{ form.email|attr:"class:form-input w-full h-11 !ring-0 !ring-offset-0 bg-secondary border-border focus:border-border rounded-xl text-sm text-foreground px-5"|attr:"type:email" }}
+                                                    </div>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <label for="bio" class="font-medium text-xs text-muted">
+                                                        {{ form.message.label }}
+                                                    </label>
+                                                    {{ form.message|attr:"rows:10"|attr:"class:form-textarea w-full !ring-0 !ring-offset-0 bg-secondary border-border focus:border-border rounded-xl text-sm text-foreground px-5" }}
+                                                </div>
+                                                <div class="flex justify-center gap-5">
+                                                    <button type="submit"
+                                                            class="h-11 inline-flex items-center justify-center gap-3 bg-primary rounded-full text-white px-4 mr-auto">
+                                                        <span class="font-semibold text-sm">ارسال پیام</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                             fill="currentColor" class="w-5 h-5">
+                                                            <path fill-rule="evenodd"
+                                                                  d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
+                                                                  clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        {% include 'includes/footer.html' %}
+    </div>
+{% endblock %}
