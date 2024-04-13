@@ -4,7 +4,7 @@
 <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
     <!-- Profile Detail Page -->
     <li>
-        <a href="{% url 'account:owner_profile' slug=request.user.username %}"
+        <a href="{% url 'account:profile' slug=request.user.username %}"
            class="w-full h-11 inline-flex items-center text-right gap-3 rounded-full px-4 {% if request.resolver_match.url_name == 'profile' %}bg-primary text-primary-foreground{% else %}bg-background text-muted hover:bg-primary hover:text-primary-foreground transition-colors{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                  class="w-5 h-5">
@@ -29,8 +29,8 @@
     </li>
 
     <li>
-        <a href="{% url 'account:favorite_exams' slug=request.user.username %}"
-           class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+        <a href="{% url 'account:favorites' slug=request.user.username %}"
+           class="w-full h-11 inline-flex items-center text-right gap-3 rounded-full px-4 {% if request.resolver_match.url_name == 'favorites' %}bg-primary text-primary-foreground{% else %}bg-background text-muted hover:bg-primary hover:text-primary-foreground transition-colors{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                  stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"

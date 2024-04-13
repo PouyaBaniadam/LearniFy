@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow, FavoriteExam
+from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow, FavoriteVideoCourse
 
 
 class CustomUserAdmin(UserAdmin):
@@ -60,7 +60,7 @@ class FollowAdmin(admin.ModelAdmin):
     search_fields = ('follower__username', 'following__username')
 
 
-@admin.register(FavoriteExam)
+@admin.register(FavoriteVideoCourse)
 class FavoriteExamAdmin(admin.ModelAdmin):
-    list_display = ('user', 'exam', 'created_at',)
-    search_fields = ('user__username', 'exam__name')
+    list_display = ('user', 'video_course', 'created_at',)
+    search_fields = ('user__username', 'video_course__name')

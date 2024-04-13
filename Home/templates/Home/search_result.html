@@ -85,7 +85,7 @@
 
                                                             <div class="flex flex-col items-start space-y-1">
                                                                 <span class="line-clamp-1 font-semibold text-xs text-muted">نویسنده وبلاگ: </span>
-                                                                <a href="{% url 'account:owner_profile' weblog.author.slug %}"
+                                                                <a href="{% url 'account:profile' weblog.author.slug %}"
                                                                    class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ weblog.author.full_name }}</a>
                                                             </div>
                                                         </div>
@@ -204,7 +204,7 @@
 
                                                             <div class="flex flex-col items-start space-y-1">
                                                                 <span class="line-clamp-1 font-semibold text-xs text-muted">نویسنده خبر: </span>
-                                                                <a href="{% url 'account:owner_profile' news.author.slug %}"
+                                                                <a href="{% url 'account:profile' news.author.slug %}"
                                                                    class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ news.author.full_name }}</a>
                                                             </div>
                                                         </div>
@@ -285,17 +285,17 @@
                                             </div>
                                             <div class="bg-background rounded-b-3xl -mt-12 pt-12">
                                                 <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
-                                                    {% if exam.status == "F" %}
+                                                    {% if exam.holding_status == "F" %}
                                                         <div class="flex items-center gap-2">
                                                             <span class="block w-1 h-1 bg-error rounded-full"></span>
                                                             <span class="font-bold text-xs text-red-500">تکمیل شده</span>
                                                         </div>
-                                                    {% elif exam.status == "IP" %}
+                                                    {% elif exam.holding_status == "IP" %}
                                                         <div class="flex items-center gap-2">
                                                             <span class="block w-1 h-1 bg-success rounded-full"></span>
                                                             <span class="font-bold text-xs text-success">در حال برگزاری</span>
                                                         </div>
-                                                    {% elif exam.status == "NS" %}
+                                                    {% elif exam.holding_status == "NS" %}
                                                         <div class="flex items-center gap-2">
                                                             <span class="block w-1 h-1 bg-error rounded-full"></span>
                                                             <span class="font-bold text-xs text-warning">هنوز شروع نشده</span>
@@ -337,20 +337,20 @@
                                                                 <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
                                                                     <img src="{{ exam.teacher.image.url }}"
                                                                          class="w-full h-full object-cover"
-                                                                         alt="طراح آزمون {{ exam.name }}"/>
+                                                                         alt="مدرس دوره {{ exam.name }}"/>
                                                                 </div>
                                                             {% else %}
                                                                 <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
                                                                     <img src="{% static 'images/avatars/teacher.JPG' %}"
                                                                          class="w-full h-full object-cover"
-                                                                         alt="طراح آزمون {{ exam.name }}"/>
+                                                                         alt="مدرس دوره {{ exam.name }}"/>
                                                                 </div>
                                                             {% endif %}
 
                                                             <div class="flex flex-col items-start space-y-1">
-                                                                <span class="line-clamp-1 font-semibold text-xs text-muted">طراح آزمون</span>
-                                                                <a href="{% url 'account:owner_profile' exam.designer.slug %}"
-                                                                   class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ exam.designer.full_name }}</a>
+                                                                <span class="line-clamp-1 font-semibold text-xs text-muted">مدرس دوره</span>
+                                                                <a href="{% url 'account:profile' exam.teacher.slug %}"
+                                                                   class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ exam.teacher.full_name }}</a>
                                                             </div>
                                                         </div>
                                                         <div class="flex flex-col items-end justify-center h-14">
@@ -453,17 +453,17 @@
                                             </div>
                                             <div class="bg-background rounded-b-3xl -mt-12 pt-12">
                                                 <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
-                                                    {% if video_course.status == "F" %}
+                                                    {% if video_course.holding_status == "F" %}
                                                         <div class="flex items-center gap-2">
                                                             <span class="block w-1 h-1 bg-error rounded-full"></span>
                                                             <span class="font-bold text-xs text-red-500">تکمیل شده</span>
                                                         </div>
-                                                    {% elif video_course.status == "IP" %}
+                                                    {% elif video_course.holding_status == "IP" %}
                                                         <div class="flex items-center gap-2">
                                                             <span class="block w-1 h-1 bg-success rounded-full"></span>
                                                             <span class="font-bold text-xs text-success">در حال برگزاری</span>
                                                         </div>
-                                                    {% elif video_course.status == "NS" %}
+                                                    {% elif video_course.holding_status == "NS" %}
                                                         <div class="flex items-center gap-2">
                                                             <span class="block w-1 h-1 bg-error rounded-full"></span>
                                                             <span class="font-bold text-xs text-warning">هنوز شروع نشده</span>
@@ -518,7 +518,7 @@
                                                             <div class="flex flex-col items-start space-y-1">
                                                         <span class="line-clamp-1 font-semibold text-xs text-muted">مدرس
                                                             دوره:</span>
-                                                                <a href="{% url 'account:owner_profile' video_course.teacher.slug %}"
+                                                                <a href="{% url 'account:profile' video_course.teacher.slug %}"
                                                                    class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ video_course.teacher.full_name }}</a>
                                                             </div>
                                                         </div>

@@ -3,7 +3,6 @@ from uuid import uuid4
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -12,8 +11,8 @@ from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, OwnerRequiredMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow, FavoriteExam
-from Course.models import Exam
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow, FavoriteVideoCourse
+from Course.models import Exam, VideoCourse
 from Home.mixins import URLStorageMixin
 
 
@@ -74,11 +73,11 @@ class LogInView(NonAuthenticatedUsersOnlyMixin, FormView):
 
             return redirect(redirect_url)
 
-        return redirect(reverse("account:owner_profile", kwargs={"slug": request.user.username}))
+        return redirect(reverse("account:profile", kwargs={"slug": request.user.username}))
 
     def get_success_url(self):
         referring_url = self.request.session.pop(key="referring_url", default=None)
-        return referring_url or reverse_lazy("account:owner_profile")
+        return referring_url or reverse_lazy("account:profile")
 
 
 class LogOutView(AuthenticatedUsersOnlyMixin, View):
@@ -124,7 +123,7 @@ class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
             return redirect(redirect_url)
 
         else:
-            return redirect(reverse('account:owner_profile', kwargs={'slug': self.request.user.username}))
+            return redirect(reverse('account:profile', kwargs={'slug': self.request.user.username}))
 
     def form_invalid(self, form):
         return super().form_invalid(form)
@@ -190,7 +189,7 @@ class CheckOTPView(FormView):
 
             messages.success(request, f"{user.username} عزیز، حساب کاربری شما با موفقیت ایجاد شد.")
 
-            return redirect(reverse("account:owner_profile", kwargs={"slug": user.username}))
+            return redirect(reverse("account:profile", kwargs={"slug": user.username}))
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="F").exists():
             return redirect(reverse(viewname="account:change_password") + f"?uuid={uuid}")
@@ -215,25 +214,26 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class OwnerProfileDetailView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, DetailView):
+class ProfileDetailView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, DetailView):
     model = CustomUser
-    template_name = 'Account/owner_profile.html'
+    template_name = 'Account/profile.html'
     context_object_name = 'user'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        exams = Exam.objects.filter(participated_users=user)
+        video_courses = VideoCourse.objects.filter(participated_users=user)
 
         user = self.request.user
         if user.is_authenticated:
-            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
+                                                                                                            flat=True)
         else:
-            favorite_exams = []
+            favorite_video_courses = []
 
-        context['exams'] = exams
-        context['favorite_exams'] = favorite_exams
+        context['video_courses'] = video_courses
+        context['favorite_video_courses'] = favorite_video_courses
 
         return context
 
@@ -269,7 +269,7 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorag
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('account:owner_profile', kwargs={'slug': self.request.user.username})
+        return reverse('account:profile', kwargs={'slug': self.request.user.username})
 
 
 class NotificationListView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
@@ -334,11 +334,11 @@ class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStor
 
         user = self.request.user
         if user.is_authenticated:
-            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+            favorite_video_courses = Exam.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
         else:
-            favorite_exams = []
+            favorite_video_courses = []
 
-        context['favorite_exams'] = favorite_exams
+        context['favorite_video_courses'] = favorite_video_courses
 
         return context
 
@@ -349,28 +349,15 @@ class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStor
         return exams
 
 
-class FavoriteExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
-    model = FavoriteExam
-    template_name = 'Account/favorite_exams.html'
-    context_object_name = 'exams'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        user = self.request.user
-        if user.is_authenticated:
-            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
-        else:
-            favorite_exams = []
-
-        context['favorite_exams'] = favorite_exams
-
-        return context
+class FavoriteCourses(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
+    model = FavoriteVideoCourse
+    template_name = 'Account/favorites.html'
+    context_object_name = 'video_courses'
 
     def get_queryset(self):
         slug = self.kwargs.get("slug")
         user = CustomUser.objects.get(slug=slug)
 
-        exams = FavoriteExam.objects.filter(user=user)
+        video_courses = FavoriteVideoCourse.objects.filter(user=user)
 
-        return exams
+        return video_courses

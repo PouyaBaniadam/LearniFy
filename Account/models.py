@@ -258,17 +258,17 @@ class NewsLetter(models.Model):
         verbose_name_plural = "خبرنامه‌ها"
 
 
-class FavoriteExam(models.Model):
+class FavoriteVideoCourse(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, blank=True, null=True, verbose_name="کاربر")
 
-    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
+    video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     def __str__(self):
-        return f"{self.user} - {self.exam.name}"
+        return f"{self.user} - {self.video_course.name}"
 
     class Meta:
-        db_table = 'account__favorite_exam'
-        verbose_name = "آزمون مورد علاقه"
-        verbose_name_plural = "آزمون‌های مورد علاقه"
+        db_table = 'account__favorite_video_course'
+        verbose_name = "دوره ویدئویی مورد علاقه"
+        verbose_name_plural = "دوره‌های ویدئویی مورد علاقه"

@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from Account.models import CustomUser
-from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile, UserFinalAnswer
+from Course.models import Exam, EnteredExamUser, UserFinalAnswer
 from utils.useful_functions import get_time_difference
 
 
@@ -63,19 +63,6 @@ class AllowedExamsOnlyMixin:
 
         if not exam.is_entrance_allowed:
             messages.error(request, f"با عرض پوزش، در حال حاضر شرکت در آزمون {exam.name} امکان پذیر نیست.")
-
-            return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
-
-        return super().dispatch(request, *args, **kwargs)
-
-
-class DownloadedQuestionsFileFirstMixin:
-    def dispatch(self, request, *args, **kwargs):
-        slug = kwargs.get('slug')
-        user = request.user
-
-        if not DownloadedQuestionFile.objects.filter(exam__slug=slug, user=user).exists():
-            messages.error(request, f"جهت ورود به آزمون، ابتدا باید فایل سوالات را دانلود کنید.")
 
             return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
 

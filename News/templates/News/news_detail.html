@@ -211,7 +211,7 @@
                                                                                 {% endif %}
                                                                             </div>
                                                                             <div class="flex flex-col items-start space-y-1">
-                                                                                <a href="{% url 'account:owner_profile' comment.user.username %}"
+                                                                                <a href="{% url 'account:profile' comment.user.username %}"
                                                                                    class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ comment.user.username }}</a>
                                                                                 <span class="text-xs text-muted">{{ comment.created_at|j_date_formatter }}</span>
                                                                             </div>
@@ -327,7 +327,7 @@
                                                                                         {% endif %}
                                                                                     </div>
                                                                                     <div class="flex flex-col items-start space-y-1">
-                                                                                        <a href="{% url 'account:owner_profile' reply.user.username %}"
+                                                                                        <a href="{% url 'account:profile' reply.user.username %}"
                                                                                            class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ reply.user.username }}</a>
                                                                                         <span class="text-xs text-muted">{{ reply.created_at|j_date_formatter }}</span>
                                                                                     </div>

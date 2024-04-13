@@ -108,7 +108,7 @@ TEMPLATES = [
                 'utils.context_processors.social_media',
                 'utils.context_processors.custom_user_info',
                 'utils.context_processors.filter_categories',
-                'utils.context_processors.filter_exams',
+                'utils.context_processors.filter_video_courses',
             ],
         },
     },

@@ -304,17 +304,17 @@
                                                     </div>
                                                     <div class="bg-background rounded-b-3xl -mt-12 pt-12">
                                                         <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
-                                                            {% if course.status == "F" %}
+                                                            {% if course.holding_status == "F" %}
                                                                 <div class="flex items-center gap-2">
                                                                     <span class="block w-1 h-1 bg-error rounded-full"></span>
                                                                     <span class="font-bold text-xs text-red-500">تکمیل شده</span>
                                                                 </div>
-                                                            {% elif course.status == "IP" %}
+                                                            {% elif course.holding_status == "IP" %}
                                                                 <div class="flex items-center gap-2">
                                                                     <span class="block w-1 h-1 bg-success rounded-full"></span>
                                                                     <span class="font-bold text-xs text-success">در حال برگزاری</span>
                                                                 </div>
-                                                            {% elif course.status == "NS" %}
+                                                            {% elif course.holding_status == "NS" %}
                                                                 <div class="flex items-center gap-2">
                                                                     <span class="block w-1 h-1 bg-error rounded-full"></span>
                                                                     <span class="font-bold text-xs text-warning">هنوز شروع نشده</span>
@@ -371,7 +371,7 @@
                                                                     <div class="flex flex-col items-start space-y-1">
                                                         <span class="line-clamp-1 font-semibold text-xs text-muted">مدرس
                                                             دوره:</span>
-                                                                        <a href="{% url 'account:owner_profile' course.teacher__slug %}"
+                                                                        <a href="{% url 'account:profile' course.teacher__slug %}"
                                                                            class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ course.teacher__full_name }}</a>
                                                                     </div>
                                                                 </div>
@@ -582,18 +582,18 @@
                                                 <!-- article:card -->
                                                 <div class="relative bg-background rounded-xl p-4">
                                                     <div class="relative mb-3 z-20">
-                                                        <a href="{% url 'course:exam_detail' exam.slug %}"
+                                                        <a href="{% url 'course:exam_detail' course.slug %}"
                                                            class="block">
-                                                            <img src="media/{{ exam.cover_image }}"
+                                                            <img src="media/{{ course.cover_image }}"
                                                                  class="max-w-full rounded-xl"
-                                                                 alt="تصویر کاور آزمون {{ exam.name }}"/>
+                                                                 alt="تصویر کاور آزمون {{ course.name }}"/>
                                                         </a>
 
                                                         {% if request.user.is_authenticated %}
-                                                            {% if exam.id in favorite_exams %}
+                                                            {% if course.id in favorite_video_courses %}
                                                                 <button type="button"
                                                                         class="add-to-favorites-btn absolute left-3 -bottom-3 w-9 h-9 inline-flex items-center justify-center bg-secondary rounded-full shadow-xl text-muted transition-colors text-red-500 z-10"
-                                                                        data-exam-id="{{ exam.id }}">
+                                                                        data-video_course-id="{{ course.id }}">
                                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                                          viewBox="0 0 20 20"
                                                                          fill="currentColor" class="w-5 h-5">
@@ -604,7 +604,7 @@
                                                             {% else %}
                                                                 <button type="button"
                                                                         class="add-to-favorites-btn absolute left-3 -bottom-3 w-9 h-9 inline-flex items-center justify-center bg-secondary rounded-full shadow-xl text-muted transition-colors hover:text-red-500 z-10"
-                                                                        data-exam-id="{{ exam.id }}">
+                                                                        data-video_course-id="{{ course.id }}">
                                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                                          viewBox="0 0 20 20"
                                                                          fill="currentColor" class="w-5 h-5">
@@ -628,29 +628,29 @@
                                                     </div>
                                                     <div class="relative space-y-3 z-10">
                                                         <h2 class="font-bold text-sm">
-                                                            <a href="{% url 'course:exam_detail' exam.slug %}"
-                                                               class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ exam.name }}</a>
+                                                            <a href="{% url 'course:exam_detail' course.slug %}"
+                                                               class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ course.name }}</a>
                                                         </h2>
                                                         <div class="flex items-center justify-between">
                                                             <div class="flex items-center gap-1">
                                                                 <div class="flex-shrink-0 w-8 h-8 border border-white rounded-full overflow-hidden">
 
-                                                                    {% if exam.designer__image %}
-                                                                        <img src="media/{{ exam.designer__image }}"
+                                                                    {% if course.designer__image %}
+                                                                        <img src="media/{{ course.designer__image }}"
                                                                              class="w-full h-full object-cover"
-                                                                             alt="تصویر طراح آزمون">
+                                                                             alt="تصویر مدرس دوره">
                                                                     {% else %}
                                                                         <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
                                                                              class="w-full h-full object-cover"
-                                                                             alt="تصویر طراح آزمون">
+                                                                             alt="تصویر مدرس دوره">
                                                                     {% endif %}
                                                                 </div>
-                                                                <a href="{% url 'account:owner_profile' exam.designer__slug %}"
-                                                                   class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ exam.designer__full_name }}</a>
+                                                                <a href="{% url 'account:profile' course.designer__slug %}"
+                                                                   class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ course.designer__full_name }}</a>
                                                             </div>
-                                                            <a href="{% url 'course:exams_by_category' exam.category__slug %}"
+                                                            <a href="{% url 'course:exams_by_category' course.category__slug %}"
                                                                class="bg-primary/10 rounded-full text-primary transition-all hover:opacity-80 py-1 px-4">
-                                                                <span class="font-bold text-xxs">{{ exam.category__name }}</span>
+                                                                <span class="font-bold text-xxs">{{ course.category__name }}</span>
                                                             </a>
                                                         </div>
                                                         <div class="flex items-center gap-1 text-muted">
@@ -662,7 +662,7 @@
                                                                       d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
                                                             </svg>
                                                             <span class="font-semibold text-xs text-muted">زمان آزمون</span>
-                                                            <span class="font-semibold text-xs text-foreground">{{ exam.total_duration.seconds|format_seconds_to_time }}</span>
+                                                            <span class="font-semibold text-xs text-foreground">{{ course.total_duration.seconds|format_seconds_to_time }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -676,11 +676,11 @@
                                                 <!-- article:card -->
                                                 <div class="relative bg-background rounded-xl p-4">
                                                     <div class="relative mb-3 z-20">
-                                                        <a href="{% url 'course:exam_detail' exam.slug %}"
+                                                        <a href="{% url 'course:exam_detail' course.slug %}"
                                                            class="block">
-                                                            <img src="media/{{ exam.cover_image }}"
+                                                            <img src="media/{{ course.cover_image }}"
                                                                  class="max-w-full rounded-xl"
-                                                                 alt="تصویر کاور آزمون {{ exam.name }}"/>
+                                                                 alt="تصویر کاور آزمون {{ course.name }}"/>
                                                         </a>
                                                         <button type="button"
                                                                 class="absolute left-3 -bottom-3 w-9 h-9 inline-flex items-center justify-center bg-secondary rounded-full shadow-xl text-muted transition-colors hover:text-red-500 z-10">
@@ -694,29 +694,29 @@
                                                     </div>
                                                     <div class="relative space-y-3 z-10">
                                                         <h2 class="font-bold text-sm">
-                                                            <a href="{% url 'course:exam_detail' exam.slug %}"
-                                                               class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ exam.name }}</a>
+                                                            <a href="{% url 'course:exam_detail' course.slug %}"
+                                                               class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ course.name }}</a>
                                                         </h2>
                                                         <div class="flex items-center justify-between">
                                                             <div class="flex items-center gap-1">
                                                                 <div class="flex-shrink-0 w-8 h-8 border border-white rounded-full overflow-hidden">
 
-                                                                    {% if exam.designer__image %}
-                                                                        <img src="media/{{ exam.designer__image }}"
+                                                                    {% if course.designer__image %}
+                                                                        <img src="media/{{ course.designer__image }}"
                                                                              class="w-full h-full object-cover"
-                                                                             alt="تصویر طراح آزمون">
+                                                                             alt="تصویر مدرس دوره">
                                                                     {% else %}
                                                                         <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
                                                                              class="w-full h-full object-cover"
-                                                                             alt="تصویر طراح آزمون">
+                                                                             alt="تصویر مدرس دوره">
                                                                     {% endif %}
                                                                 </div>
-                                                                <a href="{% url 'account:owner_profile' exam.designer__slug %}"
-                                                                   class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ exam.designer__full_name }}</a>
+                                                                <a href="{% url 'account:profile' course.designer__slug %}"
+                                                                   class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ course.designer__full_name }}</a>
                                                             </div>
-                                                            <a href="{% url 'course:exams_by_category' exam.category__slug %}"
+                                                            <a href="{% url 'course:exams_by_category' course.category__slug %}"
                                                                class="bg-primary/10 rounded-full text-primary transition-all hover:opacity-80 py-1 px-4">
-                                                                <span class="font-bold text-xxs">{{ exam.category__name }}</span>
+                                                                <span class="font-bold text-xxs">{{ course.category__name }}</span>
                                                             </a>
                                                         </div>
                                                         <div class="flex items-center gap-1 text-muted">
@@ -728,7 +728,7 @@
                                                                       d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
                                                             </svg>
                                                             <span class="font-semibold text-xs text-muted">زمان آزمون</span>
-                                                            <span class="font-semibold text-xs text-foreground">{{ exam.total_duration.seconds|format_seconds_to_time }}</span>
+                                                            <span class="font-semibold text-xs text-foreground">{{ course.total_duration.seconds|format_seconds_to_time }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -810,6 +810,6 @@
     </div>
 
     <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/like_unlike_exam_ajax.js' %}"></script>
+    <script src="{% static 'js/like_unlike_video_course_ajax.js' %}"></script>
 
 {% endblock %}

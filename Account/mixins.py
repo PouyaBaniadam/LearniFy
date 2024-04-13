@@ -44,6 +44,6 @@ class OwnerRequiredMixin:
 
                 return redirect(redirect_url)
 
-            return redirect(reverse("account:owner_profile", kwargs={'slug': user.username}))
+            return redirect(reverse("account:profile", kwargs={'slug': user.username}))
 
         return super(OwnerRequiredMixin, self).dispatch(request, *args, **kwargs)

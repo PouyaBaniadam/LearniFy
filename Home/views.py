@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from Account.models import FavoriteExam
+from Account.models import FavoriteVideoCourse
 from Course.models import VideoCourse, Exam
 from Home.mixins import URLStorageMixin
 from Home.models import HeroBanner, Banner1, Banner2, Banner3
@@ -29,52 +29,14 @@ class HomeView(URLStorageMixin, TemplateView):
                                                           "total_sessions",
                                                           "total_seasons",
                                                           "has_discount",
-                                                          "type",
+                                                          "payment_type",
                                                           "price",
                                                           "slug",
                                                           "price_after_discount",
                                                           "total_duration",
                                                           "name",
-                                                          "status").order_by('-created_at').filter(
-            Q(status="F") | Q(status="IP"))[:6]
-
-        latest_exams_1 = Exam.objects.values(
-            "name",
-            "slug",
-            "id",
-            "designer__image",
-            "designer__full_name",
-            "designer__slug",
-            "category__name",
-            "category__slug",
-            "cover_image",
-            "type",
-            "price",
-            "has_discount",
-            "discount_percentage",
-            "price_after_discount",
-            "total_duration",
-            "created_at",
-        ).order_by('-created_at')[:2]
-
-        latest_exams_2 = Exam.objects.values(
-            "name",
-            "slug",
-            "id",
-            "designer__image",
-            "designer__full_name",
-            "designer__slug",
-            "category__name",
-            "category__slug",
-            "cover_image",
-            "type",
-            "price",
-            "has_discount",
-            "discount_percentage",
-            "price_after_discount",
-            "total_duration",
-            "created_at",
-        ).order_by('-created_at')[2:4]
+                                                          "holding_status").order_by('-created_at').filter(
+            Q(holding_status="F") | Q(holding_status="IP"))[:6]
 
         latest_news = News.objects.all().order_by('-created_at')
 
@@ -91,13 +53,11 @@ class HomeView(URLStorageMixin, TemplateView):
         attitudes = Message.objects.filter(can_be_shown=True).order_by('-created_at')
 
         if user.is_authenticated:
-            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
         else:
-            favorite_exams = []
+            favorite_video_courses = []
 
         context['latest_video_courses'] = latest_video_courses  # Is a queryset
-        context['latest_exams_1'] = latest_exams_1  # Is a queryset
-        context['latest_exams_2'] = latest_exams_2  # Is a queryset
         context['latest_news'] = latest_news  # Is a queryset
         context['latest_weblogs'] = latest_weblogs  # Is a queryset
         context['hero_banners'] = hero_banners  # Is a queryset
@@ -105,7 +65,7 @@ class HomeView(URLStorageMixin, TemplateView):
         context['banner_2'] = banner_2  # Is a single object
         context['banner_3'] = banner_3  # Is a queryset
         context['attitudes'] = attitudes  # Is a queryset
-        context['favorite_exams'] = favorite_exams  # Is a queryset
+        context['favorite_video_courses'] = favorite_video_courses  # Is a queryset
 
         return context
 

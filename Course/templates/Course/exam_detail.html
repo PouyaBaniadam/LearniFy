@@ -26,16 +26,16 @@
                                         {% if exam.designer.image %}
                                             <img src="{{ exam.designer.image.url }}"
                                                  class="w-full h-full object-cover"
-                                                 alt="عکس طراح آزمون"/>
+                                                 alt="عکس مدرس دوره"/>
                                         {% else %}
                                             <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
                                                  class="w-full h-full object-cover"
-                                                 alt="عکس طراح آزمون"/>
+                                                 alt="عکس مدرس دوره"/>
                                         {% endif %}
                                     </div>
                                     <div class="flex flex-col items-start space-y-1">
                                         <p class="line-clamp-1 font-bold text-sm text-foreground hover:text-primary">
-                                            {{ exam.designer.full_name }}
+                                            {{ exam.teacher.full_name }}
                                         </p>
                                     </div>
                                 </div>

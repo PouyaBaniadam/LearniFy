@@ -1,6 +1,6 @@
 from Account.models import CustomUser
-from Course.filters import ExamFilter
-from Course.models import Category, Exam
+from Course.filters import VideoCourseFilter
+from Course.models import Category, Exam, VideoCourse
 from Us.models import SocialMedia, AboutUs
 
 
@@ -42,13 +42,13 @@ def filter_categories(request):
     return context
 
 
-def filter_exams(request):
-    exams = Exam.objects.all()
+def filter_video_courses(request):
+    video_courses = VideoCourse.objects.all()
 
-    exam_filter = ExamFilter(request.GET, queryset=exams)
+    video_course_filter = VideoCourseFilter(request.GET, queryset=video_courses)
 
     context = {
-        'exam_filter_form': exam_filter.form
+        'video_course_filter_form': video_course_filter.form
     }
 
     return context

@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
-    {% include 'includes/header.html' %}
+        {% include 'includes/header.html' %}
 
         <main class="flex-auto py-5">
             <!-- container -->
@@ -23,17 +23,17 @@
                             <div class="-mt-12 pt-12">
                                 <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
                                     <!-- course:status -->
-                                    {% if course.status == "F" %}
+                                    {% if course.holding_status == "F" %}
                                         <div class="flex items-center gap-2">
                                             <span class="block w-1 h-1 bg-error rounded-full"></span>
                                             <span class="font-bold text-xs text-red-500">تکمیل شده</span>
                                         </div>
-                                    {% elif course.status == "IP" %}
+                                    {% elif course.holding_status == "IP" %}
                                         <div class="flex items-center gap-2">
                                             <span class="block w-1 h-1 bg-success rounded-full"></span>
                                             <span class="font-bold text-xs text-success">در حال برگزاری</span>
                                         </div>
-                                    {% elif course.status == "NS" %}
+                                    {% elif course.holding_status == "NS" %}
                                         <div class="flex items-center gap-2">
                                             <span class="block w-1 h-1 bg-error rounded-full"></span>
                                             <span class="font-bold text-xs text-warning">هنوز شروع نشده</span>
@@ -41,7 +41,7 @@
                                     {% endif %}
 
                                     <!-- course:title -->
-                                    <h1 class="font-bold text-xl text-foreground">دوره پروژه محور React و Next</h1>
+                                    <h1 class="font-bold text-xl text-foreground">{{ course.name }}</h1>
 
                                     <!-- course:excerpt -->
                                     <p class="text-sm text-muted">
@@ -175,41 +175,6 @@
                                                         </button>
                                                     </li><!-- end tabs:list:item -->
 
-                                                    <!-- tabs:list:item -->
-                                                    <li>
-                                                        <button type="button"
-                                                                class="flex items-center gap-x-2 relative rounded-full py-2 px-4"
-                                                                x-bind:class="activeTab === 'tabThree' ? 'text-foreground bg-background' : 'text-muted'"
-                                                                x-on:click="activeTab = 'tabThree'; scroll();">
-                                                            <!-- active icon -->
-                                                            <span x-show="activeTab === 'tabThree'">
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     viewBox="0 0 20 20" fill="currentColor"
-                                                                     class="w-5 h-5">
-                                                                    <path
-                                                                            d="M3.505 2.365A41.369 41.369 0 0 1 9 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 0 0-.577-.069 43.141 43.141 0 0 0-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 0 1 5 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914Z">
-                                                                    </path>
-                                                                    <path
-                                                                            d="M14 6c-.762 0-1.52.02-2.271.062C10.157 6.148 9 7.472 9 8.998v2.24c0 1.519 1.147 2.839 2.71 2.935.214.013.428.024.642.034.2.009.385.09.518.224l2.35 2.35a.75.75 0 0 0 1.28-.531v-2.07c1.453-.195 2.5-1.463 2.5-2.915V8.998c0-1.526-1.157-2.85-2.729-2.936A41.645 41.645 0 0 0 14 6Z">
-                                                                    </path>
-                                                                </svg>
-                                                            </span><!-- end active icon -->
-
-                                                            <!-- inactive icon -->
-                                                            <span x-show="activeTab !== 'tabThree'">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                     viewBox="0 0 24 24" stroke-width="1.5"
-                                                                     stroke="currentColor" class="w-5 h-5">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                          d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155">
-                                                                    </path>
-                                                                </svg>
-                                                            </span><!-- end inactive icon -->
-
-                                                            <span class="font-semibold text-sm whitespace-nowrap">دیدگاه
-                                                                و پرسش</span>
-                                                        </button>
-                                                    </li><!-- end tabs:list:item -->
                                                 </ul><!-- end tabs:list -->
                                             </div><!-- end tabs:list-container -->
                                         </div>
@@ -277,7 +242,8 @@
                                                                           d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
                                                                 </svg>
                                                             </span>
-                                                            </button><!-- end accordion:button -->
+                                                            </button>
+                                                            <!-- end accordion:button -->
 
                                                             <!-- accordion:content -->
                                                             <div class="flex flex-col relative py-3 sm:pr-8 sm:pl-16"
@@ -665,7 +631,7 @@
                                             <span class="line-through text-muted">{{ course.price|price_splitter }}</span>
                                         {% endif %}
 
-                                        {% if course.type == "P" %}
+                                        {% if course.payment_type == "P" %}
                                             <div class="flex items-center gap-1">
                                                 {% if course.has_discount %}
                                                     <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
@@ -674,7 +640,7 @@
                                                 {% endif %}
                                                 <span class="text-xs text-muted">تومان</span>
                                             </div>
-                                        {% elif course.type == "F" %}
+                                        {% elif course.payment_type == "F" %}
                                             <div class="flex items-center gap-1">
                                                 <span class="font-black text-xl text-success">رایگان!</span>
                                             </div>
@@ -682,40 +648,94 @@
                                     </div>
                                 </div>
                                 <div class="flex gap-3 mt-3">
-                                    {% if course.type == "P" %}
+
+                                    {% if request.user.is_authenticated %}
+                                        {% if request.user not in course.participated_users %}
+                                            {% if course.payment_type == "P" %}
+                                                <button type="button"
+                                                        class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                    <span class="font-semibold text-sm">اضافه به سبد</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                         fill="currentColor"
+                                                         class="w-5 h-5">
+                                                        <path fill-rule="evenodd"
+                                                              d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                              clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </button>
+                                            {% elif course.payment_type == "F" %}
+                                                <button type="button" onclick="register_video_course({{ course.id }})"
+                                                        class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                    <span class="font-semibold text-sm">ثبت نام</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                         fill="currentColor"
+                                                         class="w-5 h-5">
+                                                        <path fill-rule="evenodd"
+                                                              d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                              clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </button>
+                                            {% endif %}
+                                        {% else %}
+                                            <button type="button"
+                                                    class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                <span class="font-semibold text-sm">ورود</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                     fill="currentColor"
+                                                     class="w-5 h-5">
+                                                    <path fill-rule="evenodd"
+                                                          d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                          clip-rule="evenodd"></path>
+                                                </svg>
+                                            </button>
+                                        {% endif %}
                                         <button type="button"
-                                                class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                            <span class="font-semibold text-sm">اضافه به سبد</span>
+                                                class="flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                  fill="currentColor"
                                                  class="w-5 h-5">
-                                                <path fill-rule="evenodd"
-                                                      d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
-                                                      clip-rule="evenodd"></path>
+                                                <path
+                                                        d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                </path>
                                             </svg>
                                         </button>
-                                    {% elif course.type == "F" %}
+
+                                    {% else %}
+                                        {% if course.payment_type == "P" %}
+                                            <button type="button"
+                                                    class="login-first w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                <span class="font-semibold text-sm">اضافه به سبد</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                     fill="currentColor"
+                                                     class="w-5 h-5">
+                                                    <path fill-rule="evenodd"
+                                                          d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                          clip-rule="evenodd"></path>
+                                                </svg>
+                                            </button>
+                                        {% elif course.payment_type == "F" %}
+                                            <button type="button"
+                                                    class="login-first w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                <span class="font-semibold text-sm">ثبت نام</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                     fill="currentColor"
+                                                     class="w-5 h-5">
+                                                    <path fill-rule="evenodd"
+                                                          d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                          clip-rule="evenodd"></path>
+                                                </svg>
+                                            </button>
+                                        {% endif %}
                                         <button type="button"
-                                                class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                            <span class="font-semibold text-sm">شرکت در دوره</span>
+                                                class="login-first flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                  fill="currentColor"
                                                  class="w-5 h-5">
-                                                <path fill-rule="evenodd"
-                                                      d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
-                                                      clip-rule="evenodd"></path>
+                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                </path>
                                             </svg>
                                         </button>
                                     {% endif %}
-                                    <button type="button"
-                                            class="flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                             class="w-5 h-5">
-                                            <path
-                                                    d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
-                                            </path>
-                                        </svg>
-                                    </button>
                                 </div>
                             </div>
                             <!-- end course:registering -->
@@ -746,7 +766,7 @@
                                     {% endif %}
                                     <div class="flex flex-col items-start space-y-1">
                                         <p class="line-clamp-1 font-bold text-sm text-foreground">{{ course.teacher.full_name }}</p>
-                                        <a href="{% url 'account:owner_profile' course.teacher.slug %}"
+                                        <a href="{% url 'account:profile' course.teacher.slug %}"
                                            class="line-clamp-1 font-semibold text-xs text-primary">پروفایل
                                             مدرس</a>
                                     </div>
@@ -764,7 +784,11 @@
             </div>
             <!-- end container -->
         </main>
-
-    {% include 'includes/footer.html' %}
     </div>
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/register_video_course_ajax.js' %}"></script>
+    <script src="{% static 'js/log_in_first_sweetalert2.js' %}"></script>
+
 {% endblock %}

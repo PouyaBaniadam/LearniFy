@@ -2,13 +2,12 @@ $(document).ready(function () {
     $('.add-to-favorites-btn').click(function (e) {
         e.preventDefault();
         var button = $(this);
-        var examId = button.data('exam-id');
-        console.log(examId)
+        var id = button.data('id');
         $.ajax({
             type: 'POST',
-            url: '/course/exam/favorite/toggle/',
+            url: '/course/video/favorite/toggle/',
             data: {
-                'exam_id': examId,
+                'id': id,
             },
             success: function (data) {
                 if (data.success) {
