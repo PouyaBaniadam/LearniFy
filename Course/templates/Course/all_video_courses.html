@@ -68,17 +68,17 @@
                                                 {% if course.holding_status == "F" %}
                                                     <div class="flex items-center gap-2">
                                                         <span class="block w-1 h-1 bg-error rounded-full"></span>
-                                                        <span class="font-bold text-xs text-red-500">تکمیل شده</span>
+                                                        <span class="font-bold text-xs text-red-500">{{ course.get_holding_status_display }}</span>
                                                     </div>
                                                 {% elif course.holding_status == "IP" %}
                                                     <div class="flex items-center gap-2">
                                                         <span class="block w-1 h-1 bg-success rounded-full"></span>
-                                                        <span class="font-bold text-xs text-success">در حال برگزاری</span>
+                                                        <span class="font-bold text-xs text-success">{{ course.get_holding_status_display }}</span>
                                                     </div>
                                                 {% elif course.holding_status == "NS" %}
                                                     <div class="flex items-center gap-2">
                                                         <span class="block w-1 h-1 bg-error rounded-full"></span>
-                                                        <span class="font-bold text-xs text-warning">هنوز شروع نشده</span>
+                                                        <span class="font-bold text-xs text-warning">{{ course.get_holding_status_display }}</span>
                                                     </div>
                                                 {% endif %}
                                                 <h2 class="font-bold text-sm">
@@ -219,6 +219,6 @@
     {% include 'includes/footer.html' %}
 
     <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/like_unlike_video_course_ajax.js' %}"></script>
+    <script src="{% static 'js/toggle_like_video_course_ajax.js' %}"></script>
 
 {% endblock %}

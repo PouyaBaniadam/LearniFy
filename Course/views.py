@@ -12,6 +12,7 @@ from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import FavoriteVideoCourse
+from Cart.models import CartItem
 from Course.filters import VideoCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     NonFinishedExamsOnlyMixin
@@ -54,6 +55,25 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.select_related('category', 'teacher')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+
+        does_course_exists_in_cart = CartItem.objects.filter(
+            cart__user=user, course_pk=self.object.id, course_type="V").exists()
+
+        if user.is_authenticated:
+            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
+                                                                                                            flat=True)
+        else:
+            favorite_video_courses = []
+
+        context['does_course_exists_in_cart'] = does_course_exists_in_cart
+        context['favorite_video_courses'] = favorite_video_courses
+
+        return context
 
     def get_object(self, queryset=None):
         slug = uri_to_iri(self.kwargs.get(self.slug_url_kwarg))

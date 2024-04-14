@@ -58,7 +58,7 @@ class VideoCourse(models.Model):
 
     introduction_video = models.FileField(upload_to='Course/VideoCourse/introduction_video', verbose_name='فیلم مقدمه')
 
-    holding_status = models.CharField(max_length=2, choices=PAYMENT_TYPE_CHOICES, verbose_name='وضعیت دوره', default='NS')
+    holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره', default='NS')
 
     total_seasons = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد فصل‌ها')
 

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "django_cleanup",
     "hitcount",
     "star_ratings",
+    "Cart.apps.CartConfig"
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -109,6 +110,7 @@ TEMPLATES = [
                 'utils.context_processors.custom_user_info',
                 'utils.context_processors.filter_categories',
                 'utils.context_processors.filter_video_courses',
+                'utils.context_processors.cart_items_count',
             ],
         },
     },

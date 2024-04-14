@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
-    {% include 'includes/header.html' %}
+        {% include 'includes/header.html' %}
 
         <main class="flex-auto py-5">
             <div class="max-w-7xl space-y-14 px-4 mx-auto">
@@ -46,8 +46,10 @@
                                     <!-- course:card -->
                                     <div class="relative">
                                         <div class="relative z-10">
-                                            <a href="{% url 'course:video_course_detail' course.slug %}" class="block">
-                                                <img src="{{ course.cover_image.url }}" class="max-w-full rounded-3xl"
+                                            <a href="{% url 'course:video_course_detail' course.slug %}"
+                                               class="block">
+                                                <img src="{{ course.cover_image.url }}"
+                                                     class="max-w-full rounded-3xl"
                                                      alt="{{ course.name }}"/>
                                             </a>
                                             <a href="{% url 'course:videos_by_category' course.category.slug %}"
@@ -66,17 +68,17 @@
                                                 {% if course.holding_status == "F" %}
                                                     <div class="flex items-center gap-2">
                                                         <span class="block w-1 h-1 bg-error rounded-full"></span>
-                                                        <span class="font-bold text-xs text-red-500">تکمیل شده</span>
+                                                        <span class="font-bold text-xs text-red-500">{{ course.get_holding_status_display }}</span>
                                                     </div>
                                                 {% elif course.holding_status == "IP" %}
                                                     <div class="flex items-center gap-2">
                                                         <span class="block w-1 h-1 bg-success rounded-full"></span>
-                                                        <span class="font-bold text-xs text-success">در حال برگزاری</span>
+                                                        <span class="font-bold text-xs text-success">{{ course.get_holding_status_display }}</span>
                                                     </div>
                                                 {% elif course.holding_status == "NS" %}
                                                     <div class="flex items-center gap-2">
                                                         <span class="block w-1 h-1 bg-error rounded-full"></span>
-                                                        <span class="font-bold text-xs text-warning">هنوز شروع نشده</span>
+                                                        <span class="font-bold text-xs text-warning">{{ course.get_holding_status_display }}</span>
                                                     </div>
                                                 {% endif %}
                                                 <h2 class="font-bold text-sm">
@@ -133,7 +135,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="flex flex-col items-end justify-center h-14">
-                                                        {% if course.type == "P" %}
+                                                        {% if course.payment_type == "P" %}
                                                             {% if course.has_discount %}
                                                                 <span class="line-through text-muted">{{ course.price|price_splitter }} <span
                                                                         style="color: #1D4ED8;">T</span></span>
@@ -145,7 +147,7 @@
                                                             <span class="font-black text-xl text-success">رایگان!</span>
                                                         {% endif %}
 
-                                                        {% if course.has_discount and course.type == "P" %}
+                                                        {% if course.has_discount and course.payment_type == "P" %}
                                                             <div class="flex items-center gap-1">
                                                                 <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
                                                                 <span class="text-xs text-muted"><span
@@ -165,15 +167,40 @@
                                                                   clip-rule="evenodd"></path>
                                                         </svg>
                                                     </a>
-                                                    <button type="button"
-                                                            class="flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                             fill="currentColor" class="w-5 h-5">
-                                                            <path
-                                                                    d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
+                                                    {% if request.user.is_authenticated %}
+                                                        {% if course.id in favorite_video_courses %}
+                                                            <button type="button"
+                                                                    class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
+                                                                    data-id="{{ course.id }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                     viewBox="0 0 20 20"
+                                                                     fill="currentColor" class="w-5 h-5">
+                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                        {% else %}
+                                                            <button type="button"
+                                                                    class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
+                                                                    data-id="{{ course.id }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                     viewBox="0 0 20 20"
+                                                                     fill="currentColor" class="w-5 h-5">
+                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <button type="button"
+                                                                class="login-first flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                 viewBox="0 0 20 20"
+                                                                 fill="currentColor" class="w-5 h-5">
+                                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z"></path>
+                                                            </svg>
+                                                        </button>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -188,7 +215,10 @@
                 </div>
             </div>
         </main>
-
-    {% include 'includes/footer.html' %}
     </div>
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/toggle_like_video_course_ajax.js' %}"></script>
+
 {% endblock %}

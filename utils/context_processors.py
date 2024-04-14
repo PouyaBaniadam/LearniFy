@@ -1,4 +1,5 @@
 from Account.models import CustomUser
+from Cart.models import Cart
 from Course.filters import VideoCourseFilter
 from Course.models import Category, Exam, VideoCourse
 from Us.models import SocialMedia, AboutUs
@@ -49,6 +50,22 @@ def filter_video_courses(request):
 
     context = {
         'video_course_filter_form': video_course_filter.form
+    }
+
+    return context
+
+
+def cart_items_count(request):
+    user = request.user
+    if user.is_authenticated:
+        cart = Cart.objects.get(user=user)
+        count = cart.items.count()
+
+    else:
+        count = 0
+
+    context = {
+        'cart_items_count': count
     }
 
     return context

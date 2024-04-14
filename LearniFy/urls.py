@@ -17,6 +17,7 @@ urlpatterns = ([
                    path('news/', include('News.urls')),
                    path('weblog/', include('Weblog.urls')),
                    path('us/', include('Us.urls')),
+                   path('cart/', include('Cart.urls')),
                ]
                + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
 urlpatterns += i18n_patterns(path("admin/", admin.site.urls))

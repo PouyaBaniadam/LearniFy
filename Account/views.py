@@ -12,6 +12,7 @@ from django.views.generic import FormView, UpdateView, ListView, DetailView
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, OwnerRequiredMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow, FavoriteVideoCourse
+from Cart.models import Cart
 from Course.models import Exam, VideoCourse
 from Home.mixins import URLStorageMixin
 
@@ -178,6 +179,7 @@ class CheckOTPView(FormView):
 
             user = CustomUser.objects.create_user(mobile_phone=mobile_phone, username=username)
             Wallet.objects.create(owner=user)
+            Cart.objects.create(user=user)
 
             user.set_password(password)
             user.save()
@@ -334,7 +336,7 @@ class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStor
 
         user = self.request.user
         if user.is_authenticated:
-            favorite_video_courses = Exam.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
+            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
         else:
             favorite_video_courses = []
 
