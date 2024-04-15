@@ -137,8 +137,7 @@
                                                     <div class="flex flex-col items-end justify-center h-14">
                                                         {% if course.payment_type == "P" %}
                                                             {% if course.has_discount %}
-                                                                <span class="line-through text-muted">{{ course.price|price_splitter }} <span
-                                                                        style="color: #1D4ED8;">تومان</span></span>
+                                                                <span class="line-through text-muted">{{ course.price|price_splitter }}</span>
                                                             {% else %}
                                                                 <span class="text-muted">{{ course.price|price_splitter }} <span
                                                                         style="color: #1D4ED8;">تومان</span></span>
@@ -215,10 +214,7 @@
                 </div>
             </div>
         </main>
+        {% include 'includes/footer.html' %}
     </div>
-    {% include 'includes/footer.html' %}
-
-    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/ajax/toggle_like_video_course_ajax.js' %}"></script>
 
 {% endblock %}

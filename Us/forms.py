@@ -14,6 +14,16 @@ class ContactForm(forms.ModelForm):
         self.request = kwargs.pop('request', None)
         super(ContactForm, self).__init__(*args, **kwargs)
 
+    def clean_message(self):
+        message = self.cleaned_data.get("message")
+
+        if len(message) > 250:
+            raise forms.ValidationError(
+                message="متن پیام نمی‌تواند بیش‌تر از 250 کاراکتر داشته باشد.",
+                code="too_long_message")
+
+        return message
+
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')

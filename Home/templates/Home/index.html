@@ -601,7 +601,7 @@
                                     </svg>
                                 </span>
                                 <div class="flex flex-col space-y-2">
-                                    <span class="font-black xs:text-2xl text-lg text-primary">در مورد نابغه چه
+                                    <span class="font-black xs:text-2xl text-lg text-primary">در مورد LearniFy چه
                                         میشنویم؟</span>
                                     <span class="font-semibold xs:text-base text-sm text-muted">این‌ها، بخش خیلی کوچکی
                                         از نظراتی
@@ -613,62 +613,60 @@
                             <div class="md:col-span-8 w-full max-w-xl mx-auto">
                                 <div class="swiper card-swiper-slider">
                                     <div class="swiper-wrapper">
-                                        <div class="swiper-slide pb-8">
-                                            <div
-                                                    class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
-                                                <div class="font-semibold text-sm text-muted text-center">
-                                                    وبسایت شما به خوبی به نیازها و سطح دانش کاربران پاسخ می‌دهد. از
-                                                    مبتدیان
-                                                    تا
-                                                    حرفه‌ایان، می‌توانند از محتواهای آموزشی شما بهره‌بردند. این
-                                                    گسترده‌بودن
-                                                    پوشش
-                                                    محتوا بسیار قابل قدردانی است.
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                        <img src="./assets/images/avatars/01.jpeg"
-                                                             class="w-full h-full object-cover" alt="...">
-                                                    </div>
-                                                    <div class="flex flex-col items-start space-y-1">
-                                                        <span
-                                                                class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">
-                                                            جلال بهرامی راد
+                                        {% for attitude in attitudes %}
+                                            {% if attitude.user %}
+                                                <div class="swiper-slide pb-8">
+                                                    <div class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
+                                                        <div class="font-semibold text-sm text-muted text-center">{{ attitude.message }}
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                {% if attitude.user.image %}
+                                                                    <img src="{{ attitude.user.image.url }}"
+                                                                         class="w-full h-full object-cover"
+                                                                         alt="{{ attitude.useer.username }}">
+                                                                {% else %}
+                                                                    <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                         class="w-full h-full object-cover"
+                                                                         alt="{{ attitude.useer.username }}">
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="flex flex-col items-start space-y-1">
+                                                        <span class="line-clamp-1 font-bold text-xs text-foreground">
+                                                            {{ attitude.user.username }}
                                                         </span>
-                                                        <span class="font-semibold text-xs text-muted">
-                                                            دوره پروژه محور React و Next
+                                                                <span class="font-semibold text-xs text-muted">
+                                                            {{ attitude.created_at|j_date_formatter }}
                                                         </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="swiper-slide pb-8">
-                                            <div
-                                                    class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
-                                                <div class="font-semibold text-sm text-muted text-center">
-                                                    من به تیم شما بابت پشتیبانی عالیتان از وبسایتتان تشکر می‌کنم. سوالات
-                                                    و
-                                                    مشکلات من به سرعت پاسخ داده می‌شوند و همیشه یک راه حل مناسب برای هر
-                                                    مشکل
-                                                    پیدا می‌کنید. این امر بسیار قابل ارزش است.
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                        <img src="./assets/images/avatars/01.jpeg"
-                                                             class="w-full h-full object-cover" alt="...">
-                                                    </div>
-                                                    <div class="flex flex-col items-start space-y-1">
-                                                        <span
-                                                                class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">
-                                                            جلال بهرامی راد
-                                                        </span>
-                                                        <span class="font-semibold text-xs text-muted">
-                                                            دوره پروژه محور React و Next
-                                                        </span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
+
+                                            {% else %}
+                                                <div class="swiper-slide pb-8">
+                                                    <div class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
+                                                        <div class="font-semibold text-sm text-muted text-center">{{ attitude.message }}
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                <img src="{% static 'images/avatars/author.JPG' %}"
+                                                                     class="w-full h-full object-cover"
+                                                                     alt="کاربر ناشناس">
+                                                            </div>
+                                                            <div class="flex flex-col items-start space-y-1">
+                                                        <span class="line-clamp-1 font-bold text-xs text-foreground">
+                                                            کاربر ناشناس
+                                                        </span>
+                                                                <span class="font-semibold text-xs text-muted">
+                                                            {{ attitude.created_at|j_date_formatter }}
+                                                        </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
                                     </div>
 
                                     <div class="swiper-button-prev"></div>
@@ -938,11 +936,7 @@
                 <!-- end container -->
             </div>
         </main>
-
         {% include 'includes/footer.html' %}
     </div>
-
-    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/ajax/toggle_like_video_course_ajax.js' %}"></script>
 
 {% endblock %}

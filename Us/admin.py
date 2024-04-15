@@ -6,7 +6,7 @@ from Us.models import AboutUs, SocialMedia, Message
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ['user', 'mobile_phone', 'email', 'full_name', 'created_at']
-    readonly_fields = ['user', 'mobile_phone', 'email', 'full_name']
+    readonly_fields = ['user', 'mobile_phone', 'email', 'full_name', 'message']
     search_fields = ['user', 'mobile_phone', 'email', 'full_name']
 
 

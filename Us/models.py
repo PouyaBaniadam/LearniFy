@@ -17,7 +17,7 @@ class Message(models.Model):
 
     can_be_shown = models.BooleanField(default=False, verbose_name="مجوز نشان داده شدن دارد؟")
 
-    message = models.TextField(max_length=500, verbose_name="پیام")
+    message = models.TextField(verbose_name="پیام")
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
