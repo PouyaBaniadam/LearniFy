@@ -1,5 +1,5 @@
 function toggleCart(courseId, courseType) {
-    const data = {
+    var data = {
         course_type: courseType,
         course_id: courseId,
     };
