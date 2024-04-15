@@ -1,5 +1,4 @@
 function register_video_course(courseId) {
-    console.log(courseId)
     $.ajax({
         type: 'POST',
         url: `/course/video/register/`,

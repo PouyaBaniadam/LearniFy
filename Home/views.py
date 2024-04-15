@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from Account.models import FavoriteVideoCourse
+from Cart.models import CartItem
 from Course.models import VideoCourse, Exam
 from Home.mixins import URLStorageMixin
 from Home.models import HeroBanner, Banner1, Banner2, Banner3
@@ -19,10 +20,20 @@ class HomeView(URLStorageMixin, TemplateView):
 
         user = self.request.user
 
+        if user.is_authenticated:
+            user_cart_v_types = CartItem.objects.filter(
+                cart__user=user, course_type="V"
+            ).values_list("id", flat=True)
+
+        else:
+            user_cart_v_types = []
+
         latest_video_courses = VideoCourse.objects.values("teacher__image",
+                                                          "id",
                                                           "category__name",
                                                           "category__slug",
                                                           "cover_image",
+                                                          "holding_status",
                                                           "teacher__username",
                                                           "teacher__slug",
                                                           "teacher__full_name",
@@ -53,7 +64,8 @@ class HomeView(URLStorageMixin, TemplateView):
         attitudes = Message.objects.filter(can_be_shown=True).order_by('-created_at')
 
         if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
+            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
+                                                                                                            flat=True)
         else:
             favorite_video_courses = []
 
@@ -66,6 +78,7 @@ class HomeView(URLStorageMixin, TemplateView):
         context['banner_3'] = banner_3  # Is a queryset
         context['attitudes'] = attitudes  # Is a queryset
         context['favorite_video_courses'] = favorite_video_courses  # Is a queryset
+        context['user_cart_v_types'] = user_cart_v_types  # Is a queryset
 
         return context
 

@@ -6,7 +6,9 @@ from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
@@ -302,28 +304,28 @@ class EnterNewsletters(View):
             return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)
 
 
-class FollowUser(AuthenticatedUsersOnlyMixin, View):
-    def post(self, request, username):
-        user_to_follow = get_object_or_404(CustomUser, username=username)
+@method_decorator(csrf_exempt, name='dispatch')
+class ToggleFollow(View):
+    def post(self, request):
+        follower = CustomUser.objects.get(username=request.user.username)
 
-        if request.user == user_to_follow:
-            return JsonResponse({'error': 'شما نمی‌توانید خود را فالو کنید!'}, status=400)
+        following_id = request.POST.get("following_id")
+        following = CustomUser.objects.get(id=following_id)
 
-        request.user.follow(user_to_follow)
+        is_following = follower.is_following(following)
 
-        return JsonResponse({'message': f"شما {username} را فالو کردید."}, status=200)
+        if is_following:
+            follower.unfollow(following)
+            return JsonResponse(
+                {'message': "unfollowed"},
+                status=200
+            )
 
-
-class UnfollowUser(AuthenticatedUsersOnlyMixin, View):
-    def post(self, request, username):
-        user_to_unfollow = get_object_or_404(CustomUser, username=username)
-
-        if request.user == user_to_unfollow:
-            return JsonResponse({'error': 'شما نمی‌توانید خود را آن‌فالو کنید!'}, status=400)
-
-        request.user.unfollow(user_to_unfollow)
-
-        return JsonResponse({'message': f"شما {username} را آن‌فالو کردید."}, status=200)
+        follower.follow(following)
+        return JsonResponse(
+            {'message': "followed"},
+            status=200
+        )
 
 
 class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
@@ -336,7 +338,8 @@ class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStor
 
         user = self.request.user
         if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
+            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
+                                                                                                            flat=True)
         else:
             favorite_video_courses = []
 

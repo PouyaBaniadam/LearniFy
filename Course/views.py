@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import pytz
@@ -11,12 +12,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
-from Account.models import FavoriteVideoCourse
+from Account.models import FavoriteVideoCourse, Follow
 from Cart.models import CartItem
 from Course.filters import VideoCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     NonFinishedExamsOnlyMixin
-from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer
+from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 from utils.useful_functions import get_time_difference
@@ -61,17 +62,31 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
 
         user = self.request.user
 
-        does_course_exists_in_cart = CartItem.objects.filter(
-            cart__user=user, course_pk=self.object.id, course_type="V").exists()
-
         if user.is_authenticated:
+            does_course_exists_in_cart = CartItem.objects.filter(
+                cart__user=user, course_pk=self.object.id, course_type="V").exists()
+
             favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
                                                                                                             flat=True)
         else:
+            does_course_exists_in_cart = False
             favorite_video_courses = []
+
+        comments = self.object.video_course_comments.all()
+
+        if self.request.user.is_authenticated:
+            user_likes = VideoCourseComment.objects.filter(likes=user).values_list('id', flat=True)
+            is_following = Follow.objects.filter(follower=user, following=self.object.teacher).exists()
+
+        else:
+            user_likes = []
+            is_following = False
 
         context['does_course_exists_in_cart'] = does_course_exists_in_cart
         context['favorite_video_courses'] = favorite_video_courses
+        context['comments'] = comments
+        context['user_likes'] = user_likes
+        context['is_following'] = is_following
 
         return context
 
@@ -336,3 +351,55 @@ class ToggleFavorite(View):
             pass
 
         return JsonResponse({'success': False}, status=400)
+
+
+class AddVideoCourseComment(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        text = request.POST.get('text')
+        parent_id = request.POST.get('parent_id')
+        slug = kwargs.get('slug')
+
+        video_course = get_object_or_404(VideoCourse, slug=slug)
+
+        VideoCourseComment.objects.create(user=user, text=text, video_course=video_course, parent_id=parent_id)
+        messages.success(request, f"نظر شما با موفقیت ثبت شد.")
+
+        fragment = 'reply_section'
+        url = reverse('course:video_course_detail', kwargs={'slug': slug}) + f'#{fragment}'
+
+        return redirect(url)
+
+
+class DeleteVideoCourseComment(AuthenticatedUsersOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+
+        comment = VideoCourseComment.objects.get(id=id)
+        video_course = VideoCourse.objects.get(video_course_comments=comment)
+        comment.delete()
+
+        messages.success(request, f"نظر شما با موفقیت حذف شد.")
+
+        return redirect(reverse("course:video_course_detail", kwargs={'slug': video_course.slug}))
+
+
+class LikeVideoCourseComment(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            comment_id = data.get('comment_id')
+
+            comment = get_object_or_404(VideoCourseComment, id=comment_id)
+            user = request.user
+
+            if user in comment.likes.all():
+                comment.likes.remove(user)
+                liked = False
+            else:
+                comment.likes.add(user)
+                liked = True
+
+            return JsonResponse({'liked': liked})
+        except VideoCourseComment.DoesNotExist:
+            return JsonResponse({'error': 'چنین کامنتی یافت نشد.'}, status=404)

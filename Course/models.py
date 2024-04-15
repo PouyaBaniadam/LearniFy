@@ -58,7 +58,8 @@ class VideoCourse(models.Model):
 
     introduction_video = models.FileField(upload_to='Course/VideoCourse/introduction_video', verbose_name='فیلم مقدمه')
 
-    holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره', default='NS')
+    holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره',
+                                      default='NS')
 
     total_seasons = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد فصل‌ها')
 
@@ -101,6 +102,35 @@ class VideoCourse(models.Model):
         db_table = 'course__video_course'
         verbose_name = 'دوره ویدئویی'
         verbose_name_plural = 'دوره‌های ویدئویی'
+
+
+class VideoCourseComment(models.Model):
+    video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, verbose_name="دوره ویدئویی",
+                                     related_name='video_course_comments')
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر",
+                             related_name="user_video_course_comments")
+
+    parent = models.ForeignKey(to="self", on_delete=models.CASCADE, verbose_name="والد", blank=True, null=True,
+                               related_name="replies")
+
+    text = models.TextField(max_length=1000, verbose_name="متن")
+
+    likes = models.ManyToManyField(to="Account.CustomUser", verbose_name="لایک‌ها",
+                                   related_name="video_courses_comments_likes", blank=True)
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
+
+    updated_at = jDateTimeField(auto_now=True, verbose_name='به‌روز‌رسانی شده در تاریخ')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.video_course.name}"
+
+    class Meta:
+        db_table = 'course__video_course_comment'
+        verbose_name = 'کامنت'
+        verbose_name_plural = 'کامنت‌ها'
+        ordering = ('-created_at',)
 
 
 class VideoCourseSeason(models.Model):

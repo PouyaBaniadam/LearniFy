@@ -112,7 +112,6 @@ class LikeCommentView(AuthenticatedUsersOnlyMixin, View):
         try:
             data = json.loads(request.body)
             comment_id = data.get('comment_id')
-            print(comment_id)
 
             comment = get_object_or_404(Comment, id=comment_id)
             user = request.user

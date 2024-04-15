@@ -242,10 +242,6 @@
                                                                                               d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z"
                                                                                               clip-rule="evenodd"></path>
                                                                                     </svg>
-                                                                                    <span id="likeCount-{{ comment.id }}"
-                                                                                          class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
-                                                                                                    {{ comment.likes.count }}
-                                                                                    </span>
                                                                                 </button>
                                                                             {% endif %}
 
@@ -465,8 +461,9 @@
 
     {% include 'includes/footer.html' %}
 
-    <script src="{% static 'js/toggle_like_comment_ajax.js' %}"></script>
+    <script src="{% static 'js/ajax/toggle_like_comment_ajax.js' %}"></script>
     <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'js/reply_comment.js' %}"></script>
+    <script src="{% static 'js/submit_comment_deletion.js' %}"></script>
 
 {% endblock %}

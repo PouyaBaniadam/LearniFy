@@ -15,8 +15,7 @@ urlpatterns = [
     path("password/change", views.ChangePasswordView.as_view(), name="change_password"),
     path("notifications", views.NotificationListView.as_view(), name="notifications"),
     path("enter_newsletters", views.EnterNewsletters.as_view(), name="enter_newsletters"),
-    path('follow/<str:username>/', views.FollowUser.as_view(), name='follow_user'),
-    path('unfollow/<str:username>/', views.UnfollowUser.as_view(), name='unfollow_user'),
+    path('toggle/follow/', views.ToggleFollow.as_view(), name='toggle_follow'),
     path('participated/exams/<slug:slug>', views.ParticipatedExams.as_view(), name='participated_exams'),
     path('favorite/<slug:slug>', views.FavoriteCourses.as_view(), name='favorites'),
 ]
