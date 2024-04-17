@@ -263,7 +263,6 @@ class ToggleFollow(View):
         follower = CustomUser.objects.get(username=request.user.username)
 
         following_id = request.POST.get("following_id")
-        print(following_id)
         following = CustomUser.objects.get(id=following_id)
 
         is_following = follower.is_following(following)
