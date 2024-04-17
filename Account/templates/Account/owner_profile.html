@@ -19,7 +19,7 @@
                     <div class="lg:col-span-9 md:col-span-8">
                         <div class="space-y-10">
 
-                            {% include 'includes/statistics.html' %}
+                            {% include 'includes/owner_statistics.html' %}
 
                             <!-- section:learning-courses -->
                             <div class="space-y-5">
@@ -37,19 +37,18 @@
                                 <div class="swiper col3-swiper-slider">
                                     <div class="swiper-wrapper">
 
-
                                         {% for course in video_courses %}
                                             <div class="swiper-slide">
                                                 <!-- course:card -->
                                                 <div class="relative">
                                                     <div class="relative z-10">
-                                                        <a href="{% url 'course:exam_detail' course.slug %}"
+                                                        <a href="{% url 'course:video_course_detail' course.slug %}"
                                                            class="block">
                                                             <img src="{{ course.cover_image.url }}"
                                                                  class="max-w-full rounded-3xl"
                                                                  alt="{{ course.name }}"/>
                                                         </a>
-                                                        <a href="{% url 'course:exams_by_category' course.category.slug %}"
+                                                        <a href="{% url 'course:videos_by_category' course.category.slug %}"
                                                            class="absolute left-3 top-3 h-11 inline-flex items-center justify-center gap-1 bg-black/20 rounded-full text-white transition-all hover:opacity-80 px-4">
                                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                                                  fill="currentColor" class="w-6 h-6">
@@ -64,7 +63,7 @@
                                                         <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
 
                                                             <h2 class="font-bold text-sm">
-                                                                <a href="#"
+                                                                <a href="{% url 'course:video_course_detail' course.slug %}"
                                                                    class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ course.name }}</a>
                                                             </h2>
                                                         </div>
@@ -78,7 +77,7 @@
                                                                               stroke-linejoin="round"
                                                                               d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"></path>
                                                                     </svg>
-                                                                    <span class="font-semibold text-xs">{{ course.examanswer_set.count }} سوال </span>
+                                                                    <span class="font-semibold text-xs">{{ course.total_sessions }} قسمت </span>
                                                                 </div>
 
                                                                 <span class="block w-1 h-1 bg-muted-foreground rounded-full"></span>
@@ -90,26 +89,26 @@
                                                                               d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
                                                                               clip-rule="evenodd"></path>
                                                                     </svg>
-                                                                    <span class="font-semibold text-xs"> زمان آزمون: {{ course.total_duration }}</span>
+                                                                    <span class="font-semibold text-xs">{{ course.total_duration|format_seconds_to_time }}</span>
                                                                 </div>
                                                             </div>
                                                             <div class="flex items-center justify-between gap-5">
                                                                 <div class="flex items-center gap-3">
-                                                                    {% if course.designer.image %}
+                                                                    {% if course.teacher.image %}
                                                                         <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                                            <img src="{{ course.designer.image.url }}"
+                                                                            <img src="{{ course.teacher.image.url }}"
                                                                                  class="w-full h-full object-cover"
                                                                                  alt="مدرس دوره {{ course.name }}"/>
                                                                         </div>
                                                                     {% else %}
                                                                         <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                                            <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
+                                                                            <img src="{% static 'images/avatars/default_user.JPG' %}"
                                                                                  class="w-full h-full object-cover"
                                                                                  alt="مدرس دوره {{ course.name }}"/>
                                                                         </div>
                                                                     {% endif %}
                                                                     <div class="flex flex-col items-start space-y-1">
-                                                                        <span class="line-clamp-1 font-semibold text-xs text-muted">مدرس دوره</span>
+                                                                        <span class="line-clamp-1 font-semibold text-xs text-muted">مدرس دوره: </span>
                                                                         <a href="{% url 'account:profile' course.teacher.slug %}"
                                                                            class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ course.teacher.full_name }}</a>
                                                                     </div>
@@ -137,9 +136,9 @@
                                                                 </div>
                                                             </div>
                                                             <div class="flex gap-3 mt-3">
-                                                                <a href="{% url 'course:exam_detail' course.slug %}"
+                                                                <a href="{% url 'course:video_course_detail' course.slug %}"
                                                                    class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                                                    <span class="line-clamp-1 font-semibold text-sm">مشاهده آزمون</span>
+                                                                    <span class="line-clamp-1 font-semibold text-sm">مشاهده دوره</span>
                                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                                          viewBox="0 0 20 20"
                                                                          fill="currentColor" class="w-5 h-5">
@@ -153,7 +152,8 @@
                                                                     {% if course.id in favorite_video_courses %}
                                                                         <button type="button"
                                                                                 class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
-                                                                                data-video_course-id="{{ course.id }}">
+                                                                                data-id="{{ course.id }}"
+                                                                                data-user="{{ request.user }}">
                                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                                  viewBox="0 0 20 20"
                                                                                  fill="currentColor" class="w-5 h-5">
@@ -164,7 +164,8 @@
                                                                     {% else %}
                                                                         <button type="button"
                                                                                 class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
-                                                                                data-video_course-id="{{ course.id }}">
+                                                                                data-id="{{ course.id }}"
+                                                                                data-user="{{ request.user }}">
                                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                                  viewBox="0 0 20 20"
                                                                                  fill="currentColor" class="w-5 h-5">
@@ -191,7 +192,6 @@
                                                 <!-- end course:card -->
                                             </div>
                                         {% endfor %}
-
 
                                     </div>
 

@@ -481,7 +481,8 @@
                                                             {% if course.id in favorite_video_courses %}
                                                                 <button type="button"
                                                                         class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
-                                                                        data-id="{{ course.id }}">
+                                                                        data-id="{{ course.id }}"
+                                                                        data-user="{{ request.user }}">
                                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                                          viewBox="0 0 20 20"
                                                                          fill="currentColor" class="w-5 h-5">
@@ -492,7 +493,8 @@
                                                             {% else %}
                                                                 <button type="button"
                                                                         class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
-                                                                        data-id="{{ course.id }}">
+                                                                        data-id="{{ course.id }}"
+                                                                        data-user="{{ request.user }}">
                                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                                          viewBox="0 0 20 20"
                                                                          fill="currentColor" class="w-5 h-5">

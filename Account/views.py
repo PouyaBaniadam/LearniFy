@@ -4,16 +4,16 @@ from uuid import uuid4
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, UpdateView, ListView, DetailView
+from django.views.generic import FormView, UpdateView, ListView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
-from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, OwnerRequiredMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow, FavoriteVideoCourse
+from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse
 from Cart.models import Cart
 from Course.models import Exam, VideoCourse
 from Home.mixins import URLStorageMixin
@@ -218,50 +218,71 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, DetailView):
-    model = CustomUser
-    template_name = 'Account/profile.html'
-    context_object_name = 'user'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, View):
+    def get(self, request, slug):
         user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
+        owner = CustomUser.objects.get(slug=slug)
 
-        video_courses = VideoCourse.objects.filter(participated_users=user)
-
-        user = self.request.user
         if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                            flat=True)
-        else:
-            favorite_video_courses = []
+            is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
+            video_courses = VideoCourse.objects.filter(participated_users=owner)
 
-        context['video_courses'] = video_courses
-        context['favorite_video_courses'] = favorite_video_courses
+            if is_visitor_the_owner:
+                favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=owner).values_list('id',
+                                                                                                                 flat=True)
 
-        return context
+                context = {
+                    "user": owner,
+                    "video_courses": video_courses,
+                    "favorite_video_courses": favorite_video_courses
+                }
+
+                return render(
+                    request=request, template_name="Account/owner_profile.html", context=context)
+
+            else:
+                favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
+                                                                                                                flat=True)
+                is_following = user.is_following(owner)
+
+                context = {
+                    "user": owner,
+                    "video_courses": video_courses,
+                    "favorite_video_courses": favorite_video_courses,
+                    "is_following": is_following
+                }
+
+                return render(
+                    request=request, template_name="Account/visitor_profile.html", context=context)
 
 
-class VisitorProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
-    model = CustomUser
-    template_name = 'Account/visitor_profile.html'
-    context_object_name = 'user'
+@method_decorator(csrf_exempt, name='dispatch')
+class ToggleFollow(View):
+    def post(self, request):
+        follower = CustomUser.objects.get(username=request.user.username)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        owner = self.get_object()
-        user = self.request.user
+        following_id = request.POST.get("following_id")
+        print(following_id)
+        following = CustomUser.objects.get(id=following_id)
 
-        is_following = Follow.objects.filter(follower=user, following=owner).exists()
-        entered_exams = Exam.objects.filter(participated_users=user)
+        is_following = follower.is_following(following)
 
-        context['is_following'] = is_following
-        context['entered_exams'] = entered_exams
+        if is_following:
+            follower.unfollow(following)
+            return JsonResponse(
+                {'message': "unfollowed"},
+                status=200
+            )
 
-        return context
+        follower.follow(following)
+        return JsonResponse(
+            {'message': "followed"},
+            status=200
+        )
 
 
-class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, UpdateView):
+class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
     model = CustomUser
     template_name = 'Account/edit_profile.html'
     fields = ("full_name", "email", "about_me")
@@ -304,31 +325,7 @@ class EnterNewsletters(View):
             return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class ToggleFollow(View):
-    def post(self, request):
-        follower = CustomUser.objects.get(username=request.user.username)
-
-        following_id = request.POST.get("following_id")
-        following = CustomUser.objects.get(id=following_id)
-
-        is_following = follower.is_following(following)
-
-        if is_following:
-            follower.unfollow(following)
-            return JsonResponse(
-                {'message': "unfollowed"},
-                status=200
-            )
-
-        follower.follow(following)
-        return JsonResponse(
-            {'message': "followed"},
-            status=200
-        )
-
-
-class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
+class ParticipatedExams(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     model = Exam
     template_name = 'Account/participated_exams.html'
     context_object_name = 'exams'
@@ -354,7 +351,7 @@ class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStor
         return exams
 
 
-class FavoriteCourses(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
+class FavoriteCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     model = FavoriteVideoCourse
     template_name = 'Account/favorites.html'
     context_object_name = 'video_courses'

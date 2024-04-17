@@ -12,35 +12,36 @@
             {% endif %}
         </div>
         <div class="flex flex-col items-start space-y-1">
-            {% if request.user == user %}
-                <span class="text-xs text-muted">خوش آمدید</span>
-            {% endif %}
             <span class="line-clamp-1 font-semibold text-sm text-foreground cursor-default">{{ user.username }}</span>
         </div>
     </div>
 
     {% if is_following %}
-        <button type="submit" data-username="{{ user.username }}"
-                class="unfollow-btn flex items-center justify-center gap-1 w-full h-10 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+        <button type="button" id="follow-btn"
+                onclick="toggle_follow('{{ user.id }}')"
+                class="flex items-center justify-center gap-1 w-36 h-10 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
             <span class="font-semibold text-sm">آن‌فالو</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            <svg id="follow-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24"
                  stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+                      d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z"></path>
             </svg>
         </button>
     {% else %}
-        <button type="submit" data-username="{{ user.username }}"
-                class="follow-btn flex items-center justify-center gap-1 w-full h-10 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+        <button type="button" id="follow-btn"
+                onclick="toggle_follow('{{ user.id }}')"
+                class="flex items-center justify-center gap-1 w-36 h-10 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
             <span class="font-semibold text-sm">فالو</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            <svg id="follow-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24"
                  stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z">
-                </path>
+                      d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"></path>
             </svg>
         </button>
     {% endif %}
+
 
 </div>
 <!-- end user:info -->

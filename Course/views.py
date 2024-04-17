@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
-from Account.models import FavoriteVideoCourse, Follow
+from Account.models import FavoriteVideoCourse, Follow, CustomUser
 from Cart.models import CartItem
 from Course.filters import VideoCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
@@ -337,7 +337,8 @@ class VideoCourseFilterView(View):
 class ToggleFavorite(View):
     def post(self, request, *args, **kwargs):
         course_id = request.POST.get('id')
-        user = request.user
+        user_id = request.POST.get('user')
+        user = CustomUser.objects.get(username=user_id)
 
         try:
             video_course = VideoCourse.objects.get(id=course_id)

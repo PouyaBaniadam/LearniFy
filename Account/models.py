@@ -42,6 +42,10 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    ACCOUNT_CHOICES = (
+        ("PV", "شخصی"),
+        ("PU", "عمومی"),
+    )
     username = models.CharField(max_length=75, unique=True, verbose_name='نام کاربری')
 
     slug = models.SlugField(unique=True, verbose_name='اسلاگ')
@@ -58,6 +62,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     stars = models.PositiveIntegerField(default=0, verbose_name='تعداد ستاره')
 
     about_me = models.TextField(blank=True, null=True, verbose_name='درباره من')
+
+    account_status = models.CharField(max_length=2, choices=ACCOUNT_CHOICES, default='PU', verbose_name='حالت اکانت')
 
     image = models.ImageField(upload_to='Account/Users/profiles/', verbose_name="تصویر پروفایل", blank=True, null=True)
 

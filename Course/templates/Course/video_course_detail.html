@@ -759,7 +759,8 @@
                                         {% if course.id in favorite_video_courses %}
                                             <button type="button"
                                                     class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
-                                                    data-id="{{ course.id }}">
+                                                    data-id="{{ course.id }}"
+                                                    data-user="{{ request.user }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                      viewBox="0 0 20 20"
                                                      fill="currentColor" class="w-5 h-5">
@@ -770,7 +771,8 @@
                                         {% else %}
                                             <button type="button"
                                                     class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
-                                                    data-id="{{ course.id }}">
+                                                    data-id="{{ course.id }}"
+                                                    data-user="{{ request.user }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                      viewBox="0 0 20 20"
                                                      fill="currentColor" class="w-5 h-5">
@@ -901,7 +903,8 @@
                                                 {% if course.id in favorite_video_courses %}
                                                     <button type="button"
                                                             class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
-                                                            data-id="{{ course.id }}">
+                                                            data-id="{{ course.id }}"
+                                                            data-user="{{ request.user }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                              viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
@@ -912,7 +915,8 @@
                                                 {% else %}
                                                     <button type="button"
                                                             class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
-                                                            data-id="{{ course.id }}">
+                                                            data-id="{{ course.id }}"
+                                                            data-user="{{ request.user }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                              viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
@@ -984,7 +988,7 @@
                                     <div class="w-1 h-1 bg-foreground rounded-full"></div>
                                     <div class="w-2 h-2 bg-foreground rounded-full"></div>
                                 </div>
-                                <div class="font-black text-sm text-foreground">مدرس دوره</div>
+                                <div class="font-black text-sm text-foreground">مدرس دوره: </div>
                             </div>
                             <div class="space-y-3">
                                 <div class="flex items-center gap-3">

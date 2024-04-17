@@ -29,21 +29,3 @@ class AuthenticatedUsersOnlyMixin:
             return redirect("home:home")
 
         return super(AuthenticatedUsersOnlyMixin, self).dispatch(request, *args, **kwargs)
-
-
-class OwnerRequiredMixin:
-    def dispatch(self, request, *args, **kwargs):
-        user = request.user
-        slug = kwargs['slug']
-
-        if user.username != slug:
-            redirect_url = request.session.get('current_url')
-
-            if redirect_url is not None:
-                messages.error(request, f"شما اجازه دسترسی به این صفحه را ندارید!")
-
-                return redirect(redirect_url)
-
-            return redirect(reverse("account:profile", kwargs={'slug': user.username}))
-
-        return super(OwnerRequiredMixin, self).dispatch(request, *args, **kwargs)

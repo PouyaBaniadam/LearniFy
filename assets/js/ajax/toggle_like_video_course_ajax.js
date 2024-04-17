@@ -3,11 +3,14 @@ $(document).ready(function () {
         e.preventDefault();
         var button = $(this);
         var id = button.data('id');
+        var user = button.data('user');
+
         $.ajax({
             type: 'POST',
             url: '/course/video/favorite/toggle/',
             data: {
                 'id': id,
+                'user': user
             },
             success: function (data) {
                 if (data.success) {

@@ -1,9 +1,9 @@
-function toggle_follow(teacherId) {
+function toggle_follow(followingId) {
     $.ajax({
         type: 'POST',
         url: '/account/toggle/follow/',
         data: {
-            "following_id": teacherId
+            "following_id": followingId
         },
         success: function (response) {
             const button = document.getElementById("follow-btn");
