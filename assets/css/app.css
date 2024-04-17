@@ -2431,6 +2431,10 @@ body, html {
     background-color: hsl(var(--primary))
 }
 
+.hover\:bg-red:hover {
+    background-color: hsl(var(--error))
+}
+
 .hover\:bg-secondary:hover {
     background-color: hsl(var(--secondary))
 }
