@@ -218,13 +218,14 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, View):
+class ProfileDetailView(URLStorageMixin, View):
     def get(self, request, slug):
         user = self.request.user
-        user = CustomUser.objects.get(username=user.username)
-        owner = CustomUser.objects.get(slug=slug)
 
         if user.is_authenticated:
+            user = CustomUser.objects.get(username=user.username)
+            owner = CustomUser.objects.get(slug=slug)
+
             is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
             video_courses = VideoCourse.objects.filter(participated_users=owner)
 
@@ -235,7 +236,8 @@ class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, View):
                 context = {
                     "user": owner,
                     "video_courses": video_courses,
-                    "favorite_video_courses": favorite_video_courses
+                    "favorite_video_courses": favorite_video_courses,
+                    "account_status": owner.account_status
                 }
 
                 return render(
@@ -255,6 +257,20 @@ class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, View):
 
                 return render(
                     request=request, template_name="Account/visitor_profile.html", context=context)
+
+        else:
+            is_following = False
+            owner = CustomUser.objects.get(slug=slug)
+            video_courses = VideoCourse.objects.filter(participated_users=owner)
+
+            context = {
+                "user": owner,
+                "video_courses": video_courses,
+                "is_following": is_following
+            }
+
+            return render(
+                request=request, template_name="Account/visitor_profile.html", context=context)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -279,6 +295,31 @@ class ToggleFollow(View):
             {'message': "followed"},
             status=200
         )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ToggleAccountStatus(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request):
+        user = request.user
+        user = CustomUser.objects.get(username=user.username)
+
+        if user.account_status == "PU":
+            user.account_status = "PV"
+            user.save()
+
+            return JsonResponse(
+                {'account_status': "private"},
+                status=200
+            )
+
+        elif user.account_status == "PV":
+            user.account_status = "PU"
+            user.save()
+
+            return JsonResponse(
+                {'account_status': "public"},
+                status=200
+            )
 
 
 class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):

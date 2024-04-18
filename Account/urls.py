@@ -16,6 +16,7 @@ urlpatterns = [
     path("notifications", views.NotificationListView.as_view(), name="notifications"),
     path("enter_newsletters", views.EnterNewsletters.as_view(), name="enter_newsletters"),
     path('toggle/follow/', views.ToggleFollow.as_view(), name='toggle_follow'),
+    path('toggle/account/status/', views.ToggleAccountStatus.as_view(), name='toggle_account_status'),
     path('participated/exams/<slug:slug>', views.ParticipatedExams.as_view(), name='participated_exams'),
     path('favorite/<slug:slug>', views.FavoriteCourses.as_view(), name='favorites'),
 ]
