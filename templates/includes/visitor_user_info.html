@@ -15,19 +15,34 @@
             <span class="line-clamp-1 font-semibold text-sm text-foreground cursor-default">{{ user.username }}</span>
         </div>
     </div>
+
     {% if request.user.is_authenticated %}
         {% if is_following %}
-            <button type="button" id="follow-btn"
-                    onclick="toggle_follow('{{ user.id }}')"
-                    class="flex items-center justify-center gap-1 w-36 h-10 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                <span class="font-semibold text-sm">آن‌فالو</span>
-                <svg id="follow-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
-                     viewBox="0 0 24 24"
-                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z"></path>
-                </svg>
-            </button>
+            {% if account_status == "PU" %}
+                <button type="button" id="follow-btn"
+                        onclick="toggle_follow('{{ user.id }}')"
+                        class="flex items-center justify-center gap-1 w-36 h-10 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                    <span class="font-semibold text-sm">آن‌فالو</span>
+                    <svg id="follow-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z"></path>
+                    </svg>
+                </button>
+            {% else %}
+                <button type="button" id="follow-btn"
+                        onclick="confirmToggleFollow('{{ user.id }}')"
+                        class="flex items-center justify-center gap-1 w-36 h-10 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                    <span class="font-semibold text-sm">آن‌فالو</span>
+                    <svg id="follow-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z"></path>
+                    </svg>
+                </button>
+            {% endif %}
         {% else %}
             <button type="button" id="follow-btn"
                     onclick="toggle_follow('{{ user.id }}')"
@@ -53,7 +68,6 @@
             </svg>
         </button>
     {% endif %}
-
 
 </div>
 <!-- end user:info -->

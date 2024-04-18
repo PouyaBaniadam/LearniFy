@@ -247,12 +247,14 @@ class ProfileDetailView(URLStorageMixin, View):
                 favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
                                                                                                                 flat=True)
                 is_following = user.is_following(owner)
+                account_status = owner.account_status
 
                 context = {
                     "user": owner,
                     "video_courses": video_courses,
                     "favorite_video_courses": favorite_video_courses,
-                    "is_following": is_following
+                    "is_following": is_following,
+                    "account_status": account_status
                 }
 
                 return render(
@@ -285,6 +287,7 @@ class ToggleFollow(View):
 
         if is_following:
             follower.unfollow(following)
+
             return JsonResponse(
                 data={
                     'message': 'unfollowed',
@@ -298,6 +301,26 @@ class ToggleFollow(View):
             data={
                 'message': "followed",
                 'following_count': following.followers_count()
+            },
+            status=200
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UnfollowPrivateAccounts(View):
+    def post(self, request):
+        follower = CustomUser.objects.get(username=request.user.username)
+
+        following_id = request.POST.get("following_id")
+
+        following = CustomUser.objects.get(id=following_id)
+
+        follower.unfollow(following)
+
+        return JsonResponse(
+            data={
+                "message": "unfollowed",
+                "redirect_url": f""
             },
             status=200
         )

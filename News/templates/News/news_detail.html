@@ -329,8 +329,8 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-center gap-3 sm:mr-0 mr-auto">
-                                                                                    {% if request.user == comment.user %}
-                                                                                        <button onclick="submit_deletion('{{ comment.id }}', 'news')"
+                                                                                    {% if request.user == reply.user %}
+                                                                                        <button onclick="submit_deletion('{{ reply.id }}', 'news')"
                                                                                                 class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-red-700 px-4">
                                                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                                                  fill="none"
@@ -347,7 +347,7 @@
 
                                                                                     {% if request.user.is_authenticated %}
                                                                                         {% if reply.id in user_likes %}
-                                                                                            <button onclick="toggleLike('{{ comment.id }}', 'news')"
+                                                                                            <button onclick="toggleLike('{{ reply.id }}', 'news')"
                                                                                                     id="likeBtn-{{ reply.id }}"
                                                                                                     type="button"
                                                                                                     class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
@@ -364,7 +364,7 @@
                                                                                                 </span>
                                                                                             </button>
                                                                                         {% else %}
-                                                                                            <button onclick="toggleLike('{{ comment.id }}', 'news')"
+                                                                                            <button onclick="toggleLike('{{ reply.id }}', 'news')"
                                                                                                     id="likeBtn-{{ reply.id }}"
                                                                                                     type="button"
                                                                                                     class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
