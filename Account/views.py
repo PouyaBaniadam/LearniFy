@@ -286,13 +286,19 @@ class ToggleFollow(View):
         if is_following:
             follower.unfollow(following)
             return JsonResponse(
-                {'message': "unfollowed"},
+                data={
+                    'message': 'unfollowed',
+                    'following_count': following.followers_count()
+                },
                 status=200
             )
 
         follower.follow(following)
         return JsonResponse(
-            {'message': "followed"},
+            data={
+                'message': "followed",
+                'following_count': following.followers_count()
+            },
             status=200
         )
 
