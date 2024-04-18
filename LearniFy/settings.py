@@ -52,7 +52,6 @@ INSTALLED_APPS = [
 
     # Third party packages
     "widget_tweaks",
-    "django_cleanup",
     "hitcount",
     "star_ratings",
     "Cart.apps.CartConfig"

@@ -19,6 +19,5 @@ urlpatterns = [
     path('toggle/follow/private/accounts/', views.FollowPrivateAccounts.as_view(), name='follow_private_accounts'),
     path('unfollow/private/accounts/', views.UnfollowPrivateAccounts.as_view(), name='unfollow_private_accounts'),
     path('toggle/account/status/', views.ToggleAccountStatus.as_view(), name='toggle_account_status'),
-    path('participated/exams/<slug:slug>', views.ParticipatedExams.as_view(), name='participated_exams'),
     path('favorite/<slug:slug>', views.FavoriteCourses.as_view(), name='favorites'),
 ]

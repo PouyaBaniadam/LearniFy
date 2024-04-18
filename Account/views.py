@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.templatetags.static import static
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -15,7 +16,7 @@ from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPas
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse
 from Cart.models import Cart
-from Course.models import Exam, VideoCourse
+from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
 
 
@@ -252,10 +253,12 @@ class ProfileDetailView(URLStorageMixin, View):
                 is_follow_request_pending = Notification.objects.filter(
                     users=owner,
                     title="درخواست فالو",
-                    message=f"{user.username} می‌خواهد شما را دنبال کند.",
+                    message=f'<p><a href="/account/profile/{user.username}"><span style="color:hsl(240,75%,60%);">{user.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
                     visibility="P",
-                    mode="C",
-                    type="YN",
+                    following=owner,
+                    follower=user,
+                    mode="S",
+                    type="FO",
                 ).exists()
 
                 context = {
@@ -349,21 +352,24 @@ class FollowPrivateAccounts(View):
         does_request_exists = Notification.objects.filter(
             users=following,
             title="درخواست فالو",
-            message=f"{follower.username} می‌خواهد شما را دنبال کند.",
+            message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
             visibility="P",
-            mode="C",
-            type="YN",
+            following=following,
+            follower=follower,
+            mode="S",
+            type="FO",
         ).exists()
 
         if does_request_exists:
-
             Notification.objects.get(
                 users=following,
                 title="درخواست فالو",
-                message=f"{follower.username} می‌خواهد شما را دنبال کند.",
+                message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
                 visibility="P",
-                mode="C",
-                type="YN",
+                following=following,
+                follower=follower,
+                mode="S",
+                type="FO",
             ).delete()
 
             return JsonResponse(
@@ -377,11 +383,14 @@ class FollowPrivateAccounts(View):
         else:
             notification = Notification.objects.create(
                 title="درخواست فالو",
-                message=f"{follower.username} می‌خواهد شما را دنبال کند.",
+                message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
                 visibility="P",
-                mode="C",
-                type="YN",
+                following=following,
+                follower=follower,
+                mode="S",
+                type="FO",
             )
+
             notification.users.add(following)
 
             notification.save()
@@ -483,32 +492,6 @@ class EnterNewsletters(View):
             NewsLetter.objects.create(user=user, email=email)
 
             return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)
-
-
-class ParticipatedExams(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
-    model = Exam
-    template_name = 'Account/participated_exams.html'
-    context_object_name = 'exams'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        user = self.request.user
-        if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                            flat=True)
-        else:
-            favorite_video_courses = []
-
-        context['favorite_video_courses'] = favorite_video_courses
-
-        return context
-
-    def get_queryset(self):
-        user = self.request.user
-        exams = Exam.objects.filter(participated_users=user)
-
-        return exams
 
 
 class FavoriteCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):

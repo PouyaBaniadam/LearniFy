@@ -209,9 +209,9 @@ class Notification(models.Model):
     """
 
     mode_choices = (
-        ("S", "موفقیت (سیز رنگ)"),
-        ("C", "هشدار (نارتجی رنگ)"),
-        ("D", "خطر (قرمز رنگ)"),
+        ("S", "موفقیت (سبز)"),
+        ("C", "هشدار (نارنجی)"),
+        ("D", "خطر (قرمز)"),
     )
 
     visibility_choices = (
@@ -220,7 +220,7 @@ class Notification(models.Model):
     )
 
     type_choices = (
-        ("YN", "آره و نه"),
+        ("FO", "فالو"),
         ("AN", "اطلاعیه"),
     )
 
@@ -231,6 +231,14 @@ class Notification(models.Model):
     message = CKEditor5Field(config_name='extends', verbose_name="پیام")
 
     image = models.ImageField(upload_to="Account/Notification/image", blank=True, null=True, verbose_name="تصویر")
+
+    image_link = models.URLField(blank=True, null=True, verbose_name="لینک تصویر")
+
+    follower = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="فالور",
+                                 editable=False, related_name="+")
+
+    following = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="فالوینگ",
+                                  editable=False, related_name="+")
 
     users = models.ManyToManyField(to=CustomUser, blank=True, verbose_name="کاربران")
 
