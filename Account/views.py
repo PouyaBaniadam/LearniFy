@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from django.templatetags.static import static
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
