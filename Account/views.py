@@ -249,13 +249,25 @@ class ProfileDetailView(URLStorageMixin, View):
                 is_following = user.is_following(owner)
                 account_status = owner.account_status
 
+                is_follow_request_pending = Notification.objects.filter(
+                    users=owner,
+                    title="درخواست فالو",
+                    message=f"{user.username} می‌خواهد شما را دنبال کند.",
+                    visibility="P",
+                    mode="C",
+                    type="YN",
+                ).exists()
+
                 context = {
                     "user": owner,
                     "video_courses": video_courses,
                     "favorite_video_courses": favorite_video_courses,
                     "is_following": is_following,
-                    "account_status": account_status
+                    "account_status": account_status,
+                    "is_follow_request_pending": is_follow_request_pending,
                 }
+
+                print(is_follow_request_pending)
 
                 return render(
                     request=request, template_name="Account/visitor_profile.html", context=context)
@@ -327,6 +339,63 @@ class UnfollowPrivateAccounts(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class FollowPrivateAccounts(View):
+    def post(self, request):
+        follower = CustomUser.objects.get(username=request.user.username)
+        following_id = request.POST.get("following_id")
+
+        following = CustomUser.objects.get(id=following_id)
+
+        does_request_exists = Notification.objects.filter(
+            users=following,
+            title="درخواست فالو",
+            message=f"{follower.username} می‌خواهد شما را دنبال کند.",
+            visibility="P",
+            mode="C",
+            type="YN",
+        ).exists()
+
+        if does_request_exists:
+
+            Notification.objects.get(
+                users=following,
+                title="درخواست فالو",
+                message=f"{follower.username} می‌خواهد شما را دنبال کند.",
+                visibility="P",
+                mode="C",
+                type="YN",
+            ).delete()
+
+            return JsonResponse(
+                data={
+                    "message": "unrequested",
+                    "redirect_url": f""
+                },
+                status=200
+            )
+
+        else:
+            notification = Notification.objects.create(
+                title="درخواست فالو",
+                message=f"{follower.username} می‌خواهد شما را دنبال کند.",
+                visibility="P",
+                mode="C",
+                type="YN",
+            )
+            notification.users.add(following)
+
+            notification.save()
+
+            return JsonResponse(
+                data={
+                    "message": "requested",
+                    "redirect_url": f""
+                },
+                status=200
+            )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class ToggleAccountStatus(AuthenticatedUsersOnlyMixin, View):
     def post(self, request):
         user = request.user
@@ -365,6 +434,17 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
     def get_success_url(self):
         return reverse('account:profile', kwargs={'slug': self.request.user.username})
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
+
+        account_status = user.account_status
+
+        context['account_status'] = account_status
+
+        return context
+
 
 class NotificationListView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     model = Notification
@@ -375,6 +455,17 @@ class NotificationListView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListVie
         user = self.request.user
 
         return Notification.objects.filter(users=user).order_by("-created_at")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
+
+        account_status = user.account_status
+
+        context['account_status'] = account_status
+
+        return context
 
 
 class EnterNewsletters(View):
@@ -432,3 +523,14 @@ class FavoriteCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
         video_courses = FavoriteVideoCourse.objects.filter(user=user)
 
         return video_courses
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
+
+        account_status = user.account_status
+
+        context['account_status'] = account_status
+
+        return context

@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
-from Account.models import FavoriteVideoCourse, Follow, CustomUser
+from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification
 from Cart.models import CartItem
 from Course.filters import VideoCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
@@ -62,12 +62,24 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
 
         user = self.request.user
 
+        is_follow_request_pending = False
+
         if user.is_authenticated:
             does_course_exists_in_cart = CartItem.objects.filter(
                 cart__user=user, course_pk=self.object.id, course_type="V").exists()
 
             favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
                                                                                                             flat=True)
+
+            is_follow_request_pending = Notification.objects.filter(
+                users=self.object.teacher,
+                title="درخواست فالو",
+                message=f"{user.username} می‌خواهد شما را دنبال کند.",
+                visibility="P",
+                mode="C",
+                type="YN",
+            ).exists()
+
         else:
             does_course_exists_in_cart = False
             favorite_video_courses = []
@@ -87,6 +99,7 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
         context['comments'] = comments
         context['user_likes'] = user_likes
         context['is_following'] = is_following
+        context['is_follow_request_pending'] = is_follow_request_pending
 
         return context
 

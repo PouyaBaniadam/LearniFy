@@ -1624,6 +1624,11 @@ body, html {
     background-color: rgb(239 68 68/var(--tw-bg-opacity))
 }
 
+.bg-warning {
+    --tw-bg-opacity: 1;
+    background-color: rgb(234 179 8/var(--tw-bg-opacity))
+}
+
 .bg-secondary {
     background-color: hsl(var(--secondary))
 }

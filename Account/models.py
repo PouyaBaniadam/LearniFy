@@ -209,33 +209,40 @@ class Notification(models.Model):
     """
 
     mode_choices = (
-        ("S", "Safe"),
-        ("C", "Caution"),
-        ("D", "Danger"),
+        ("S", "موفقیت (سیز رنگ)"),
+        ("C", "هشدار (نارتجی رنگ)"),
+        ("D", "خطر (قرمز رنگ)"),
     )
 
     visibility_choices = (
-        ("G", "Global"),
-        ("P", "Private"),
+        ("G", "عمومی"),
+        ("P", "شخصی"),
+    )
+
+    type_choices = (
+        ("YN", "آره و نه"),
+        ("AN", "اطلاعیه"),
     )
 
     uuid = models.UUIDField(default=uuid4, editable=False)
 
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, verbose_name="تیتر")
 
-    message = CKEditor5Field(config_name='extends')
+    message = CKEditor5Field(config_name='extends', verbose_name="پیام")
 
-    image = models.ImageField(upload_to="Account/Notification/image", blank=True, null=True)
+    image = models.ImageField(upload_to="Account/Notification/image", blank=True, null=True, verbose_name="تصویر")
 
-    users = models.ManyToManyField(to=CustomUser, blank=True)
+    users = models.ManyToManyField(to=CustomUser, blank=True, verbose_name="کاربران")
 
-    created_at = jDateTimeField(auto_now_add=True)
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
-    mode = models.CharField(max_length=1, choices=mode_choices)
+    mode = models.CharField(max_length=1, choices=mode_choices, verbose_name="مود اعلان")
 
-    visibility = models.CharField(max_length=1, choices=visibility_choices)
+    visibility = models.CharField(max_length=1, choices=visibility_choices, verbose_name="وضعیت مشاهده")
 
-    has_been_read = models.BooleanField(default=False)
+    type = models.CharField(max_length=2, choices=type_choices, default="AN", verbose_name="نوع اعلان")
+
+    has_been_read = models.BooleanField(default=False, verbose_name="آیا خوانده شده؟")
 
     def __str__(self):
         return self.title
@@ -267,7 +274,8 @@ class NewsLetter(models.Model):
 class FavoriteVideoCourse(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, blank=True, null=True, verbose_name="کاربر")
 
-    video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
+    video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, blank=True, null=True,
+                                     verbose_name="آزمون")
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
