@@ -299,8 +299,6 @@ class FavoriteVideoCourse(models.Model):
 
 
 class Post(models.Model):
-    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
-
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, verbose_name="کاربر")
 
     title = models.CharField(max_length=75, blank=True, null=True, verbose_name="تیتر")

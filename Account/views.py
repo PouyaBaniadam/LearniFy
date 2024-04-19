@@ -9,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, UpdateView, ListView, DetailView
+from django.views.generic import FormView, UpdateView, ListView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
@@ -298,33 +298,6 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
             }
 
             return render(request=request, template_name="account/visitor_posts.html", context=context)
-
-
-class PostDetailView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
-    def get(self, request, slug, uuid):
-        user = self.request.user
-
-        if user.is_authenticated:
-            user = CustomUser.objects.get(username=user.username)
-            owner = CustomUser.objects.get(slug=slug)
-
-            is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
-
-            if is_visitor_the_owner:
-                post = Post.objects.get(uuid=uuid)
-                context = {
-                    "post": post
-                }
-
-                return render(request=request, template_name="account/owner_post_detail.html", context=context)
-
-            else:
-                post = Post.objects.get(uuid=uuid)
-                context = {
-                    "post": post
-                }
-
-                return render(request=request, template_name="account/visitor_post_detail.html", context=context)
 
 
 class TempFollowPrivateAccountFirst(NonFollowersOnlyMixin, URLStorageMixin, View):

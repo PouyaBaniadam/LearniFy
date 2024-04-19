@@ -6,7 +6,6 @@
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
         {% include 'includes/header.html' %}
-
         <main class="flex-auto py-5">
             <div class="max-w-7xl space-y-14 px-4 mx-auto">
                 <div class="grid md:grid-cols-12 grid-cols-1 items-start gap-5">
@@ -15,6 +14,7 @@
                         {% include 'includes/visitor_user_info.html' %}
 
                         {% include 'includes/visitor_user_menu.html' %}
+
                     </div>
 
                     <div class="lg:col-span-9 md:col-span-8">
@@ -22,71 +22,122 @@
 
                             {% include 'includes/visitor_statistics.html' %}
 
-                            <!-- section:learning-courses -->
                             <div class="space-y-5">
-                                <!-- section:title -->
                                 <div class="flex items-center gap-3">
                                     <div class="flex items-center gap-1">
                                         <div class="w-1 h-1 bg-foreground rounded-full"></div>
                                         <div class="w-2 h-2 bg-foreground rounded-full"></div>
                                     </div>
-                                    <div class="font-black text-foreground">
-                                        پست‌ها
-                                    </div>
+                                    <div class="font-black text-foreground">پست‌ها</div>
                                 </div>
-                                <!-- end section:title -->
-
-                                <!-- section:learning-courses:slider -->
                                 <div class="swiper col3-swiper-slider">
                                     <div class="swiper-wrapper">
-
                                         {% for post in posts %}
                                             <div class="swiper-slide">
-                                                <!-- course:card -->
                                                 <div class="relative">
                                                     <div class="relative z-10">
-                                                        <a href="{% url 'account:user_post' slug=post.user uuid=post.uuid %}"
+                                                        <a onclick="showPostDetail(
+                                                                '{{ post.file.url }}',
+                                                                '{{ post.title }}',
+                                                                '{{ post.caption }}',
+                                                                )"
                                                            class="block">
                                                             <img src="{{ post.file.url }}"
-                                                                 class="max-w-full rounded-3xl"
-                                                                 alt="{{ post.title }}"/>
+                                                                 class="max-w-full rounded-3xl" alt=""/>
                                                         </a>
                                                     </div>
+
                                                     <div class="bg-background rounded-b-3xl -mt-12 pt-12">
                                                         <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
-
                                                             <h2 class="font-bold text-sm">
-                                                                <a href="{% url 'account:user_post' slug=post.user uuid=post.uuid %}"
+                                                                <a onclick="showPostDetail(
+                                                                        '{{ post.file.url }}',
+                                                                        '{{ post.title }}',
+                                                                        '{{ post.caption }}',
+                                                                        )"
                                                                    class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ post.title }}</a>
                                                             </h2>
-                                                            <p>
-                                                                {{ post.caption|truncatechars:"50" }}
-                                                            </p>
+                                                        </div>
+                                                        <div class="space-y-3 p-5">
+                                                            <div class="flex items-center justify-between gap-5">
+                                                                <div class="flex items-center gap-3">
+                                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                        {% if post.user.image %}
+                                                                            <img src="{{ post.user.image.url }}"
+                                                                                 class="w-full h-full object-cover"
+                                                                                 alt="تصویر پروفایل"/>
+                                                                        {% else %}
+                                                                            <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                                 class="w-full h-full object-cover"
+                                                                                 alt="تصویر پروفایل"/>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                    <div class="flex flex-col items-start space-y-1">
+                                                                        <a onclick="showPostDetail(
+                                                                                '{{ post.file.url }}',
+                                                                                '{{ post.title }}',
+                                                                                '{{ post.caption }}',
+                                                                                )"
+                                                                           class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ post.user.username }}</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="space-y-3 mt-3">
+                                                                <a onclick="showPostDetail(
+                                                                        '{{ post.file.url }}',
+                                                                        '{{ post.title }}',
+                                                                        '{{ post.caption }}',
+                                                                        )"
+                                                                   class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                                    <span class="font-semibold text-sm">مشاهده پست</span>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                         viewBox="0 0 20 20" fill="currentColor"
+                                                                         class="w-5 h-5">
+                                                                        <path fill-rule="evenodd"
+                                                                              d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                                              clip-rule="evenodd"></path>
+                                                                    </svg>
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- end course:card -->
-                                            </div>
                                         {% endfor %}
+                                    </div>
+
+                                    <div class="swiper-button-prev"></div>
+                                    <div class="swiper-button-next"></div>
 
                                 </div>
-
-                                <div class="swiper-button-prev"></div>
-                                <div class="swiper-button-next"></div>
+                                <!-- end section:learning-courses:slider -->
                             </div>
-                            <!-- end section:learning-courses:slider -->
+                            <!-- end section:learning-courses -->
                         </div>
-                        <!-- end section:learning-courses -->
                     </div>
                 </div>
             </div>
         </main>
+
+        {% include 'includes/footer.html' %}
     </div>
 
-    {% include 'includes/footer.html' %}
-
-    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/ajax/toggle_like_video_course_ajax.js' %}"></script>
+    <script>
+        function showPostDetail(imageUrl, postTitle, postCaption) {
+            Swal.fire({
+                icon: "info",
+                title: postTitle,
+                imageUrl: imageUrl,
+                imageWidth: 400,
+                imageHeight: 200,
+                confirmButtonText: 'بستن',
+                html: `
+                <div>
+                    <p>${postCaption}</p>
+                </div>
+            `,
+            });
+        }
+    </script>
 
 {% endblock %}
