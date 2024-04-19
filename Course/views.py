@@ -74,7 +74,6 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
                 title="درخواست فالو",
-                message=f'<p><a href="/account/profile/{user.username}"><span style="color:hsl(240,75%,60%);">{user.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
                 visibility="P",
                 following=self.object.teacher,
                 follower=user,

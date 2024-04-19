@@ -126,7 +126,7 @@ class Follow(models.Model):
         unique_together = ('follower', 'following')
 
     def __str__(self):
-        return f'{self.follower.username}، {self.following.username} را از تاریخ {self.followed_at} دنبال می‌کند.'
+        return f'{self.follower.username}، {self.following.username} را از تاریخ {self.followed_at} فالو می‌کند.'
 
 
 class OTP(models.Model):
@@ -234,11 +234,11 @@ class Notification(models.Model):
 
     image_link = models.URLField(blank=True, null=True, verbose_name="لینک تصویر")
 
-    follower = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="فالور",
-                                 editable=False, related_name="+")
+    follower = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+                                 verbose_name="فالور", editable=False, related_name="+")
 
-    following = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="فالوینگ",
-                                  editable=False, related_name="+")
+    following = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+                                  verbose_name="فالوینگ", editable=False, related_name="+")
 
     users = models.ManyToManyField(to=CustomUser, blank=True, verbose_name="کاربران")
 

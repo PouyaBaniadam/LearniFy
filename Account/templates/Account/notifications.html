@@ -36,7 +36,8 @@
 
                                     {% for notification in notifications %}
                                         <!-- notification-item -->
-                                        <div class="flex md:items-center items-start gap-5 bg-background border border-border rounded-xl p-5">
+                                        <div id="whole-rejection-div"
+                                             class="flex md:items-center items-start gap-5 bg-background border border-border rounded-xl p-5">
                                             <div class="flex items-center gap-5">
                                                 {% if notification.mode == "D" %}
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -67,33 +68,87 @@
                                             </div>
                                             {% if notification.type == "FO" %}
                                                 {% if notification.follower.image %}
-                                                    <a href="{% url 'account:profile' notification.follower.slug %}">
                                                     <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
                                                         <img src="{{ notification.follower.image.url }}"
                                                              class="w-full h-full object-cover"
                                                              alt="تصویر پروفایل {{ notification.follower.username }}">
                                                     </div>
                                                 {% else %}
-                                                    <a href="{% url 'account:profile' notification.follower.slug %}">
-                                                        <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                            <img src="{% static 'images/avatars/default_user.JPG' %}"
-                                                                 class="w-full h-full object-cover"
-                                                                 alt="تصویر پروفایل {{ notification.follower.username }}">
-                                                        </div>
-                                                    </a>
+                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                        <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                             class="w-full h-full object-cover"
+                                                             alt="تصویر پروفایل {{ notification.follower.username }}">
+                                                    </div>
                                                 {% endif %}
+                                                <div class="flex flex-col items-start space-y-1">
+                                                    <div id="follow-title" class="font-bold text-xs text-foreground">
+                                                        {{ notification.title }}
+                                                    </div>
+                                                    <div id="follow-message" class="font-medium text-xs text-muted">
+                                                        {{ notification.message|safe }}
+                                                    </div>
+                                                    <div id="follow-created_at" class="flex items-center gap-1 font-medium text-xs text-muted">
+                                                        {{ notification.created_at|j_date_formatter }}
+                                                    </div>
+
+                                                    <div id="followRequestButtons">
+                                                        <button type="button" id="accept-btn"
+                                                                onclick="handleFollowRequests('{{ notification.follower }}', '{{ notification.following }}', 'ACC')"
+                                                                class="flex items-center justify-center gap-1 w-36 h-10 bg-success rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                            <span class="font-semibold text-sm">قبول کردن</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                 viewBox="0 0 24 24" stroke-width="1.5"
+                                                                 stroke="currentColor"
+                                                                 class="w-5 h-5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                      d="m4.5 12.75 6 6 9-13.5">
+                                                                </path>
+                                                            </svg>
+                                                        </button>
+
+                                                        <button type="button" id="reject-btn"
+                                                                onclick="handleFollowRequests('{{ notification.follower }}', '{{ notification.following }}', 'REJ')"
+                                                                class="flex items-center justify-center gap-1 w-36 h-10 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                            <span class="font-semibold text-sm">رد کردن</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                 viewBox="0 0 24 24" stroke-width="1.5"
+                                                                 stroke="currentColor"
+                                                                 class="w-5 h-5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                      d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636">
+                                                                </path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             {% endif %}
-                                            <div class="flex flex-col items-start space-y-1">
-                                                <div class="font-bold text-xs text-foreground">
-                                                    {{ notification.title }}
+
+                                            {% if notification.type == "AN" %}
+                                                {% if notification.follower.image %}
+                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                        <img src="{{ notification.follower.image.url }}"
+                                                             class="w-full h-full object-cover"
+                                                             alt="تصویر پروفایل {{ notification.follower.username }}">
+                                                    </div>
+                                                {% else %}
+                                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                        <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                             class="w-full h-full object-cover"
+                                                             alt="تصویر پروفایل {{ notification.follower.username }}">
+                                                    </div>
+                                                {% endif %}
+                                                <div class="flex flex-col items-start space-y-1">
+                                                    <div class="font-bold text-xs text-foreground">
+                                                        {{ notification.title }}
+                                                    </div>
+                                                    <div class="font-medium text-xs text-muted">
+                                                        {{ notification.message|safe }}
+                                                    </div>
+                                                    <div class="flex items-center gap-1 font-medium text-xs text-muted">
+                                                        {{ notification.created_at|j_date_formatter }}
+                                                    </div>
                                                 </div>
-                                                <div class="font-medium text-xs text-muted">
-                                                    {{ notification.message|safe }}
-                                                </div>
-                                                <div class="flex items-center gap-1 font-medium text-xs text-muted">
-                                                    {{ notification.created_at|j_date_formatter }}
-                                                </div>
-                                            </div>
+                                            {% endif %}
                                         </div>
                                         <!-- end notification-item -->
                                     {% endfor %}

@@ -252,7 +252,6 @@ class ProfileDetailView(URLStorageMixin, View):
                 is_follow_request_pending = Notification.objects.filter(
                     users=owner,
                     title="درخواست فالو",
-                    message=f'<p><a href="/account/profile/{user.username}"><span style="color:hsl(240,75%,60%);">{user.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
                     visibility="P",
                     following=owner,
                     follower=user,
@@ -351,7 +350,6 @@ class FollowPrivateAccounts(View):
         does_request_exists = Notification.objects.filter(
             users=following,
             title="درخواست فالو",
-            message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
             visibility="P",
             following=following,
             follower=follower,
@@ -363,7 +361,6 @@ class FollowPrivateAccounts(View):
             Notification.objects.get(
                 users=following,
                 title="درخواست فالو",
-                message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
                 visibility="P",
                 following=following,
                 follower=follower,
@@ -382,7 +379,7 @@ class FollowPrivateAccounts(View):
         else:
             notification = Notification.objects.create(
                 title="درخواست فالو",
-                message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را دنبال کند.</p>',
+                message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را فالو کند.</p>',
                 visibility="P",
                 following=following,
                 follower=follower,
@@ -516,3 +513,54 @@ class FavoriteCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
         context['account_status'] = account_status
 
         return context
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class HandleFollowRequests(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request):
+        follower = request.POST.get('follower')
+        following = request.POST.get('following')
+        mode = request.POST.get('mode')
+
+        follower = CustomUser.objects.get(username=follower)
+        following = CustomUser.objects.get(username=following)
+
+        if mode == 'ACC':
+            notification = Notification.objects.get(
+                users=following,
+                title="درخواست فالو",
+                visibility="P",
+                following=following,
+                follower=follower,
+                mode="S",
+                type="FO",
+            )
+            notification.delete()
+
+            follower.follow(following)
+
+            return JsonResponse(
+                data={
+                    "message": "accepted",
+                    "message_text": f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> شما را فالو کرد.</p>'
+                },
+                status=200
+            )
+
+        notification = Notification.objects.get(
+            users=following,
+            title="درخواست فالو",
+            visibility="P",
+            following=following,
+            follower=follower,
+            mode="S",
+            type="FO",
+        )
+        notification.delete()
+
+        return JsonResponse(
+            data={
+                "message": "rejected"
+            },
+            status=200
+        )

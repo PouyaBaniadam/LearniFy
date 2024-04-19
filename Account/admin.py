@@ -43,7 +43,7 @@ class WalletAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'title', 'created_at', 'mode', 'visibility', 'has_been_read')
+    list_display = ('uuid', 'title','message', 'created_at', 'mode', 'visibility', 'has_been_read')
 
 
 @admin.register(NewsLetter)

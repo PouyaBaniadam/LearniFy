@@ -18,6 +18,7 @@ urlpatterns = [
     path('toggle/follow/', views.ToggleFollow.as_view(), name='toggle_follow'),
     path('toggle/follow/private/accounts/', views.FollowPrivateAccounts.as_view(), name='follow_private_accounts'),
     path('unfollow/private/accounts/', views.UnfollowPrivateAccounts.as_view(), name='unfollow_private_accounts'),
+    path('handle/follow/requests/', views.HandleFollowRequests.as_view(), name='handle_follow_requests'),
     path('toggle/account/status/', views.ToggleAccountStatus.as_view(), name='toggle_account_status'),
     path('favorite/<slug:slug>', views.FavoriteCourses.as_view(), name='favorites'),
 ]
