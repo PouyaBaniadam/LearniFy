@@ -73,10 +73,29 @@ class NonFollowersOnlyMixin:
                     messages.error(request, f"شما مجوز ورود به این صفحه را ندارید!")
 
                     redirect_url = request.session.get('current_url')
+                    print(redirect_url)
 
                     if redirect_url is not None:
-                        return redirect(redirect_url)
+                        if request.resolver_match.url_name != "temp_follow":
+                            return redirect(redirect_url)
+
+                        else:
+                            return redirect(reverse("account:profile", kwargs={"slug": owner.slug}))
 
                     return redirect("home:home")
+
+        else:
+            messages.error(request, f"شما مجوز ورود به این صفحه را ندارید!")
+
+            redirect_url = request.session.get('current_url')
+
+            if redirect_url is not None:
+                if request.resolver_match.url_name != "temp_follow":
+                    return redirect(redirect_url)
+
+                else:
+                    return redirect(reverse("account:profile", kwargs={"slug": owner.slug}))
+
+            return redirect("home:home")
 
         return super(NonFollowersOnlyMixin, self).dispatch(request, *args, **kwargs)
