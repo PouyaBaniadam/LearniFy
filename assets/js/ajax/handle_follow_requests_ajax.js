@@ -12,11 +12,11 @@ function handleFollowRequests(follower, following, mode) {
         dataType: "json",
         success: function (response) {
             if (response.message === "accepted") {
-                const div = document.getElementById("followRequestButtons");
+                const button_divs = document.getElementById("followRequestButtons");
                 const title_div = document.getElementById("follow-title");
                 const message_div = document.getElementById("follow-message");
 
-                div.style.display = "none";
+                button_divs.style.display = "none";
                 title_div.innerText = "فالو";
 
                 // Function to strip HTML tags from a string
