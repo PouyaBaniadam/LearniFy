@@ -9,11 +9,12 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, UpdateView, ListView
+from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
-from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse
+from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
+    NonFollowersOnlyMixin
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post
 from Cart.models import Cart
 from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
@@ -218,7 +219,161 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(URLStorageMixin, View):
+class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
+    def get(self, request, slug):
+        user = self.request.user
+        owner = CustomUser.objects.get(slug=slug)
+
+        if user.is_authenticated:
+            user = CustomUser.objects.get(username=user.username)
+
+            is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
+
+            if is_visitor_the_owner:
+                posts = Post.objects.filter(user=owner)
+
+                is_following = user.is_following(owner)
+                account_status = owner.account_status
+
+                is_follow_request_pending = Notification.objects.filter(
+                    users=owner,
+                    title="درخواست فالو",
+                    visibility="P",
+                    following=owner,
+                    follower=user,
+                    mode="S",
+                    type="FO",
+                ).exists()
+
+                context = {
+                    "posts": posts,
+                    "user": owner,
+                    "is_following": is_following,
+                    "account_status": account_status,
+                    "is_follow_request_pending": is_follow_request_pending,
+                }
+
+                return render(request=request, template_name="account/owner_posts.html", context=context)
+
+            else:
+                posts = Post.objects.filter(user=owner)
+
+                is_following = user.is_following(owner)
+                account_status = owner.account_status
+
+                is_follow_request_pending = Notification.objects.filter(
+                    users=owner,
+                    title="درخواست فالو",
+                    visibility="P",
+                    following=owner,
+                    follower=user,
+                    mode="S",
+                    type="FO",
+                ).exists()
+
+                context = {
+                    "posts": posts,
+                    "user": owner,
+                    "is_following": is_following,
+                    "account_status": account_status,
+                    "is_follow_request_pending": is_follow_request_pending,
+                }
+
+                return render(request=request, template_name="account/visitor_posts.html", context=context)
+
+        else:
+            posts = Post.objects.filter(user=owner)
+
+            is_following = False
+            account_status = owner.account_status
+
+            is_follow_request_pending = False
+
+            context = {
+                "posts": posts,
+                "user": owner,
+                "is_following": is_following,
+                "account_status": account_status,
+                "is_follow_request_pending": is_follow_request_pending,
+            }
+
+            return render(request=request, template_name="account/visitor_posts.html", context=context)
+
+
+class PostDetailView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
+    def get(self, request, slug, uuid):
+        user = self.request.user
+
+        if user.is_authenticated:
+            user = CustomUser.objects.get(username=user.username)
+            owner = CustomUser.objects.get(slug=slug)
+
+            is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
+
+            if is_visitor_the_owner:
+                post = Post.objects.get(uuid=uuid)
+                context = {
+                    "post": post
+                }
+
+                return render(request=request, template_name="account/owner_post_detail.html", context=context)
+
+            else:
+                post = Post.objects.get(uuid=uuid)
+                context = {
+                    "post": post
+                }
+
+                return render(request=request, template_name="account/visitor_post_detail.html", context=context)
+
+
+class TempFollowPrivateAccountFirst(NonFollowersOnlyMixin, URLStorageMixin, View):
+    def get(self, request, slug):
+        user = self.request.user
+        owner = CustomUser.objects.get(slug=slug)
+
+        if user.is_authenticated:
+            user = CustomUser.objects.get(username=user.username)
+
+            is_following = user.is_following(owner)
+            account_status = owner.account_status
+
+            is_follow_request_pending = Notification.objects.filter(
+                users=owner,
+                title="درخواست فالو",
+                visibility="P",
+                following=owner,
+                follower=user,
+                mode="S",
+                type="FO",
+            ).exists()
+
+            context = {
+                "user": owner,
+                "is_following": is_following,
+                "account_status": account_status,
+                "is_follow_request_pending": is_follow_request_pending,
+            }
+
+            return render(request=request, template_name="account/visitor_posts_blur.html", context=context)
+
+        else:
+            is_following = False
+            account_status = owner.account_status
+
+            is_follow_request_pending = False
+
+            context = {
+                "user": owner,
+                "is_following": is_following,
+                "account_status": account_status,
+                "is_follow_request_pending": is_follow_request_pending,
+            }
+
+            return render(request=request, template_name="account/visitor_posts_blur.html", context=context)
+
+
+class VideoCoursesView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
     def get(self, request, slug):
         user = self.request.user
 
@@ -230,6 +385,9 @@ class ProfileDetailView(URLStorageMixin, View):
             video_courses = VideoCourse.objects.filter(participated_users=owner)
 
             if is_visitor_the_owner:
+                if owner.is_staff:
+                    video_courses = VideoCourse.objects.filter(teacher=owner)
+
                 favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=owner).values_list('id',
                                                                                                                  flat=True)
 
@@ -241,11 +399,15 @@ class ProfileDetailView(URLStorageMixin, View):
                 }
 
                 return render(
-                    request=request, template_name="Account/owner_profile.html", context=context)
+                    request=request, template_name="Account/owner_videos_profile.html", context=context)
 
             else:
                 favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
                                                                                                                 flat=True)
+
+                if owner.is_staff:
+                    video_courses = VideoCourse.objects.filter(teacher=owner)
+
                 is_following = user.is_following(owner)
                 account_status = owner.account_status
 
@@ -268,10 +430,8 @@ class ProfileDetailView(URLStorageMixin, View):
                     "is_follow_request_pending": is_follow_request_pending,
                 }
 
-                print(is_follow_request_pending)
-
                 return render(
-                    request=request, template_name="Account/visitor_profile.html", context=context)
+                    request=request, template_name="Account/visitor_video_profile.html", context=context)
 
         else:
             is_following = False
@@ -285,7 +445,7 @@ class ProfileDetailView(URLStorageMixin, View):
             }
 
             return render(
-                request=request, template_name="Account/visitor_profile.html", context=context)
+                request=request, template_name="Account/visitor_video_profile.html", context=context)
 
 
 @method_decorator(csrf_exempt, name='dispatch')

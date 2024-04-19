@@ -29,7 +29,11 @@
                                         <div class="w-1 h-1 bg-foreground rounded-full"></div>
                                         <div class="w-2 h-2 bg-foreground rounded-full"></div>
                                     </div>
-                                    <div class="font-black text-foreground">دوره‌های ویدئویی شرکت شده</div>
+                                    {% if user.is_staff %}
+                                        <div class="font-black text-foreground">دوره‌های تدریس شده</div>
+                                    {% else %}
+                                        <div class="font-black text-foreground">دوره‌های ویدئویی شرکت شده</div>
+                                    {% endif %}
                                 </div>
                                 <!-- end section:title -->
 

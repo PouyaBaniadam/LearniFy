@@ -2,10 +2,12 @@ from uuid import uuid4
 
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.text import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
+from star_ratings.models import Rating
 
 from Account.validators import validate_email
 from Course.models import VideoCourse, Exam
@@ -294,3 +296,29 @@ class FavoriteVideoCourse(models.Model):
         db_table = 'account__favorite_video_course'
         verbose_name = "دوره ویدئویی مورد علاقه"
         verbose_name_plural = "دوره‌های ویدئویی مورد علاقه"
+
+
+class Post(models.Model):
+    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
+
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, verbose_name="کاربر")
+
+    title = models.CharField(max_length=75, blank=True, null=True, verbose_name="تیتر")
+
+    file = models.FileField(upload_to='Account/Posts/files/', verbose_name="فایل")
+
+    caption = models.TextField(blank=True, null=True, verbose_name="کپشن")
+
+    ratings = GenericRelation(to=Rating, related_query_name='post')
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    updated_at = jDateTimeField(auto_now=True, verbose_name='به‌روز‌رسانی شده در تاریخ')
+
+    def __str__(self):
+        return f"{self.user} - {self.created_at.strftime('%d/%m/%Y')}"
+
+    class Meta:
+        db_table = 'account__post'
+        verbose_name = "پست"
+        verbose_name_plural = "پست‌ها"

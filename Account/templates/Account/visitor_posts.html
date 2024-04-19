@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load ratings %}
+{% load filters %}
+{% load static %}
+
+{% block content %}
+    <div class="flex flex-col min-h-screen bg-background">
+        {% include 'includes/header.html' %}
+
+        <main class="flex-auto py-5">
+            <div class="max-w-7xl space-y-14 px-4 mx-auto">
+                <div class="grid md:grid-cols-12 grid-cols-1 items-start gap-5">
+                    <div class="lg:col-span-3 md:col-span-4 md:sticky md:top-24">
+
+                        {% include 'includes/visitor_user_info.html' %}
+
+                        {% include 'includes/visitor_user_menu.html' %}
+                    </div>
+
+                    <div class="lg:col-span-9 md:col-span-8">
+                        <div class="space-y-10">
+
+                            {% include 'includes/visitor_statistics.html' %}
+
+                            <!-- section:learning-courses -->
+                            <div class="space-y-5">
+                                <!-- section:title -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                        <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                    </div>
+                                    <div class="font-black text-foreground">
+                                        پست‌ها
+                                    </div>
+                                </div>
+                                <!-- end section:title -->
+
+                                <!-- section:learning-courses:slider -->
+                                <div class="swiper col3-swiper-slider">
+                                    <div class="swiper-wrapper">
+
+                                        {% for post in posts %}
+                                            <div class="swiper-slide">
+                                                <!-- course:card -->
+                                                <div class="relative">
+                                                    <div class="relative z-10">
+                                                        <a href="{% url 'account:user_post' slug=post.user uuid=post.uuid %}"
+                                                           class="block">
+                                                            <img src="{{ post.file.url }}"
+                                                                 class="max-w-full rounded-3xl"
+                                                                 alt="{{ post.title }}"/>
+                                                        </a>
+                                                    </div>
+                                                    <div class="bg-background rounded-b-3xl -mt-12 pt-12">
+                                                        <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
+
+                                                            <h2 class="font-bold text-sm">
+                                                                <a href="{% url 'account:user_post' slug=post.user uuid=post.uuid %}"
+                                                                   class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ post.title }}</a>
+                                                            </h2>
+                                                            <p>
+                                                                {{ post.caption|truncatechars:"50" }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- end course:card -->
+                                            </div>
+                                        {% endfor %}
+
+                                </div>
+
+                                <div class="swiper-button-prev"></div>
+                                <div class="swiper-button-next"></div>
+                            </div>
+                            <!-- end section:learning-courses:slider -->
+                        </div>
+                        <!-- end section:learning-courses -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/ajax/toggle_like_video_course_ajax.js' %}"></script>
+
+{% endblock %}

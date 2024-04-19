@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load ratings %}
+{% load filters %}
+{% load static %}
+
+{% block content %}
+    <div class="flex flex-col min-h-screen bg-background">
+        {% include 'includes/header.html' %}
+
+        <main class="flex-auto py-5">
+            <div class="max-w-7xl space-y-14 px-4 mx-auto">
+                <div class="grid md:grid-cols-12 grid-cols-1 items-start gap-5">
+                    <div class="lg:col-span-3 md:col-span-4 md:sticky md:top-24">
+
+                        {% include 'includes/visitor_user_info.html' %}
+
+                        {% include 'includes/visitor_temp_follow_menu.html' %}
+                    </div>
+
+
+                    <div class="lg:col-span-9 md:col-span-8">
+                        {% include 'includes/visitor_statistics.html' %}
+                        <div class="flex flex-col items-center justify-center space-y-3">
+                            <!-- Image Container -->
+                            <div class="flex items-center justify-center">
+                                <img src="{% static 'images/screens/protection.png' %}" class="max-w-xs w-52"
+                                     alt="..."/>
+                            </div>
+
+                            <!-- Text Container -->
+                            <div class="text-center space-y-3">
+                                <h2 class="font-bold text-xl text-foreground">
+                                    این حساب کاربری شخصی است.
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- end section:learning-courses -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/ajax/toggle_like_video_course_ajax.js' %}"></script>
+
+{% endblock %}
