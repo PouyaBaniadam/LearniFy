@@ -5,11 +5,12 @@ from uuid import uuid4
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView, UpdateView, ListView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
@@ -700,11 +701,6 @@ class HandleFollowRequests(AuthenticatedUsersOnlyMixin, View):
         )
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ValidationError
-
-
 @csrf_exempt
 def add_post(request):
     if request.method == 'POST':
@@ -745,6 +741,26 @@ def add_post(request):
         return JsonResponse({'message': 'پست با موفقیت ساخته شد.'}, status=200)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+import json
+from django.http import JsonResponse
+
+
+@require_POST
+def delete_post(request):
+    try:
+        data = json.loads(request.body)
+        print("E")
+        post_id = data.get('postId')
+        if post_id is not None:
+            post = get_object_or_404(Post, id=post_id)
+            post.delete()
+            return JsonResponse({'message': 'Post deleted successfully.'})
+        else:
+            return JsonResponse({'error': 'Invalid postId'}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
 
 @csrf_exempt
