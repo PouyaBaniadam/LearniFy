@@ -49,6 +49,8 @@
 
                                                     <div class="bg-background rounded-b-3xl -mt-12 pt-12">
                                                         <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
+                                                            {% ratings post %}
+
                                                             <h2 class="font-bold text-sm">
                                                                 <a onclick="showPostDetail(
                                                                         '{{ post.file.url }}',
@@ -73,11 +75,7 @@
                                                                         {% endif %}
                                                                     </div>
                                                                     <div class="flex flex-col items-start space-y-1">
-                                                                        <a onclick="showPostDetail(
-                                                                                '{{ post.file.url }}',
-                                                                                '{{ post.title }}',
-                                                                                '{{ post.caption }}',
-                                                                                )"
+                                                                        <a href="{% url 'account:profile' user.slug %}"
                                                                            class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ post.user.username }}</a>
                                                                     </div>
                                                                 </div>

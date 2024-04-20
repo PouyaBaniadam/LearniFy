@@ -6,6 +6,8 @@ app_name = "account"
 
 urlpatterns = [
     path("profile/<slug:slug>", views.PostListView.as_view(), name="profile"),
+    path("profile/post/add/", views.add_post, name="add_post"),
+    path("profile/post/caption/update/", views.update_caption, name="update_caption"),
     path("profile/<slug:slug>/temp/follow", views.TempFollowPrivateAccountFirst.as_view(), name="temp_follow"),
     path("profile/videos/<slug:slug>", views.VideoCoursesView.as_view(), name="video_courses"),
     path("profile/<slug:slug>/edit", views.ProfileEditView.as_view(), name="edit_profile"),

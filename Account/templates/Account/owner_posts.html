@@ -3,6 +3,21 @@
 {% load filters %}
 {% load static %}
 
+<style>
+    #postDetailContainer {
+        position: relative;
+    }
+
+    textarea {
+        width: 100%;
+        height: 100px;
+        resize: vertical; /* Allow vertical resizing */
+        padding: 6px;
+        box-sizing: border-box;
+    }
+
+</style>
+
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
         {% include 'includes/header.html' %}
@@ -30,8 +45,68 @@
                                     </div>
                                     <div class="font-black text-foreground">پست‌ها</div>
                                 </div>
+
                                 <div class="swiper col3-swiper-slider">
                                     <div class="swiper-wrapper">
+
+                                        <div class="swiper-slide">
+                                            <div class="relative">
+                                                <div class="relative z-10">
+                                                    <a onclick="showAddPostForm()"
+                                                       class="block">
+                                                        <img src="{% static 'images/screens/add-post.jpg' %}"
+                                                             class="max-w-full rounded-3xl" alt=""/>
+                                                    </a>
+                                                </div>
+
+                                                <div class="bg-background rounded-b-3xl -mt-12 pt-12">
+                                                    <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
+                                                        <h2 class="font-bold text-sm">
+                                                            <a onclick="showAddPostForm()"
+                                                               class="line-clamp-1 text-foreground transition-colors hover:text-primary">افزودن
+                                                                پست</a>
+                                                        </h2>
+                                                    </div>
+                                                    <div class="space-y-3 p-5">
+                                                        <div class="flex items-center justify-between gap-5">
+                                                            <div class="flex items-center gap-3">
+                                                                <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                    {% if user.image %}
+                                                                        <img src="{{ user.image.url }}"
+                                                                             class="w-full h-full object-cover"
+                                                                             alt="تصویر پروفایل"/>
+                                                                    {% else %}
+                                                                        <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                             class="w-full h-full object-cover"
+                                                                             alt="تصویر پروفایل"/>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="flex flex-col items-start space-y-1">
+                                                                    <a href="{% url 'account:profile' user.slug %}"
+                                                                       class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ user.username }}</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="space-y-3 mt-3">
+                                                            <a onclick="showAddPostForm()"
+                                                               class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                                <span class="font-semibold text-sm">افزودن پست</span>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                     viewBox="0 0 24 24" stroke-width="1.5"
+                                                                     stroke="currentColor" class="w-6 h-6">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                          d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z">
+                                                                    </path>
+                                                                </svg>
+
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
                                         {% for post in posts %}
                                             <div class="swiper-slide">
                                                 <div class="relative">
@@ -40,6 +115,7 @@
                                                                 '{{ post.file.url }}',
                                                                 '{{ post.title }}',
                                                                 '{{ post.caption }}',
+                                                                '{{ post.id }}',
                                                                 )"
                                                            class="block">
                                                             <img src="{{ post.file.url }}"
@@ -49,11 +125,14 @@
 
                                                     <div class="bg-background rounded-b-3xl -mt-12 pt-12">
                                                         <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
+                                                            {% ratings post %}
+
                                                             <h2 class="font-bold text-sm">
                                                                 <a onclick="showPostDetail(
                                                                         '{{ post.file.url }}',
                                                                         '{{ post.title }}',
                                                                         '{{ post.caption }}',
+                                                                        '{{ post.id }}',
                                                                         )"
                                                                    class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ post.title }}</a>
                                                             </h2>
@@ -73,11 +152,7 @@
                                                                         {% endif %}
                                                                     </div>
                                                                     <div class="flex flex-col items-start space-y-1">
-                                                                        <a onclick="showPostDetail(
-                                                                                '{{ post.file.url }}',
-                                                                                '{{ post.title }}',
-                                                                                '{{ post.caption }}',
-                                                                                )"
+                                                                        <a href="{% url 'account:profile' user.slug %}"
                                                                            class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ post.user.username }}</a>
                                                                     </div>
                                                                 </div>
@@ -87,6 +162,7 @@
                                                                         '{{ post.file.url }}',
                                                                         '{{ post.title }}',
                                                                         '{{ post.caption }}',
+                                                                        '{{ post.id }}',
                                                                         )"
                                                                    class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                                                     <span class="font-semibold text-sm">مشاهده پست</span>
@@ -104,6 +180,8 @@
                                                 </div>
                                             </div>
                                         {% endfor %}
+
+
                                     </div>
 
                                     <div class="swiper-button-prev"></div>
@@ -123,7 +201,8 @@
     </div>
 
     <script>
-        function showPostDetail(imageUrl, postTitle, postCaption) {
+
+        function showPostDetail(imageUrl, postTitle, postCaption, postId) {
             Swal.fire({
                 width: 550,
                 title: postTitle,
@@ -132,12 +211,151 @@
                 imageHeight: 250,
                 confirmButtonText: 'بستن',
                 html: `
-                <div>
-                    <p>${postCaption}</p>
-                </div>
+<div id="postDetailContainer">
+    <p id="postCaption">${postCaption}</p>
+    <button id="editButton" onclick="enableEditing(${postId})">✏️</button>
+</div>
             `,
             });
         }
-    </script>
 
+        function enableEditing(postId) {
+            const postCaptionElement = document.getElementById('postCaption');
+            const editButton = document.getElementById('editButton');
+
+            const textarea = document.createElement('textarea');
+            textarea.id = 'editedCaption';
+            textarea.value = postCaptionElement.innerText;
+            textarea.style.width = '100%';
+            textarea.style.height = '100px';
+            textarea.classList.add(
+                'form-textarea',
+                'w-full',
+                '!ring-0',
+                '!ring-offset-0',
+                'bg-secondary',
+                'border-0',
+                'focus:border-border',
+                'border-border',
+                'rounded-xl',
+                'text-sm',
+                'text-foreground',
+                'p-5'
+            );
+            postCaptionElement.replaceWith(textarea);
+            editButton.innerHTML = `
+        <button class="w-full h-11 inline-flex items-center justify-center gap-1 bg-success rounded-lg text-primary-foreground transition-all hover:opacity-80 px-4" onclick="saveChanges(${postId})">ذخیره</button>
+    `;
+        }
+
+        function saveChanges(post_id) {
+            const editedCaption = document.getElementById('editedCaption').value;
+            const postId = post_id; // Replace with your post ID
+            const data = {
+                caption: editedCaption,
+                post_id: postId
+            };
+
+            fetch(`/account/profile/post/caption/update/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Use a function to get CSRF token
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json(); // Parse the response body as JSON
+                    }
+                })
+                .then(data => {
+                    // Update the UI with the new caption if successful
+                    const postCaptionElement = document.createElement('p');
+                    postCaptionElement.id = 'postCaption';
+                    postCaptionElement.innerText = data.caption; // Access 'caption' property from response
+                    const textarea = document.getElementById('editedCaption');
+                    textarea.replaceWith(postCaptionElement);
+
+                    // Reset the button to Edit mode
+                    const editButton = document.getElementById('editButton');
+                    editButton.innerHTML = '✏️';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function showAddPostForm() {
+            Swal.fire({
+                icon: "info",
+                title: 'افزودن پست',
+                confirmButtonText: 'افزودن',
+                html:
+                    '<input id="imageInput" type="file" accept="image/*" required>' +
+                    '<input id="titleInput" maxlength="50" type="text" class="form-textarea w-full form-textareaw-full !ring-0 !ring-offset-0 bg-secondary border-0 focus:border-border border-border rounded-xl text-sm text-foreground p-5!ring-0 mb-3 mt-3" placeholder="موضوع" required>' +
+                    '<textarea id="captionInput" maxlength="1000" class="h-full form-textarea w-full form-textareaw-full !ring-0 !ring-offset-0 bg-secondary border-0 focus:border-border border-border rounded-xl text-sm text-foreground p-5!ring-0" placeholder="کپشن"></textarea>',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const imageInput = document.getElementById('imageInput');
+                    const titleInput = document.getElementById('titleInput');
+                    const captionInput = document.getElementById('captionInput');
+
+                    if (!imageInput || !imageInput.files || !imageInput.files[0]) {
+                        Swal.showValidationMessage('لطفاً یک تصویر انتخاب کنید');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('image', imageInput.files[0]);
+                    formData.append('title', titleInput.value);
+                    formData.append('caption', captionInput.value);
+
+                    return fetch('/account/profile/post/add/', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.error) {
+                                throw new Error(data.error);
+                            } else {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'پست با موفقیت افزوده شد',
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطا در افزودن پست',
+                                text: error.message || 'خطای ناشناخته رخ داده است',
+                                confirmButtonText: 'باشه',
+                                confirmButtonColor: 'red',
+                            });
+                        });
+                }
+            });
+        }
+
+
+    </script>
 {% endblock %}

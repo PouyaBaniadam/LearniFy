@@ -1,3 +1,4 @@
+import json
 import random
 from uuid import uuid4
 
@@ -230,7 +231,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
             is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
 
             if is_visitor_the_owner:
-                posts = Post.objects.filter(user=owner)
+                posts = Post.objects.filter(user=owner).order_by("-created_at")
 
                 is_following = user.is_following(owner)
                 account_status = owner.account_status
@@ -256,7 +257,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                 return render(request=request, template_name="account/owner_posts.html", context=context)
 
             else:
-                posts = Post.objects.filter(user=owner)
+                posts = Post.objects.filter(user=owner).order_by("-created_at")
 
                 is_following = user.is_following(owner)
                 account_status = owner.account_status
@@ -282,7 +283,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                 return render(request=request, template_name="account/visitor_posts.html", context=context)
 
         else:
-            posts = Post.objects.filter(user=owner)
+            posts = Post.objects.filter(user=owner).order_by("-created_at")
 
             is_following = False
             account_status = owner.account_status
@@ -697,3 +698,78 @@ class HandleFollowRequests(AuthenticatedUsersOnlyMixin, View):
             },
             status=200
         )
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ValidationError
+
+
+@csrf_exempt
+def add_post(request):
+    if request.method == 'POST':
+        image = request.FILES.get('image')
+        title = request.POST.get('title')
+        caption = request.POST.get('caption')
+
+        if len(title) > 50:
+            return JsonResponse(
+                data={
+                    "error": "موضوع نباید بیشتر از 50 کارکاتر داشته باشد.",
+                },
+                status=400
+            )
+
+        if len(caption) > 1000:
+            return JsonResponse(
+                data={
+                    "error": "کپشن نباید بیشتر از 1000 کارکاتر داشته باشد.",
+                },
+                status=400
+            )
+
+        if not image:
+            return JsonResponse({'error': 'هیچ فایلی ارائه نشده!'}, status=400)
+
+        max_size_bytes = 2048 * 1024
+        if image.size > max_size_bytes:
+            return JsonResponse({'error': 'تصویر نباید بیشتر از 2 مگابایت حجم داشته باشد.'}, status=400)
+
+        Post.objects.create(
+            user=request.user,
+            title=title,
+            caption=caption,
+            file=image
+        )
+
+        return JsonResponse({'message': 'پست با موفقیت ساخته شد.'}, status=200)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def update_caption(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+        caption = data.get('caption')
+
+        post = Post.objects.get(id=post_id)
+
+        post.caption = caption
+        post.save()
+
+        if request.user != post.user:
+            return JsonResponse(
+                data={
+                    'message': 'denied',
+                },
+                status=403)
+
+        else:
+            return JsonResponse(
+                data={
+                    'message': 'done',
+                    'caption': caption
+                },
+                status=200)
