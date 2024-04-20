@@ -4,14 +4,13 @@ from uuid import uuid4
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.core.files.uploadedfile import UploadedFile
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.views.generic import FormView, UpdateView, ListView
+from django.views.generic import FormView, UpdateView, ListView, View
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
@@ -701,76 +700,84 @@ class HandleFollowRequests(AuthenticatedUsersOnlyMixin, View):
         )
 
 
-@csrf_exempt
-def add_post(request):
-    if request.method == 'POST':
-        image = request.FILES.get('image')
-        title = request.POST.get('title')
-        caption = request.POST.get('caption')
+@method_decorator(csrf_exempt, name='dispatch')
+class AddPostView(View):
+    def post(self, request):
+        if request.method == 'POST':
+            image = request.FILES.get('image')
+            title = request.POST.get('title')
+            caption = request.POST.get('caption')
 
-        if len(title) > 50:
-            return JsonResponse(
-                data={
-                    "error": "موضوع نباید بیشتر از 50 کارکاتر داشته باشد.",
-                },
-                status=400
-            )
+            if len(title) > 50:
+                return JsonResponse(
+                    data={
+                        "error": "موضوع نباید بیشتر از 50 کاراکتر داشته باشد.",
+                    },
+                    status=400
+                )
 
-        if len(caption) > 1000:
-            return JsonResponse(
-                data={
-                    "error": "کپشن نباید بیشتر از 1000 کارکاتر داشته باشد.",
-                },
-                status=400
-            )
+            if len(caption) > 1000:
+                return JsonResponse(
+                    data={
+                        "error": "کپشن نباید بیشتر از 1000 کاراکتر داشته باشد.",
+                    },
+                    status=400
+                )
 
-        if not image:
-            return JsonResponse({'error': 'هیچ فایلی ارائه نشده!'}, status=400)
+            if not image or not isinstance(image, UploadedFile):
+                return JsonResponse({'error': 'هیچ فایلی ارائه نشده!'}, status=400)
 
-        max_size_bytes = 2048 * 1024
-        if image.size > max_size_bytes:
-            return JsonResponse({'error': 'تصویر نباید بیشتر از 2 مگابایت حجم داشته باشد.'}, status=400)
+            max_size_bytes = 2048 * 1024
+            if image.size > max_size_bytes:
+                return JsonResponse({'error': 'تصویر نباید بیشتر از 2 مگابایت حجم داشته باشد.'}, status=400)
 
-        Post.objects.create(
-            user=request.user,
-            title=title,
-            caption=caption,
-            file=image
-        )
+            if request.user.is_authenticated:
+                Post.objects.create(
+                    user=request.user,
+                    title=title,
+                    caption=caption,
+                    file=image
+                )
+                return JsonResponse({'message': 'پست با موفقیت ساخته شد.'}, status=200)
+            else:
+                return JsonResponse({'error': 'لطفا ابتدا وارد شوید.'}, status=401)
 
-        return JsonResponse({'message': 'پست با موفقیت ساخته شد.'}, status=200)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-
-import json
-from django.http import JsonResponse
-
-
-@require_POST
-def delete_post(request):
-    try:
-        data = json.loads(request.body)
-        print("E")
-        post_id = data.get('postId')
-        if post_id is not None:
-            post = get_object_or_404(Post, id=post_id)
-            post.delete()
-            return JsonResponse({'message': 'Post deleted successfully.'})
-        else:
-            return JsonResponse({'error': 'Invalid postId'}, status=400)
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
-@csrf_exempt
-def update_caption(request):
-    if request.method == 'POST':
+@method_decorator(csrf_exempt, name='dispatch')
+class DeletePostView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            post_id = data.get('postId')
+
+            if post_id is not None:
+                post = get_object_or_404(Post, id=post_id)
+                post.delete()
+                return JsonResponse({'message': 'Post deleted successfully.'})
+            else:
+                return JsonResponse({'error': 'Invalid postId'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateCaptionView(View):
+    def post(self, request):
         data = json.loads(request.body)
         post_id = data.get('post_id')
         caption = data.get('caption')
 
-        post = Post.objects.get(id=post_id)
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse(
+                data={
+                    'message': 'Post not found',
+                },
+                status=404
+            )
 
         post.caption = caption
         post.save()
@@ -778,14 +785,15 @@ def update_caption(request):
         if request.user != post.user:
             return JsonResponse(
                 data={
-                    'message': 'denied',
+                    'message': 'Denied',
                 },
-                status=403)
-
+                status=403
+            )
         else:
             return JsonResponse(
                 data={
-                    'message': 'done',
+                    'message': 'Done',
                     'caption': caption
                 },
-                status=200)
+                status=200
+            )
