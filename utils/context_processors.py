@@ -1,7 +1,7 @@
 from Account.models import CustomUser
 from Cart.models import Cart
-from Course.filters import VideoCourseFilter
-from Course.models import Category, Exam, VideoCourse
+from Course.filters import VideoCourseFilter, PDFCourseFilter
+from Course.models import Category, Exam, VideoCourse, PDFCourse
 from Us.models import SocialMedia, AboutUs
 
 
@@ -43,13 +43,16 @@ def filter_categories(request):
     return context
 
 
-def filter_video_courses(request):
+def filter_courses(request):
     video_courses = VideoCourse.objects.all()
+    pdf_courses = PDFCourse.objects.all()
 
     video_course_filter = VideoCourseFilter(request.GET, queryset=video_courses)
+    pdf_course_filter = PDFCourseFilter(request.GET, queryset=pdf_courses)
 
     context = {
-        'video_course_filter_form': video_course_filter.form
+        'video_course_filter_form': video_course_filter.form,
+        'pdf_course_filter_form': pdf_course_filter.form
     }
 
     return context

@@ -1,4 +1,4 @@
-function register_video_course(courseId) {
+function register_course(courseId, appName) {
     Swal.fire({
         title: 'ثبت نام',
         text: 'آیا از ثبت نام در دوره اطمینان دارید؟',
@@ -12,7 +12,7 @@ function register_video_course(courseId) {
         if (result.isConfirmed) {
             $.ajax({
                 type: 'POST',
-                url: '/course/video/register/',
+                url: `/${appName}/video/register/`,
                 data: {
                     "courseId": courseId
                 },

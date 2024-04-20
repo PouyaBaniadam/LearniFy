@@ -10,7 +10,7 @@ from django_jalali.db.models import jDateTimeField
 from star_ratings.models import Rating
 
 from Account.validators import validate_email
-from Course.models import VideoCourse, Exam
+from Course.models import VideoCourse, Exam, PDFCourse
 
 
 class CustomUserManager(BaseUserManager):
@@ -296,6 +296,23 @@ class FavoriteVideoCourse(models.Model):
         db_table = 'account__favorite_video_course'
         verbose_name = "دوره ویدئویی مورد علاقه"
         verbose_name_plural = "دوره‌های ویدئویی مورد علاقه"
+
+
+class FavoritePDFCourse(models.Model):
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, blank=True, null=True, verbose_name="کاربر")
+
+    pdf_course = models.ForeignKey(to=PDFCourse, on_delete=models.CASCADE, blank=True, null=True,
+                                   verbose_name="دوره پی‌دی‌افی")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user} - {self.pdf_course.name}"
+
+    class Meta:
+        db_table = 'account__favorite_pdf_course'
+        verbose_name = "دوره پی‌دی‌افی مورد علاقه"
+        verbose_name_plural = "دوره‌های پی‌دی‌افی مورد علاقه"
 
 
 class Post(models.Model):

@@ -61,7 +61,7 @@
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">مدت دوره</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.total_duration|format_seconds_to_time }}</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.total_pages }}</span>
                                             </div>
                                         </div>
                                         <div
@@ -215,7 +215,7 @@
                                                 <!-- course:sections:wrapper -->
                                                 <div class="flex flex-col space-y-3">
 
-                                                    {% for season in course.videocourseseason_set.all %}
+                                                    {% for season in course.pdfcourseseason_set.all %}
                                                         <!-- course:section:accordion -->
                                                         <div class="w-full" x-data="{ open: false }">
 
@@ -251,8 +251,8 @@
                                                                  x-show="open">
                                                                 <!-- course:section:episodes wrapper -->
                                                                 <div class="space-y-1">
-                                                                    {% if season.videocourseobject_set.all %}
-                                                                        {% for session in season.videocourseobject_set.all %}
+                                                                    {% if season.pdfcourseobject_set.all %}
+                                                                        {% for session in season.pdfcourseobject_set.all %}
                                                                             <!-- episode -->
                                                                             <div class="flex sm:flex-nowrap flex-wrap items-center gap-3 sm:h-12 border border-border rounded-xl p-3">
                                                                                 <span class="text-xs text-muted">{{ forloop.counter }}</span>
@@ -264,7 +264,7 @@
                                                                                 </a>
                                                                                 <div class="flex items-center justify-end gap-3 sm:w-auto w-full mr-auto">
                                                                         <span class="flex items-center gap-1 text-muted">
-                                                                            <span class="text-xs">{{ session.duration|format_seconds_to_time }}</span>
+                                                                            <span class="text-xs">{{ session.page }}</span>
                                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                                  fill="none" viewBox="0 0 24 24"
                                                                                  stroke-width="1.5"
@@ -292,7 +292,7 @@
                                                                                                         </svg>
                                                                                                     </button>
                                                                                                 {% else %}
-                                                                                                    <button onclick="register_course('{{ course.id }}', 'video')"
+                                                                                                    <button onclick="register_course('{{ course.id }}', 'pdf')"
                                                                                                             class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
                                                                                                         <span class="text-xs">ثبت‌نام دوره</span>
                                                                                                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -455,7 +455,7 @@
 
                                                     <!-- course:comments:form -->
                                                     <form method="post"
-                                                          action="{% url 'course:add_video_course_comment' course.slug %}"
+                                                          action="{% url 'course:add_pdf_course_comment' course.slug %}"
                                                           class="flex flex-col space-y-5">
                                                         {% csrf_token %}
 
@@ -508,7 +508,7 @@
                                                                         </div>
                                                                         <div class="flex items-center gap-3 sm:mr-0 mr-auto">
                                                                             {% if request.user == comment.user %}
-                                                                                <button onclick="submit_deletion('{{ comment.id }}', 'course/video')"
+                                                                                <button onclick="submit_deletion('{{ comment.id }}', 'course/pdf')"
                                                                                         class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-red-700 px-4">
                                                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                                                          fill="none" viewBox="0 0 24 24"
@@ -538,7 +538,7 @@
 
                                                                             {% if request.user.is_authenticated %}
                                                                                 {% if comment.id in user_likes %}
-                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'course/video')"
+                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'course/pdf')"
                                                                                             id="likeBtn-{{ comment.id }}"
                                                                                             type="button"
                                                                                             class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
@@ -555,7 +555,7 @@
                                                                                     </span>
                                                                                     </button>
                                                                                 {% else %}
-                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'course/video')"
+                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'course/pdf')"
                                                                                             id="likeBtn-{{ comment.id }}"
                                                                                             type="button"
                                                                                             class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
@@ -620,7 +620,7 @@
                                                                                 </div>
                                                                                 <div class="flex items-center gap-3 sm:mr-0 mr-auto">
                                                                                     {% if request.user == reply.user %}
-                                                                                        <button onclick="submit_deletion('{{ reply.id }}', 'course/video')"
+                                                                                        <button onclick="submit_deletion('{{ reply.id }}', 'course/pdf')"
                                                                                                 class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-red-700 px-4">
                                                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                                                  fill="none"
@@ -637,7 +637,7 @@
 
                                                                                     {% if request.user.is_authenticated %}
                                                                                         {% if reply.id in user_likes %}
-                                                                                            <button onclick="toggleLike('{{ reply.id }}', 'course/video')"
+                                                                                            <button onclick="toggleLike('{{ reply.id }}', 'course/pdf')"
                                                                                                     id="likeBtn-{{ reply.id }}"
                                                                                                     type="button"
                                                                                                     class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
@@ -654,7 +654,7 @@
                                                                                                 </span>
                                                                                             </button>
                                                                                         {% else %}
-                                                                                            <button onclick="toggleLike('{{ reply.id }}', 'course/video')"
+                                                                                            <button onclick="toggleLike('{{ reply.id }}', 'course/pdf')"
                                                                                                     id="likeBtn-{{ reply.id }}"
                                                                                                     type="button"
                                                                                                     class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
@@ -756,7 +756,7 @@
 
 
                                     {% if request.user.is_authenticated %}
-                                        {% if course.id in favorite_video_courses %}
+                                        {% if course.id in favorite_pdf_courses %}
                                             <button type="button"
                                                     class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
                                                     data-id="{{ course.id }}"
@@ -874,7 +874,7 @@
 
                                                 {% elif course.payment_type == "F" %}
                                                     <button type="button"
-                                                            onclick="register_course('{{ course.id }}', 'video')"
+                                                            onclick="register_course('{{ course.id }}', 'pdf')"
                                                             class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                                         <span class="font-semibold text-sm">ثبت‌نام دوره</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -900,7 +900,7 @@
                                                 </button>
                                             {% endif %}
                                             {% if request.user.is_authenticated %}
-                                                {% if course.id in favorite_video_courses %}
+                                                {% if course.id in favorite_pdf_courses %}
                                                     <button type="button"
                                                             class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
                                                             data-id="{{ course.id }}"
@@ -1121,7 +1121,7 @@
 
     <script>
         document.getElementById('openAdminPanel').addEventListener('click', function () {
-            window.open('http://{{ request.get_host }}/admin/Course/videocourseobject/add/');
+            window.open('http://{{ request.get_host }}/admin/Course/pdfcourseobject/add/');
         });
     </script>
 

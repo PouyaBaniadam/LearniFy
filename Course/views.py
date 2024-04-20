@@ -14,10 +14,11 @@ from django.views.generic import ListView, DetailView, View
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification
 from Cart.models import CartItem
-from Course.filters import VideoCourseFilter
+from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     NonFinishedExamsOnlyMixin
-from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment
+from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
+    PDFCourse, PDFCourseComment
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 from utils.useful_functions import get_time_difference
@@ -348,7 +349,7 @@ class VideoCourseFilterView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ToggleFavorite(View):
+class ToggleVideoCourseFavorite(View):
     def post(self, request, *args, **kwargs):
         course_id = request.POST.get('id')
         user_id = request.POST.get('user')
@@ -417,4 +418,198 @@ class LikeVideoCourseComment(AuthenticatedUsersOnlyMixin, View):
 
             return JsonResponse({'liked': liked})
         except VideoCourseComment.DoesNotExist:
+            return JsonResponse({'error': 'چنین کامنتی یافت نشد.'}, status=404)
+
+
+class AllPDFCourses(URLStorageMixin, ListView):
+    model = PDFCourse
+    context_object_name = 'pdf_courses'
+    template_name = 'Course/all_pdf_courses.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
+                                                                                                      flat=True)
+        else:
+            favorite_pdf_courses = []
+
+        context['favorite_pdf_courses'] = favorite_pdf_courses
+
+        return context
+
+    def get_queryset(self):
+        pdf_courses = PDFCourse.objects.select_related('category', 'teacher').order_by('-created_at')
+
+        return pdf_courses
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RegisterInPDFCourse(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        course_id = request.POST.get('courseId')
+        user = self.request.user
+
+        pdf_course = PDFCourse.objects.get(id=course_id)
+        if pdf_course.payment_type == "F":
+            if not PDFCourse.objects.filter(id=course_id, participated_users=user).exists():
+                pdf_course.participated_users.add(user)
+                pdf_course.save()
+
+                return JsonResponse(data={"message": f"ثبت نام در دوره {pdf_course.name} با موفقیت انجام شد."},
+                                    status=200)
+
+            else:
+                return JsonResponse(data={"message": f"شما قبلا در دوره {pdf_course.name} ثبت نام کردید."},
+                                    status=400)
+
+
+class PDFCourseFilterView(View):
+    template_name = "Course/pdf_course_filter.html"
+
+    def get(self, request):
+        pdf_courses = PDFCourse.objects.all()
+        pdf_course_filter = PDFCourseFilter(request.GET, queryset=pdf_courses)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
+                                                                                                      flat=True)
+        else:
+            favorite_pdf_courses = []
+
+        context = {
+            'pdf_courses': pdf_course_filter.qs,
+            'favorite_pdf_courses': favorite_pdf_courses
+        }
+
+        return render(request=request, template_name=self.template_name, context=context)
+
+
+class PDFCourseDetail(URLStorageMixin, DetailView):
+    model = PDFCourse
+    context_object_name = 'course'
+    template_name = 'Course/pdf_course_detail.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('category', 'teacher')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+
+        is_follow_request_pending = False
+
+        if user.is_authenticated:
+            does_course_exists_in_cart = CartItem.objects.filter(
+                cart__user=user, course_pk=self.object.id, course_type="B").exists()
+
+            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
+                                                                                                      flat=True)
+
+            is_follow_request_pending = Notification.objects.filter(
+                users=self.object.teacher,
+                title="درخواست فالو",
+                visibility="P",
+                following=self.object.teacher,
+                follower=user,
+                mode="S",
+                type="FO",
+            ).exists()
+
+        else:
+            does_course_exists_in_cart = False
+            favorite_pdf_courses = []
+
+        comments = self.object.pdf_course_comments.all()
+
+        if self.request.user.is_authenticated:
+            user_likes = PDFCourseComment.objects.filter(likes=user).values_list('id', flat=True)
+            is_following = Follow.objects.filter(follower=user, following=self.object.teacher).exists()
+
+        else:
+            user_likes = []
+            is_following = False
+
+        context['does_course_exists_in_cart'] = does_course_exists_in_cart
+        context['favorite_pdf_courses'] = favorite_pdf_courses
+        context['comments'] = comments
+        context['user_likes'] = user_likes
+        context['is_following'] = is_following
+        context['is_follow_request_pending'] = is_follow_request_pending
+
+        return context
+
+    def get_object(self, queryset=None):
+        slug = uri_to_iri(self.kwargs.get(self.slug_url_kwarg))
+        queryset = self.get_queryset()
+        return get_object_or_404(queryset, **{self.slug_field: slug})
+
+
+class PDFCourseByCategory(URLStorageMixin, ListView):
+    model = PDFCourse
+    context_object_name = 'pdf_courses'
+    template_name = 'Course/pdf_courses_by_category.html'
+
+    def get_queryset(self):
+        slug = uri_to_iri(self.kwargs.get('slug'))
+
+        pdf_courses = get_list_or_404(PDFCourse, category__slug=slug)
+
+        return pdf_courses
+
+
+class AddPDFCourseComment(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        text = request.POST.get('text')
+        parent_id = request.POST.get('parent_id')
+        slug = kwargs.get('slug')
+
+        pdf_course = get_object_or_404(PDFCourse, slug=slug)
+
+        PDFCourseComment.objects.create(user=user, text=text, pdf_course=pdf_course, parent_id=parent_id)
+        messages.success(request, f"نظر شما با موفقیت ثبت شد.")
+
+        fragment = 'reply_section'
+        url = reverse('course:pdf_course_detail', kwargs={'slug': slug}) + f'#{fragment}'
+
+        return redirect(url)
+
+
+class DeletePDFCourseComment(AuthenticatedUsersOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+
+        comment = PDFCourseComment.objects.get(id=id)
+        pdf_course = PDFCourse.objects.get(pdf_course_comments=comment)
+        comment.delete()
+
+        messages.success(request, f"نظر شما با موفقیت حذف شد.")
+
+        return redirect(reverse("course:pdf_course_detail", kwargs={'slug': pdf_course.slug}))
+
+
+class LikePDFCourseComment(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            comment_id = data.get('comment_id')
+
+            comment = get_object_or_404(PDFCourseComment, id=comment_id)
+            user = request.user
+
+            if user in comment.likes.all():
+                comment.likes.remove(user)
+                liked = False
+            else:
+                comment.likes.add(user)
+                liked = True
+
+            return JsonResponse({'liked': liked})
+        except PDFCourseComment.DoesNotExist:
             return JsonResponse({'error': 'چنین کامنتی یافت نشد.'}, status=404)

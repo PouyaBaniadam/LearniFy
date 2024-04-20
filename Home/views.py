@@ -2,9 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from Account.models import FavoriteVideoCourse
-from Cart.models import CartItem
-from Course.models import VideoCourse, Exam
+from Course.models import VideoCourse, Exam, PDFCourse
 from Home.mixins import URLStorageMixin
 from Home.models import HeroBanner, Banner1, Banner2, Banner3
 from News.models import News
@@ -19,14 +17,6 @@ class HomeView(URLStorageMixin, TemplateView):
         context = super(HomeView, self).get_context_data(**kwargs)
 
         user = self.request.user
-
-        if user.is_authenticated:
-            user_cart_v_types = CartItem.objects.filter(
-                cart__user=user, course_type="V"
-            ).values_list("id", flat=True)
-
-        else:
-            user_cart_v_types = []
 
         latest_video_courses = VideoCourse.objects.values("teacher__image",
                                                           "id",
@@ -49,6 +39,50 @@ class HomeView(URLStorageMixin, TemplateView):
                                                           "holding_status").order_by('-created_at').filter(
             Q(holding_status="F") | Q(holding_status="IP"))[:6]
 
+        latest_pdf_courses_1 = PDFCourse.objects.values(
+            "teacher__image",
+            "id",
+            "category__name",
+            "category__slug",
+            "cover_image",
+            "holding_status",
+            "teacher__username",
+            "teacher__slug",
+            "teacher__full_name",
+            "total_sessions",
+            "total_seasons",
+            "has_discount",
+            "payment_type",
+            "price",
+            "slug",
+            "price_after_discount",
+            "total_pages",
+            "name",
+            "holding_status"
+        ).order_by('-created_at')[:2]
+
+        latest_pdf_courses_2 = PDFCourse.objects.values(
+            "teacher__image",
+            "id",
+            "category__name",
+            "category__slug",
+            "cover_image",
+            "holding_status",
+            "teacher__username",
+            "teacher__slug",
+            "teacher__full_name",
+            "total_sessions",
+            "total_seasons",
+            "has_discount",
+            "payment_type",
+            "price",
+            "slug",
+            "price_after_discount",
+            "total_pages",
+            "name",
+            "holding_status"
+        ).order_by('-created_at')[2:4]
+
         latest_news = News.objects.all().order_by('-created_at')
 
         latest_weblogs = Weblog.objects.all().order_by('-created_at')
@@ -70,6 +104,8 @@ class HomeView(URLStorageMixin, TemplateView):
             favorite_video_courses = []
 
         context['latest_video_courses'] = latest_video_courses  # Is a queryset
+        context['latest_pdf_courses_1'] = latest_pdf_courses_1  # Is a queryset
+        context['latest_pdf_courses_2'] = latest_pdf_courses_2  # Is a queryset
         context['latest_news'] = latest_news  # Is a queryset
         context['latest_weblogs'] = latest_weblogs  # Is a queryset
         context['hero_banners'] = hero_banners  # Is a queryset
@@ -78,7 +114,6 @@ class HomeView(URLStorageMixin, TemplateView):
         context['banner_3'] = banner_3  # Is a queryset
         context['attitudes'] = attitudes  # Is a queryset
         context['favorite_video_courses'] = favorite_video_courses  # Is a queryset
-        context['user_cart_v_types'] = user_cart_v_types  # Is a queryset
 
         return context
 
