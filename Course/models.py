@@ -1,4 +1,8 @@
+import os
+
+import fitz
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
@@ -96,6 +100,7 @@ class VideoCourse(models.Model):
 
         if self.has_discount:
             self.price_after_discount = self.price - (self.price * (self.discount_percentage / 100))
+
         super().save(*args, **kwargs)
 
     class Meta:
@@ -119,7 +124,7 @@ class VideoCourseComment(models.Model):
     likes = models.ManyToManyField(to="Account.CustomUser", verbose_name="لایک‌ها",
                                    related_name="video_courses_comments_likes", blank=True)
 
-    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
 
     updated_at = jDateTimeField(auto_now=True, verbose_name='به‌روز‌رسانی شده در تاریخ')
 
@@ -191,6 +196,176 @@ class VideoCourseObject(models.Model):
         db_table = 'course__video_course_object'
         verbose_name = 'جزئیات فیلم'
         verbose_name_plural = 'جزئیات فیلم'
+
+
+class PDFCourse(models.Model):
+    PAYMENT_TYPE_CHOICES = (
+        ('F', 'رایگان'),
+        ('P', 'پولی'),
+    )
+
+    HOLDING_STATUS_CHOICES = (
+        ('NS', 'هنوز شروع نشده'),
+        ('IP', 'در حال برگزاری'),
+        ('F', 'به اتمام رسیده'),
+    )
+
+    name = models.CharField(max_length=100, unique=True, verbose_name='نام دوره')
+
+    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
+
+    category = models.ForeignKey(to=Category, on_delete=models.PROTECT, verbose_name='دسته بندی')
+
+    description = CKEditor5Field(config_name="extends", verbose_name='درباره دوره')
+
+    what_we_will_learn = CKEditor5Field(config_name="extends", max_length=500, verbose_name='چی یاد میگیریم؟')
+
+    teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='مدرس',
+                                related_name='teacher_pdf_courses')
+
+    cover_image = models.ImageField(upload_to='Course/PDFCourse/cover_images', verbose_name='عکس کاور')
+
+    introduction_pdf = models.FileField(upload_to='Course/PDFCourse/introduction_pdf', verbose_name='پی‌دی‌اف مقدمه')
+
+    holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره',
+                                      default='NS')
+
+    total_seasons = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد فصل‌ها')
+
+    total_sessions = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد قسمت‌ها')
+
+    total_pages = models.PositiveIntegerField(default=0, verbose_name='تعداد صفحات دوره')
+
+    prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
+
+    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
+                                                related_name='user_pdf_courses')
+
+    payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE_CHOICES, default='F', verbose_name='نوع دوره')
+
+    price = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت')
+
+    has_discount = models.BooleanField(default=False, verbose_name='تخفیف دارد؟')
+
+    discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
+                                                           validators=[MaxValueValidator(100)])
+
+    price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
+
+    updated_at = jDateTimeField(auto_now=True, verbose_name='تاریخ آخرین به‌روز‌رسانی')
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        if self.payment_type == "F":
+            self.price = self.price_after_discount = self.discount_percentage = self.has_discount = 0
+
+        if self.has_discount:
+            self.price_after_discount = self.price - (self.price * (self.discount_percentage / 100))
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'course__pdf_course'
+        verbose_name = 'دوره پی‌دی‌افی'
+        verbose_name_plural = 'دوره‌های پی‌دی‌افی'
+
+
+class PDFCourseComment(models.Model):
+    pdf_course = models.ForeignKey(to=PDFCourse, on_delete=models.CASCADE, verbose_name="دوره پی‌دی‌افی",
+                                   related_name='pdf_course_comments')
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر",
+                             related_name="user_pdf_course_comments")
+
+    parent = models.ForeignKey(to="self", on_delete=models.CASCADE, verbose_name="والد", blank=True, null=True,
+                               related_name="replies")
+
+    text = models.TextField(max_length=1000, verbose_name="متن")
+
+    likes = models.ManyToManyField(to="Account.CustomUser", verbose_name="لایک‌ها",
+                                   related_name="pdf_courses_comments_likes", blank=True)
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
+
+    updated_at = jDateTimeField(auto_now=True, verbose_name='به‌روز‌رسانی شده در تاریخ')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.pdf_course.name}"
+
+    class Meta:
+        db_table = 'course__pdf_course_comment'
+        verbose_name = 'کامنت'
+        verbose_name_plural = 'کامنت‌ها'
+        ordering = ('-created_at',)
+
+
+class PDFCourseSeason(models.Model):
+    number = models.PositiveSmallIntegerField(default=1, verbose_name="شماره فصل")
+
+    name = models.CharField(max_length=75, verbose_name="اسم فصل")
+
+    course = models.ForeignKey(to=PDFCourse, on_delete=models.CASCADE, verbose_name="دوره")
+
+    def __str__(self):
+        return f"{self.course.name} - {self.name} - {self.number}"
+
+    class Meta:
+        db_table = 'course__pdf_course_season'
+        verbose_name = 'فصل پی‌دی‌اف'
+        verbose_name_plural = 'فصل‌های پی‌دی‌اف'
+
+
+class PDFCourseObject(models.Model):
+    pdf_course = models.ForeignKey(PDFCourse, on_delete=models.CASCADE, verbose_name="دوره", blank=True,
+                                   null=True)
+
+    title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
+
+    note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
+
+    season = models.ForeignKey(to=PDFCourseSeason, on_delete=models.CASCADE, blank=True, null=True,
+                               verbose_name="فصل")
+
+    can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
+
+    pdf_file = models.FileField(upload_to="Course/PDFCourse/tutorials", verbose_name="فایل پی‌دی‌اف")
+
+    attachment = models.FileField(upload_to="Course/PDFCourse/attachments", verbose_name="فایل ضمیمه", blank=True,
+                                  null=True)
+
+    pages = models.PositiveIntegerField(default=0, verbose_name="تعداد صفحات پی‌دی‌اف")
+
+    def __str__(self):
+        return f"{self.title}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        try:
+            pdf_path = self.pdf_file.path
+
+            # Open the PDF file using PyMuPDF
+            pdf_document = fitz.open(pdf_path)
+
+            # Get the total number of pages
+            total_pages = pdf_document.page_count
+            print(total_pages)
+
+            # Update the 'pages' field with the total number of pages
+            self.pages = total_pages
+
+        except Exception as e:
+            print(f"Error processing PDF: {e}")
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'course__pdf_course_object'
+        verbose_name = 'جزئیات پی‌دی‌اف'
+        verbose_name_plural = 'جزئیات پی‌دی‌اف'
 
 
 class ExamAnswer(models.Model):
