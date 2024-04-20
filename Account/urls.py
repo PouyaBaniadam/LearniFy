@@ -25,5 +25,6 @@ urlpatterns = [
     path('unfollow/private/accounts/', views.UnfollowPrivateAccounts.as_view(), name='unfollow_private_accounts'),
     path('handle/follow/requests/', views.HandleFollowRequests.as_view(), name='handle_follow_requests'),
     path('toggle/account/status/', views.ToggleAccountStatus.as_view(), name='toggle_account_status'),
-    path('favorite/<slug:slug>', views.FavoriteCourses.as_view(), name='favorites'),
+    path('favorite/videos/', views.FavoriteVideoCourses.as_view(), name='favorite_videos'),
+    path('favorite/pdfs/', views.FavoritePDFCourses.as_view(), name='favorite_pdfs'),
 ]

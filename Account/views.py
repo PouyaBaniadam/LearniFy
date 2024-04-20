@@ -14,8 +14,9 @@ from django.views.generic import FormView, UpdateView, ListView, View
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
-    NonFollowersOnlyMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post
+    NonFollowersOnlyMixin, OwnerOnlyMixin
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
+    FavoritePDFCourse
 from Cart.models import Cart
 from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
@@ -559,7 +560,7 @@ class ToggleAccountStatus(AuthenticatedUsersOnlyMixin, View):
             )
 
 
-class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
+class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerOnlyMixin, URLStorageMixin, UpdateView):
     model = CustomUser
     template_name = 'Account/edit_profile.html'
     fields = ("full_name", "email", "about_me")
@@ -624,9 +625,9 @@ class EnterNewsletters(View):
             return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)
 
 
-class FavoriteCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
+class FavoriteVideoCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     model = FavoriteVideoCourse
-    template_name = 'Account/favorites.html'
+    template_name = 'Account/favorite_videos.html'
     context_object_name = 'video_courses'
 
     def get_queryset(self):
@@ -636,6 +637,31 @@ class FavoriteCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
         video_courses = FavoriteVideoCourse.objects.filter(user=user)
 
         return video_courses
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
+
+        account_status = user.account_status
+
+        context['account_status'] = account_status
+
+        return context
+
+
+class FavoritePDFCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
+    model = FavoritePDFCourse
+    template_name = 'Account/favorite_pdfs.html'
+    context_object_name = 'pdf_courses'
+
+    def get_queryset(self):
+        slug = self.kwargs.get("slug")
+        user = CustomUser.objects.get(slug=slug)
+
+        pdf_courses = FavoritePDFCourse.objects.filter(user=user)
+
+        return pdf_courses
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

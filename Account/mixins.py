@@ -99,3 +99,21 @@ class NonFollowersOnlyMixin:
             return redirect("home:home")
 
         return super(NonFollowersOnlyMixin, self).dispatch(request, *args, **kwargs)
+
+
+class OwnerOnlyMixin:
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get("slug")
+
+        if request.user.username != slug:
+            messages.error(request, f"شما اجازه دسترسی به این صفحه را ندارید!")
+
+            redirect_url = request.session.get('current_url')
+
+            if request.user.is_authenticated:
+                if redirect_url is not None:
+                    return redirect(redirect_url)
+
+                return redirect("home:home")
+
+        return super(OwnerOnlyMixin, self).dispatch(request, *args, **kwargs)
