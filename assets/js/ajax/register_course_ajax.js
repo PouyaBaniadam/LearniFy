@@ -12,7 +12,7 @@ function register_course(courseId, appName) {
         if (result.isConfirmed) {
             $.ajax({
                 type: 'POST',
-                url: `/${appName}/video/register/`,
+                url: `/course/${appName}/register/`,
                 data: {
                     "courseId": courseId
                 },
