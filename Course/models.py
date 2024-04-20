@@ -1,8 +1,5 @@
-import os
-
 import fitz
 from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
