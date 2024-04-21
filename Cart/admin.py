@@ -5,7 +5,7 @@ from Cart.models import Cart, CartItem
 
 class CartItemTabularInline(admin.TabularInline):
     model = CartItem
-    readonly_fields = ('course_type', 'course_pk')
+    readonly_fields = ('course_type', 'video_course', 'pdf_course')
 
     def has_add_permission(self, request, obj=None):
         return False

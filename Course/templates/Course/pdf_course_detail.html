@@ -333,7 +333,7 @@
                                                                                                         </svg>
                                                                                                     </button>
                                                                                                 {% else %}
-                                                                                                    <button onclick="toggleCart('{{ course.id }}', 'V')"
+                                                                                                    <button onclick="toggleCart('{{ course.id }}', 'B')"
                                                                                                             class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
                                                                                                         {% if does_course_exists_in_cart %}
                                                                                                             <span class="cart-text text-xs">حذف از سبد خرید</span>
@@ -838,7 +838,7 @@
                                                     {% if does_course_exists_in_cart %}
                                                         <button type="button"
                                                                 id="main-cart-btn"
-                                                                onclick="toggleCart('{{ course.id }}', 'V')"
+                                                                onclick="toggleCart('{{ course.id }}', 'B')"
                                                                 class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4"
                                                                 data-id="{{ item.id }}">
                                                             <span class="cart-text text-xs">حذف از سبد خرید</span>
@@ -855,7 +855,7 @@
                                                         </button>
                                                     {% else %}
                                                         <button type="button" id="main-cart-btn"
-                                                                onclick="toggleCart('{{ course.id }}', 'V')"
+                                                                onclick="toggleCart('{{ course.id }}', 'B')"
                                                                 class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4"
                                                                 data-id="{{ item.id }}">
                                                             <span class="cart-text text-xs">افزودن به سبد خرید</span>

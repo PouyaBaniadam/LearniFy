@@ -95,6 +95,8 @@ class AboutUs(models.Model):
 
     what_we_do = CKEditor5Field(config_name="extends", verbose_name="چی کار می‌کنیم")
 
+    bank_card_number = models.CharField(max_length=20, verbose_name="شماره کارت")
+
     def __str__(self):
         return f"{self.name}"
 

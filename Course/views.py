@@ -67,7 +67,7 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
 
         if user.is_authenticated:
             does_course_exists_in_cart = CartItem.objects.filter(
-                cart__user=user, course_pk=self.object.id, course_type="V").exists()
+                cart__user=user, video_course=self.object, course_type="V").exists()
 
             favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
                                                                                                             flat=True)
@@ -506,7 +506,7 @@ class PDFCourseDetail(URLStorageMixin, DetailView):
 
         if user.is_authenticated:
             does_course_exists_in_cart = CartItem.objects.filter(
-                cart__user=user, course_pk=self.object.id, course_type="B").exists()
+                cart__user=user, pdf_course=self.object, course_type="B").exists()
 
             favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
                                                                                                       flat=True)

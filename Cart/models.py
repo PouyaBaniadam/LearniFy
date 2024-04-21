@@ -37,12 +37,16 @@ class CartItem(models.Model):
 
     cart = models.ForeignKey(to=Cart, on_delete=models.CASCADE, related_name='items')
 
+    video_course = models.ForeignKey(to="Course.VideoCourse", on_delete=models.CASCADE, blank=True, null=True,
+                                     verbose_name="دوره ویدئویی")
+
+    pdf_course = models.ForeignKey(to="Course.PDFCourse", on_delete=models.CASCADE, blank=True, null=True,
+                                   verbose_name="دوره پی‌دی‌افی")
+
     course_type = models.CharField(max_length=1, choices=COURSE_CHOICES, verbose_name='نوع')
 
-    course_pk = models.PositiveSmallIntegerField(verbose_name='آیدی دوره')
-
     def __str__(self):
-        return f"{self.course_pk} - {self.course_type}"
+        return f"{self.video_course or self.pdf_course} - {self.course_type}"
 
     class Meta:
         db_table = 'cart__cart_item'
