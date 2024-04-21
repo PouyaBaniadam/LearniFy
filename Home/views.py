@@ -39,15 +39,15 @@ class HomeView(URLStorageMixin, TemplateView):
                                                           "holding_status").order_by('-created_at').filter(
             Q(holding_status="F") | Q(holding_status="IP"))[:6]
 
-        latest_pdf_courses_1 = PDFCourse.objects.values(
-            "teacher__image",
+        latest_pdf_courses = PDFCourse.objects.values(
             "id",
             "category__name",
             "category__slug",
             "cover_image",
             "holding_status",
-            "teacher__username",
+            "teacher__image",
             "teacher__slug",
+            "teacher__username",
             "teacher__full_name",
             "total_sessions",
             "total_seasons",
@@ -59,29 +59,7 @@ class HomeView(URLStorageMixin, TemplateView):
             "total_pages",
             "name",
             "holding_status"
-        ).order_by('-created_at')[:2]
-
-        latest_pdf_courses_2 = PDFCourse.objects.values(
-            "teacher__image",
-            "id",
-            "category__name",
-            "category__slug",
-            "cover_image",
-            "holding_status",
-            "teacher__username",
-            "teacher__slug",
-            "teacher__full_name",
-            "total_sessions",
-            "total_seasons",
-            "has_discount",
-            "payment_type",
-            "price",
-            "slug",
-            "price_after_discount",
-            "total_pages",
-            "name",
-            "holding_status"
-        ).order_by('-created_at')[2:4]
+        ).order_by('-created_at')[:6]
 
         latest_news = News.objects.all().order_by('-created_at')
 
@@ -100,12 +78,16 @@ class HomeView(URLStorageMixin, TemplateView):
         if user.is_authenticated:
             favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
                                                                                                             flat=True)
+
+            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
+                                                                                                            flat=True)
+
         else:
             favorite_video_courses = []
+            favorite_pdf_courses = []
 
         context['latest_video_courses'] = latest_video_courses  # Is a queryset
-        context['latest_pdf_courses_1'] = latest_pdf_courses_1  # Is a queryset
-        context['latest_pdf_courses_2'] = latest_pdf_courses_2  # Is a queryset
+        context['latest_pdf_courses'] = latest_pdf_courses  # Is a queryset
         context['latest_news'] = latest_news  # Is a queryset
         context['latest_weblogs'] = latest_weblogs  # Is a queryset
         context['hero_banners'] = hero_banners  # Is a queryset
@@ -114,6 +96,7 @@ class HomeView(URLStorageMixin, TemplateView):
         context['banner_3'] = banner_3  # Is a queryset
         context['attitudes'] = attitudes  # Is a queryset
         context['favorite_video_courses'] = favorite_video_courses  # Is a queryset
+        context['favorite_pdf_courses'] = favorite_pdf_courses  # Is a queryset
 
         return context
 

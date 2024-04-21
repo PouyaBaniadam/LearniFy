@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('.add-video-to-favorites-btn').click(function (e) {
+    $('.add-pdf-to-favorites-btn').click(function (e) {
         e.preventDefault();
         var button = $(this);
         var id = button.data('id');
@@ -7,7 +7,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: '/course/video/favorite/toggle/',
+            url: '/course/pdf/favorite/toggle/',
             data: {
                 'id': id,
                 'user': user

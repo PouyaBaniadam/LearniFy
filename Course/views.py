@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
-from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification
+from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification, FavoritePDFCourse
 from Cart.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
@@ -613,3 +613,25 @@ class LikePDFCourseComment(AuthenticatedUsersOnlyMixin, View):
             return JsonResponse({'liked': liked})
         except PDFCourseComment.DoesNotExist:
             return JsonResponse({'error': 'چنین کامنتی یافت نشد.'}, status=404)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class TogglePDFCourseFavorite(View):
+    def post(self, request, *args, **kwargs):
+        course_id = request.POST.get('id')
+        user_id = request.POST.get('user')
+        print(user_id)
+        user = CustomUser.objects.get(username=user_id)
+
+        try:
+            pdf_course = PDFCourse.objects.get(id=course_id)
+            if FavoritePDFCourse.objects.filter(pdf_course=pdf_course, user=user).exists():
+                FavoritePDFCourse.objects.filter(pdf_course=pdf_course, user=user).delete()
+                return JsonResponse({'success': True, 'action': 'removed'})
+            else:
+                FavoritePDFCourse.objects.create(pdf_course=pdf_course, user=user)
+                return JsonResponse({'success': True, 'action': 'added'})
+        except Exam.DoesNotExist:
+            pass
+
+        return JsonResponse({'success': False}, status=400)

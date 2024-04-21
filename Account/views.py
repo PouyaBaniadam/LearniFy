@@ -631,8 +631,8 @@ class FavoriteVideoCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListVie
     context_object_name = 'video_courses'
 
     def get_queryset(self):
-        slug = self.kwargs.get("slug")
-        user = CustomUser.objects.get(slug=slug)
+        user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
 
         video_courses = FavoriteVideoCourse.objects.filter(user=user)
 
@@ -656,8 +656,8 @@ class FavoritePDFCourses(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView)
     context_object_name = 'pdf_courses'
 
     def get_queryset(self):
-        slug = self.kwargs.get("slug")
-        user = CustomUser.objects.get(slug=slug)
+        user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
 
         pdf_courses = FavoritePDFCourse.objects.filter(user=user)
 

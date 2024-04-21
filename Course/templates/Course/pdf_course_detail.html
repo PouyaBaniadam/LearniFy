@@ -758,7 +758,7 @@
                                     {% if request.user.is_authenticated %}
                                         {% if course.id in favorite_pdf_courses %}
                                             <button type="button"
-                                                    class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
+                                                    class="add-pdf-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
                                                     data-id="{{ course.id }}"
                                                     data-user="{{ request.user }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -770,7 +770,7 @@
                                             </button>
                                         {% else %}
                                             <button type="button"
-                                                    class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
+                                                    class="add-pdf-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
                                                     data-id="{{ course.id }}"
                                                     data-user="{{ request.user }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -902,7 +902,7 @@
                                             {% if request.user.is_authenticated %}
                                                 {% if course.id in favorite_pdf_courses %}
                                                     <button type="button"
-                                                            class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
+                                                            class="add-pdf-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
                                                             data-id="{{ course.id }}"
                                                             data-user="{{ request.user }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -914,7 +914,7 @@
                                                     </button>
                                                 {% else %}
                                                     <button type="button"
-                                                            class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
+                                                            class="add-pdf-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
                                                             data-id="{{ course.id }}"
                                                             data-user="{{ request.user }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg"

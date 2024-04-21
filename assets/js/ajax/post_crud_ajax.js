@@ -97,6 +97,11 @@ function showAddPostForm() {
                 return;
             }
 
+            if (!titleInput) {
+                Swal.showValidationMessage('موضوع پست اجباری است.');
+                return;
+            }
+
             const formData = new FormData();
             formData.append('image', imageInput.files[0]);
             formData.append('title', titleInput.value);
@@ -159,17 +164,26 @@ function deletePost(postId) {
                         text: 'پست شما با موفقیت حذف شد.',
                         icon: 'success',
                         confirmButtonText: 'باشه',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload();
-                        }
+                    }).then(() => {
+                        location.reload();
                     });
                 } else {
-                    Swal.fire('Error!', 'Failed to delete post.', 'error');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطا در حذف پست',
+                        text: 'مشکلی در حین حذف کردن پست رخ داده است.',
+                        confirmButtonText: 'باشه',
+                        timer: 3000
+                    });
                 }
             }).catch(error => {
-                console.error('Error:', error);
-                Swal.fire('Error!', 'Failed to delete post.', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطا در حذف پست',
+                    text: 'مشکلی در حین حذف کردن پست رخ داده است.',
+                    confirmButtonText: 'باشه',
+                    timer: 3000
+                });
             });
         }
     });
