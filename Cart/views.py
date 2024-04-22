@@ -72,28 +72,32 @@ class ToggleCart(View):
             )
 
 
+from django.views.generic import ListView
+from django.shortcuts import render
+from .models import CartItem
+
 class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     model = CartItem
     context_object_name = "cart_items"
-    template_name = "Cart/cart_items.html"
 
     def get_queryset(self):
         user = self.request.user
-
         cart_items = CartItem.objects.filter(cart__user=user)
-
-        print(cart_items)
-
         return cart_items
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         user = self.request.user
-        favorite_video_courses = VideoCourse.objects.filter(
-            favoritevideocourse__user=user
-        ).values_list('id', flat=True)
-
+        favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
         context['favorite_video_courses'] = favorite_video_courses
-
         return context
+
+    def get_template_names(self):
+        user = self.request.user
+        cart_items = CartItem.objects.filter(cart__user=user)
+
+        if cart_items.exists():
+            return ['Cart/cart_items.html']
+        else:
+            return ['Cart/empty_cart.html']
+

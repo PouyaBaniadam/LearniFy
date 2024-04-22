@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Cart.models import Cart, CartItem
+from Cart.models import Cart, CartItem, DiscountCode
 
 
 class CartItemTabularInline(admin.TabularInline):
@@ -20,3 +20,8 @@ class CartAdmin(admin.ModelAdmin):
     readonly_fields = ("payment_method", "total_price")
 
     inlines = [CartItemTabularInline]
+
+
+@admin.register(DiscountCode)
+class DiscountCodeAdmin(admin.ModelAdmin):
+    list_display = ("code", "ends_at")

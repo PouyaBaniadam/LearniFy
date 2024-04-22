@@ -1,6 +1,10 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
+from django_ckeditor_5.fields import CKEditor5Field
 
 from Account.models import CustomUser
+from utils.useful_functions import generate_discount_code
 
 
 class Cart(models.Model):
@@ -52,3 +56,53 @@ class CartItem(models.Model):
         db_table = 'cart__cart_item'
         verbose_name = 'آیتم سبد خرید'
         verbose_name_plural = 'آیتم‌های سبد خرید'
+
+
+class DiscountCodeUser(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    usage_date = models.DateTimeField(verbose_name="تاریخ استفاده")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.usage_date}"
+
+    class Meta:
+        db_table = 'cart__discount_code_user'
+        verbose_name = 'مورد استفاده کد تخفیف'
+        verbose_name_plural = 'موارد استفاده کد تخفیف'
+
+
+class DiscountCode(models.Model):
+    DISCOUNT_CHOICES = (
+        ("PU", "عمومی"),
+        ("PV", "شخصی"),
+    )
+
+    code = models.CharField(max_length=10, verbose_name="کد تخفیف", default=generate_discount_code, unique=True)
+
+    percent = models.PositiveSmallIntegerField(verbose_name="درصد تخفیف", validators=[MaxValueValidator(100),
+                                                                                      MinValueValidator(1)])
+
+    description = CKEditor5Field(config_name="extends", verbose_name='درباره دوره')
+
+    discount_type = models.CharField(max_length=2, choices=DISCOUNT_CHOICES, verbose_name="نوع تخفیف")
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    duration = models.DurationField(help_text="به ثانیه", verbose_name="مدت تخفیف")
+
+    ends_at = models.DateTimeField(verbose_name="تاریخ انقضا", editable=False)
+
+    usage_limits = models.PositiveSmallIntegerField(default=10, verbose_name="محدودیت استفاده به نفر")
+
+    def save(self, *args, **kwargs):
+        self.ends_at = timezone.now() + self.duration
+        super(DiscountCode, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.code
+
+    class Meta:
+        db_table = "cart__discount_code"
+        verbose_name = "تخفیف"
+        verbose_name_plural = "تخفیفات"

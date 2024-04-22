@@ -1,4 +1,5 @@
 import os
+import random
 import secrets
 import string
 from datetime import datetime
@@ -8,7 +9,8 @@ import pytz
 
 def generate_token(token_length):
     url_safe_alphabet = string.ascii_letters + string.digits + '-_~'
-    url_safe_password = ''.join(secrets.choice(url_safe_alphabet) for i in range(token_length))
+    url_safe_password = ''.join(secrets.choice(url_safe_alphabet) for _ in range(token_length))
+
     return url_safe_password
 
 
@@ -27,7 +29,6 @@ def duration_hour_to_seconds(duration_str):
 
 def get_file_size(file_path):
     return os.path.getsize(file_path)
-
 
 
 def get_time_difference(date_1, date_2):
@@ -61,3 +62,16 @@ def get_time_difference(date_1, date_2):
     time_difference = (date2_utc - date1_utc).total_seconds()
 
     return time_difference
+
+
+def generate_discount_code():
+    characters = string.ascii_uppercase + string.digits
+    discount_code = ""
+
+    for _ in range(6):
+        current_character = random.choice(characters)
+        discount_code += current_character
+
+    discount_code = discount_code[:-3] + '-' + discount_code[-3:]
+
+    return discount_code

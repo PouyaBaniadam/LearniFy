@@ -60,11 +60,15 @@ def filter_courses(request):
 
 def cart_items_count(request):
     user = request.user
-    if user.is_authenticated:
-        cart = Cart.objects.get(user=user)
-        count = cart.items.count()
+    try:
+        if user.is_authenticated:
+            cart = Cart.objects.get(user=user)
+            count = cart.items.count()
 
-    else:
+        else:
+            count = 0
+
+    except Cart.DoesNotExist:
         count = 0
 
     context = {
