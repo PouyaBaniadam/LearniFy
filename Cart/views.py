@@ -72,10 +72,6 @@ class ToggleCart(View):
             )
 
 
-from django.views.generic import ListView
-from django.shortcuts import render
-from .models import CartItem
-
 class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     model = CartItem
     context_object_name = "cart_items"
@@ -101,3 +97,6 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
         else:
             return ['Cart/empty_cart.html']
 
+
+class ApplyDiscountView(AuthenticatedUsersOnlyMixin, View):
+    pass

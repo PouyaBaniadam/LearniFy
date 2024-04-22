@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from Cart.models import Cart, CartItem, DiscountCode
+from Cart.models import Cart, CartItem, Discount, DiscountUsage
+from Home.templatetags.filters import j_date_formatter
 
 
 class CartItemTabularInline(admin.TabularInline):
@@ -22,6 +23,27 @@ class CartAdmin(admin.ModelAdmin):
     inlines = [CartItemTabularInline]
 
 
-@admin.register(DiscountCode)
-class DiscountCodeAdmin(admin.ModelAdmin):
-    list_display = ("code", "ends_at")
+class DiscountUsageTabularInline(admin.TabularInline):
+    model = DiscountUsage
+    readonly_fields = ('user', 'usage_date')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ("code", "type", "percent", "duration", "formatted_created_at", "formatted_ends_at")
+    autocomplete_fields = ("individual_user",)
+    list_filter = ("type",)
+    inlines = [DiscountUsageTabularInline]
+
+    def formatted_created_at(self, obj):
+        return j_date_formatter(obj.created_at)
+
+    formatted_created_at.short_description = 'تاریخ شروع'
+
+    def formatted_ends_at(self, obj):
+        return j_date_formatter(obj.ends_at)
+
+    formatted_ends_at.short_description = 'تاریخ انقضا'
