@@ -10,7 +10,7 @@ from django.views.generic import View, ListView
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser, Wallet
 from Cart.mixins import AllowedDiscountCodesOnlyMixin
-from Cart.models import Cart, CartItem, Discount, DiscountUsage
+from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
 from Course.models import VideoCourse, PDFCourse
 from Home.mixins import URLStorageMixin
 
@@ -118,6 +118,10 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
             Q(video_course__has_discount=True) | Q(pdf_course__has_discount=True)
         ).exists()
 
+        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user).exists()
+
+        can_be_paid_with_wallet = (wallet.fund - total_price_with_discount) >= 0
+
         context['favorite_video_courses'] = favorite_video_courses
         context['wallet'] = wallet
         context['does_cart_items_have_discount'] = does_cart_items_have_discount
@@ -126,6 +130,8 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
         context['formatted_total_price_with_discount'] = "{:,}".format(total_price_with_discount)
         context['cost_difference'] = total_price_without_discount - total_price_with_discount
         context['items_count'] = items_count
+        context['has_user_added_deposit_slip'] = has_user_added_deposit_slip
+        context['can_be_paid_with_wallet'] = can_be_paid_with_wallet
 
         return context
 
@@ -195,3 +201,23 @@ class DeleteItemFromCartItemsPage(AuthenticatedUsersOnlyMixin, View):
             CartItem.objects.get(cart__user=user, pdf_course=pdf_course).delete()
 
         return redirect("cart:items")
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        username = request.user.username
+
+        user = CustomUser.objects.get(username=username)
+
+        image = request.FILES.get("image")
+        cart = Cart.objects.get(user=user)
+
+        DepositSlip.objects.create(cart=cart, receipt=image)
+
+        return JsonResponse(
+            data={
+                "message": "فیش واریزی با موفقیت آپلود شد."
+            },
+            status=200
+        )

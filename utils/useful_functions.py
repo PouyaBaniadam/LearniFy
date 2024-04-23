@@ -75,3 +75,9 @@ def generate_discount_code():
     discount_code = discount_code[:-3] + '-' + discount_code[-3:]
 
     return discount_code
+
+
+def generate_random_integers(length=10):
+    random_value = "".join(random.choice(string.digits) for _ in range(length))
+
+    return random_value

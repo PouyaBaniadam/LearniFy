@@ -1,7 +1,5 @@
 $(document).ready(function () {
-    $('button[type="submit"]').click(function (event) {
-        event.preventDefault();
-
+    $('#applyDiscountButton').click(function () {
         var discountCode = $('#discountInput').val();
 
         var formData = {
@@ -30,7 +28,7 @@ $(document).ready(function () {
                     title: 'موفقیت',
                     text: response.message,
                     confirmButtonText: 'باشه',
-                    timer:3000
+                    timer: 3000
                 });
             },
             error: function (error) {
@@ -40,7 +38,7 @@ $(document).ready(function () {
                     text: error.responseJSON.message,
                     confirmButtonText: 'باشه',
                     confirmButtonColor: '#d33',
-                    timer:3000
+                    timer: 3000
                 });
             }
         });

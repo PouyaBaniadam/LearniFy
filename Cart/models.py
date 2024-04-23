@@ -5,8 +5,8 @@ from django.utils import timezone
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 
-from Account.models import CustomUser
-from utils.useful_functions import generate_discount_code
+from Account.models import CustomUser, Wallet
+from utils.useful_functions import generate_discount_code, generate_random_integers
 
 
 class Cart(models.Model):
@@ -122,3 +122,38 @@ class Discount(models.Model):
         db_table = "cart__discount"
         verbose_name = "تخفیف"
         verbose_name_plural = "تخفیفات"
+
+
+class DepositSlip(models.Model):
+    cart = models.ForeignKey(to=Cart, on_delete=models.PROTECT, verbose_name="سبد خرید")
+
+    admin = models.ForeignKey(to="Account.CustomUser", on_delete=models.PROTECT, blank=True, null=True,
+                              verbose_name="ادمین", editable=False)
+
+    receipt = models.ImageField(upload_to="Cart/DepositSlips/receipts", verbose_name="تصویر رسید")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    difference_cash = models.PositiveSmallIntegerField(default=0, verbose_name="ما به تفاوت")
+
+    tracking_number = models.CharField(max_length=10, default=generate_random_integers, verbose_name="شماره پیگیری")
+
+    is_valid = models.BooleanField(default=False, verbose_name="آیا معتبر است؟")
+
+    def __str__(self):
+        return f"{self.cart.user}"
+
+    def save(self, *args, **kwargs):
+        if self.is_valid:
+            user = self.cart.user
+            wallet = Wallet.objects.get(user=user)
+
+            wallet.fund += self.difference_cash
+            wallet.save()
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = "cart__deposit_slip"
+        verbose_name = "رسید خرید"
+        verbose_name_plural = "رسیدهای خرید"
