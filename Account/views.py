@@ -183,7 +183,7 @@ class CheckOTPView(FormView):
             password = otp.password
 
             user = CustomUser.objects.create_user(mobile_phone=mobile_phone, username=username)
-            Wallet.objects.create(owner=user)
+            Wallet.objects.create(user=user)
             Cart.objects.create(user=user)
 
             user.set_password(password)

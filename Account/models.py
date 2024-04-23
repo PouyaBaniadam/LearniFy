@@ -181,7 +181,7 @@ class Wallet(models.Model):
     usage_count = models.PositiveSmallIntegerField(default=0, verbose_name="دفعات استفاده")
 
     def __str__(self):
-        return f"{self.owner.username}"
+        return f"{self.user.username}"
 
     class Meta:
         db_table = "account__wallet"
