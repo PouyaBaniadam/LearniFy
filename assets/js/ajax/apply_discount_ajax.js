@@ -39,6 +39,7 @@ $(document).ready(function () {
                     title: 'خطا',
                     text: error.responseJSON.message,
                     confirmButtonText: 'باشه',
+                    confirmButtonColor: '#d33',
                     timer:3000
                 });
             }

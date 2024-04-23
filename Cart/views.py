@@ -186,9 +186,6 @@ class DeleteItemFromCartItemsPage(AuthenticatedUsersOnlyMixin, View):
         username = request.user.username
         user = CustomUser.objects.get(username=username)
 
-        print(course_type)
-        print(course_id)
-
         if course_type == "V":
             video_course = VideoCourse.objects.get(id=course_id)
             CartItem.objects.get(cart__user=user, video_course=video_course).delete()

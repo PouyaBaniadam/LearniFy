@@ -25,10 +25,10 @@ class CartAdmin(admin.ModelAdmin):
 
 class DiscountUsageTabularInline(admin.TabularInline):
     model = DiscountUsage
-    readonly_fields = ('user', 'discount', 'usage_date')
-
-    def has_add_permission(self, request, obj=None):
-        return False
+    # readonly_fields = ('user', 'discount', 'usage_date')
+    #
+    # def has_add_permission(self, request, obj=None):
+    #     return False
 
 
 @admin.register(Discount)
