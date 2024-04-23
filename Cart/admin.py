@@ -14,18 +14,18 @@ class CartItemTabularInline(admin.TabularInline):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ("user", "payment_method", "total_price", "created_at", "updated_at")
+    list_display = ("user", "payment_method", "created_at", "updated_at")
 
     autocomplete_fields = ("user",)
 
-    readonly_fields = ("payment_method", "total_price")
+    readonly_fields = ("payment_method",)
 
     inlines = [CartItemTabularInline]
 
 
 class DiscountUsageTabularInline(admin.TabularInline):
     model = DiscountUsage
-    readonly_fields = ('user', 'usage_date')
+    readonly_fields = ('user', 'discount', 'usage_date')
 
     def has_add_permission(self, request, obj=None):
         return False

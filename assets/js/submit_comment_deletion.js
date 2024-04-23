@@ -6,8 +6,7 @@ function submit_deletion(id, app) {
         text: 'آیا از حذف این نظر اطمینان دارید؟',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
         confirmButtonText: 'بله',
         cancelButtonText: 'نه'
     }).then((result) => {

@@ -64,7 +64,7 @@
         <div class="flex flex-col items-start text-right space-y-1">
             <span class="font-bold text-xs text-muted line-clamp-1">موجودی کیف پول</span>
             <div class="flex items-center gap-1">
-                <span class="font-bold text-sm text-foreground">{{ user.wallets.fund }}</span>
+                <span class="font-bold text-sm text-foreground">{{ user.wallets.fund|price_splitter }}</span>
                 <span class="text-xs text-muted">تومان</span>
             </div>
         </div>

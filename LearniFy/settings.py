@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "admin_interface",
     "colorfield",
+    "nested_inline",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,11 +51,12 @@ INSTALLED_APPS = [
     "News.apps.NewsConfig",
     "Us.apps.UsConfig",
 
+
     # Third party packages
     "widget_tweaks",
     "hitcount",
     "star_ratings",
-    "Cart.apps.CartConfig"
+    "Cart.apps.CartConfig",
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"

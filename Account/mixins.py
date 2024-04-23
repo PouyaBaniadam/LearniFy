@@ -1,11 +1,12 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.views.generic import View
 
 from Account.models import CustomUser
 
 
-class NonAuthenticatedUsersOnlyMixin:
+class NonAuthenticatedUsersOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         redirect_url = request.session.get('current_url')
 
@@ -18,7 +19,7 @@ class NonAuthenticatedUsersOnlyMixin:
         return super(NonAuthenticatedUsersOnlyMixin, self).dispatch(request, *args, **kwargs)
 
 
-class AuthenticatedUsersOnlyMixin:
+class AuthenticatedUsersOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             messages.error(request, "ابتدار وارد حساب کاربری خود شوید.")
@@ -33,7 +34,7 @@ class AuthenticatedUsersOnlyMixin:
         return super(AuthenticatedUsersOnlyMixin, self).dispatch(request, *args, **kwargs)
 
 
-class FollowersForPVAccountsOnlyMixin:
+class FollowersForPVAccountsOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get('slug')
@@ -58,7 +59,7 @@ class FollowersForPVAccountsOnlyMixin:
         return super(FollowersForPVAccountsOnlyMixin, self).dispatch(request, *args, **kwargs)
 
 
-class NonFollowersOnlyMixin:
+class NonFollowersOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get('slug')
@@ -101,7 +102,7 @@ class NonFollowersOnlyMixin:
         return super(NonFollowersOnlyMixin, self).dispatch(request, *args, **kwargs)
 
 
-class OwnerOnlyMixin:
+class OwnerOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get("slug")
 

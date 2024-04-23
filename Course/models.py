@@ -82,7 +82,7 @@ class VideoCourse(models.Model):
     discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
                                                            validators=[MaxValueValidator(100)])
 
-    price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
+    price_after_discount = models.PositiveSmallIntegerField(default=0, editable=False, verbose_name='قیمت بعد از تخفیف')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
@@ -97,6 +97,9 @@ class VideoCourse(models.Model):
 
         if self.has_discount:
             self.price_after_discount = self.price - (self.price * (self.discount_percentage / 100))
+
+        else:
+            self.price_after_discount = self.price
 
         super().save(*args, **kwargs)
 
@@ -247,7 +250,7 @@ class PDFCourse(models.Model):
     discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
                                                            validators=[MaxValueValidator(100)])
 
-    price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
+    price_after_discount = models.PositiveSmallIntegerField(default=0, editable=False, verbose_name='قیمت بعد از تخفیف')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
@@ -262,6 +265,8 @@ class PDFCourse(models.Model):
 
         if self.has_discount:
             self.price_after_discount = self.price - (self.price * (self.discount_percentage / 100))
+        else:
+            self.price_after_discount = self.price
 
         super().save(*args, **kwargs)
 

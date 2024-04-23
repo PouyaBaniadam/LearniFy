@@ -172,7 +172,7 @@ class Wallet(models.Model):
         ("B", "برنزی"),
     )
 
-    owner = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, related_name="wallets", verbose_name="مالک")
+    user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, related_name="wallets", verbose_name="مالک")
 
     fund = models.PositiveSmallIntegerField(default=0, verbose_name="سرمایه")
 

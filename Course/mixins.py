@@ -4,13 +4,14 @@ import pytz
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.views.generic import View
 
 from Account.models import CustomUser
 from Course.models import Exam, EnteredExamUser, UserFinalAnswer
 from utils.useful_functions import get_time_difference
 
 
-class ParticipatedUsersOnlyMixin:
+class ParticipatedUsersOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         user = request.user
@@ -31,7 +32,7 @@ class ParticipatedUsersOnlyMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class CheckForExamTimeMixin:
+class CheckForExamTimeMixin(View):
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         user = request.user
@@ -56,7 +57,7 @@ class CheckForExamTimeMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class AllowedExamsOnlyMixin:
+class AllowedExamsOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         exam = Exam.objects.get(slug=slug)
@@ -69,7 +70,7 @@ class AllowedExamsOnlyMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class AllowedFilesDownloadMixin:
+class AllowedFilesDownloadMixin(View):
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
 
@@ -83,7 +84,7 @@ class AllowedFilesDownloadMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class NonFinishedExamsOnlyMixin:
+class NonFinishedExamsOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         user = request.user

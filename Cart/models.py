@@ -20,8 +20,6 @@ class Cart(models.Model):
     payment_method = models.CharField(max_length=2, choices=PAYMENT_CHOICES, blank=True, null=True,
                                       verbose_name='نحوه پرداخت')
 
-    total_price = models.PositiveBigIntegerField(default=0, verbose_name='قیمت نهایی')
-
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     updated_at = models.DateTimeField(auto_now=True, verbose_name="به‌روز‌رسانی شده در تاریخ")
@@ -61,7 +59,7 @@ class CartItem(models.Model):
 
 
 class DiscountUsage(models.Model):
-    discount_code = models.ForeignKey(to="Discount", on_delete=models.CASCADE, verbose_name="تخفیف")
+    discount = models.ForeignKey(to="Discount", on_delete=models.CASCADE, verbose_name="تخفیف")
 
     user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
 

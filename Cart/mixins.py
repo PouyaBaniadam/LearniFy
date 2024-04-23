@@ -1,21 +1,35 @@
-from Account.models import CustomUser
+from django.http import JsonResponse
+from django.views.generic import View
+
+from Cart.models import Discount, DiscountUsage
 
 
-class ParticipatedUsersOnlyMixin:
+class AllowedDiscountCodesOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         discount_code = request.POST.get("discount_code")
-        user = request.user
 
-        user = CustomUser.objects.get(username=user.username)
+        if not discount_code:
+            return JsonResponse(
+                data={"message": "کد تخفیف بدون مقدار است!"},
+                status=404
+            )
 
-        if not can_user_participate:
-            redirect_url = request.session.get('current_url')
+        try:
+            discount = Discount.objects.get(code=discount_code)
 
-            messages.error(request, f"ابتدا در آزمون ثبت نام کنید!")
+            if discount.type == "PU":
+                discount_code_usages_count = DiscountUsage.objects.filter(discount=discount).count()
 
-            if redirect_url is not None:
-                return redirect(redirect_url)
+                if discount.usage_limits <= discount_code_usages_count:
+                    return JsonResponse(
+                        data={"message": "این کد تخفیف قابل استفاده نیست."},
+                        status=400
+                    )
 
-            return redirect("home:home")
+        except Discount.DoesNotExist:
+            return JsonResponse(
+                data={"message": "چنین کد تخفیفی وجود ندارد!"},
+                status=404
+            )
 
         return super().dispatch(request, *args, **kwargs)
