@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow, FavoriteVideoCourse, Post
+from Home.templatetags.filters import j_date_formatter
 
 
 class CustomUserAdmin(UserAdmin):
@@ -43,7 +44,12 @@ class WalletAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'title','message', 'created_at', 'mode', 'visibility', 'has_been_read')
+    list_display = ('uuid', 'title', 'message', 'mode', 'visibility', 'has_been_read', 'formatted_created_at')
+
+    def formatted_created_at(self, obj):
+        return j_date_formatter(obj.created_at)
+
+    formatted_created_at.short_description = 'ایجاد شده در تاریخ'
 
 
 @admin.register(NewsLetter)

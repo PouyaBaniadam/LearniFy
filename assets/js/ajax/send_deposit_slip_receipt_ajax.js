@@ -16,6 +16,7 @@ function getCookie(name) {
 function showAddDepositSlipReceiptForm() {
     Swal.fire({
         icon: "info",
+        text: 'چنانچه مبلغ مذکور را کارت به کارت کردید، فیش واریزی را در این بخش آپلود کنید.',
         title: 'آپلود رسید خرید',
         confirmButtonText: 'آپلود',
         html: '<input id="imageInput" type="file" accept="image/*" required>',

@@ -112,6 +112,7 @@ TEMPLATES = [
                 'utils.context_processors.filter_categories',
                 'utils.context_processors.filter_courses',
                 'utils.context_processors.cart_items_count',
+                'utils.context_processors.cart_is_allowed',
             ],
         },
     },

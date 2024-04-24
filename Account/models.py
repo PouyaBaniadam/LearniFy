@@ -206,22 +206,22 @@ class Notification(models.Model):
         specific CustomUser instances (blank=True allows for global notifications).
         created_at (jDateTimeField): An automatically populated field recording
         the notification's creation timestamp.
-        mode (CharField): The notification's severity level (choices from mode_choices).
-        visibility (CharField): The notification's target audience (choices from visibility_choices).
+        mode (CharField): The notification's severity level (choices from MODE_CHOICES).
+        visibility (CharField): The notification's target audience (choices from VISIBILITY_CHOICES).
     """
 
-    mode_choices = (
+    MODE_CHOICES = (
         ("S", "موفقیت (سبز)"),
         ("C", "هشدار (نارنجی)"),
         ("D", "خطر (قرمز)"),
     )
 
-    visibility_choices = (
-        ("G", "عمومی"),
-        ("P", "شخصی"),
+    VISIBILITY_CHOICES = (
+        ("GL", "عمومی"),
+        ("PV", "شخصی"),
     )
 
-    type_choices = (
+    TYPE_CHOICES = (
         ("FO", "فالو"),
         ("AN", "اطلاعیه"),
     )
@@ -246,11 +246,11 @@ class Notification(models.Model):
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
-    mode = models.CharField(max_length=1, choices=mode_choices, verbose_name="مود اعلان")
+    mode = models.CharField(max_length=1, choices=MODE_CHOICES, verbose_name="مود اعلان")
 
-    visibility = models.CharField(max_length=1, choices=visibility_choices, verbose_name="وضعیت مشاهده")
+    visibility = models.CharField(max_length=2, choices=VISIBILITY_CHOICES, verbose_name="وضعیت مشاهده")
 
-    type = models.CharField(max_length=2, choices=type_choices, default="AN", verbose_name="نوع اعلان")
+    type = models.CharField(max_length=2, choices=TYPE_CHOICES, default="AN", verbose_name="نوع اعلان")
 
     has_been_read = models.BooleanField(default=False, verbose_name="آیا خوانده شده؟")
 
@@ -270,7 +270,7 @@ class NewsLetter(models.Model):
 
     is_blocked = models.BooleanField(default=False, verbose_name="آیا بلاک شده است؟")
 
-    created_at = jDateTimeField(auto_now_add=True)
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     def __str__(self):
         return f"{self.email}"

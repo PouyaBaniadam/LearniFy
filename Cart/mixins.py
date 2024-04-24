@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views.generic import View
 
 from Account.models import CustomUser
-from Cart.models import Discount, DiscountUsage
+from Cart.models import Discount, DiscountUsage, DepositSlip
 
 
 class AllowedDiscountCodesOnlyMixin(View):
@@ -44,6 +44,22 @@ class AllowedDiscountCodesOnlyMixin(View):
         except Discount.DoesNotExist:
             return JsonResponse(
                 data={"message": "چنین کد تخفیفی وجود ندارد!"},
+                status=404
+            )
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DisallowedCarActionsMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        username = request.user.username
+
+        user = CustomUser.objects.get(username=username)
+        dose_deposit_slip_exists = DepositSlip.objects.filter(cart__user=user).exists()
+
+        if dose_deposit_slip_exists:
+            return JsonResponse(
+                data={"message": "شما در حال حاضر اجازه به‌روز‌رسانی سبد خرید خود را ندارید."},
                 status=404
             )
 

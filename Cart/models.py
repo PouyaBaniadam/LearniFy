@@ -5,20 +5,15 @@ from django.utils import timezone
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 
-from Account.models import CustomUser, Wallet
+from Account.models import CustomUser, Wallet, Notification
+from Course.models import VideoCourse, PDFCourse
 from utils.useful_functions import generate_discount_code, generate_random_integers
 
 
 class Cart(models.Model):
-    PAYMENT_CHOICES = (
-        ('PP', 'درکاه پرداخت'),  # PayPort
-        ('CT', 'انتقال به کارت'),  # CardTransfer
-    )
-
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='cart', verbose_name='کاربر')
 
-    payment_method = models.CharField(max_length=2, choices=PAYMENT_CHOICES, blank=True, null=True,
-                                      verbose_name='نحوه پرداخت')
+    penalty_counter = models.PositiveSmallIntegerField(default=0, verbose_name="تعداد دفعات خطا")
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
@@ -35,8 +30,8 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     COURSE_CHOICES = (
-        ('V', 'ویدئویی'),
-        ('B', 'کتابی'),
+        ('VID', 'ویدئویی'),
+        ('PDF', 'پی‌دی‌افی'),
     )
 
     cart = models.ForeignKey(to=Cart, on_delete=models.CASCADE, related_name='items')
@@ -47,10 +42,10 @@ class CartItem(models.Model):
     pdf_course = models.ForeignKey(to="Course.PDFCourse", on_delete=models.CASCADE, blank=True, null=True,
                                    verbose_name="دوره پی‌دی‌افی")
 
-    course_type = models.CharField(max_length=1, choices=COURSE_CHOICES, verbose_name='نوع')
+    course_type = models.CharField(max_length=3, choices=COURSE_CHOICES, verbose_name='نوع')
 
     def __str__(self):
-        return f"{self.video_course or self.pdf_course} - {self.course_type}"
+        return f"{self.video_course or self.pdf_course}"
 
     class Meta:
         db_table = 'cart__cart_item'
@@ -132,11 +127,15 @@ class DepositSlip(models.Model):
 
     receipt = models.ImageField(upload_to="Cart/DepositSlips/receipts", verbose_name="تصویر رسید")
 
+    total_cost = models.PositiveSmallIntegerField(default=0, verbose_name="مبلغ کل")
+
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     difference_cash = models.PositiveSmallIntegerField(default=0, verbose_name="ما به تفاوت")
 
     tracking_number = models.CharField(max_length=10, default=generate_random_integers, verbose_name="شماره پیگیری")
+
+    is_fake = models.BooleanField(default=False, verbose_name="آیا رسید فیک است؟")
 
     is_valid = models.BooleanField(default=False, verbose_name="آیا معتبر است؟")
 
@@ -144,16 +143,68 @@ class DepositSlip(models.Model):
         return f"{self.cart.user}"
 
     def save(self, *args, **kwargs):
-        if self.is_valid:
-            user = self.cart.user
-            wallet = Wallet.objects.get(user=user)
+        super().save(*args, **kwargs)
 
+        user = self.cart.user
+        wallet = Wallet.objects.get(user=user)
+        cart = Cart.objects.get(user=user)
+
+        if self.is_fake and self.admin:
+            cart.penalty_counter += 1
+            cart.save()
+
+            notification = Notification.objects.create(
+                title="عدم تایید رسید خرید",
+                message=f'رسید واریزی شما مورد تایید نبود. در صورت وجود هر گونه مشکلی، با تیم پشتیبانی تماس بگیرید.',
+                visibility="PV",
+                mode="D",
+                type="AN",
+            )
+
+            notification.users.add(user)
+
+            notification.save()
+
+            self.delete()
+
+        if self.is_valid and self.admin:
             wallet.fund += self.difference_cash
             wallet.save()
 
-        super().save(*args, **kwargs)
+            for item in cart.items.all():
+                if item.course_type == "VID":
+                    video_course = VideoCourse.objects.get(name=item.video_course.name)
+                    BoughtCourse.objects.create(user=user, video_course=video_course)
+
+                if item.course_type == "PDF":
+                    pdf_course = PDFCourse.objects.get(name=item.pdf_course.name)
+                    BoughtCourse.objects.create(user=user, pdf_course=pdf_course)
+
+            self.delete()
 
     class Meta:
         db_table = "cart__deposit_slip"
         verbose_name = "رسید خرید"
         verbose_name_plural = "رسیدهای خرید"
+
+
+class BoughtCourse(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    pdf_course = models.ForeignKey(to="Course.PDFCourse", on_delete=models.PROTECT, blank=True, null=True,
+                                   verbose_name="دوره پی‌دی‌افی")
+
+    video_course = models.ForeignKey(to="Course.VideoCourse", on_delete=models.PROTECT, blank=True, null=True,
+                                     verbose_name="دوره ویدئویی")
+
+    cost = models.PositiveSmallIntegerField(default=0, verbose_name="مبلغ")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user}"
+
+    class Meta:
+        db_table = "cart__bought_course"
+        verbose_name = "دوره خریداری شده"
+        verbose_name_plural = "دوره‌های خریداری شده"

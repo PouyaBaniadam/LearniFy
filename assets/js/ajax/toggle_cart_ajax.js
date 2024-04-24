@@ -34,8 +34,15 @@ function toggleCart(courseId, courseType) {
             let cart_items_count = document.getElementById("cart-items-count");
             cart_items_count.innerText = response.cart_items_count;
         },
-        error: function (xhr, textStatus, errorThrown) {
-            console.error("Error toggling cart:", errorThrown);
+        error: function (xhr) {
+            Swal.fire({
+                icon: 'error',
+                title: "خطا",
+                text: xhr.responseJSON.message,
+                confirmButtonText: 'باشه',
+                confirmButtonColor: '#d33',
+                timer: 3000
+            });
         }
     });
 }

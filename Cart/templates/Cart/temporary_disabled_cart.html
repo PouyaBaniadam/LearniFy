@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="flex flex-col min-h-screen bg-background">
+        {% include 'includes/header.html' %}
+        <main class="flex-auto py-5">
+            <div>
+                <div class="max-w-7xl space-y-14 px-4 mx-auto">
+                    <div class="flex flex-col items-center justify-center space-y-12">
+                        <img src="{% static 'images/theme/empty.svg' %}" class="w-full max-w-xs opacity-35" alt="..."/>
+                        <div class="text-center space-y-3">
+                            <h2 class="font-bold text-xl text-red-500 text-foreground">
+                                تیم پشتیبانی در حال بررسی سبد خرید شما می‌باشد و تا اطلاع ثانویه غیر فعال است.
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        {% include 'includes/footer.html' %}
+    </div>
+{% endblock %}

@@ -67,7 +67,7 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
 
         if user.is_authenticated:
             does_course_exists_in_cart = CartItem.objects.filter(
-                cart__user=user, video_course=self.object, course_type="V").exists()
+                cart__user=user, video_course=self.object, course_type="VID").exists()
 
             favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
                                                                                                             flat=True)
@@ -75,7 +75,7 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
                 title="درخواست فالو",
-                visibility="P",
+                visibility="PV",
                 following=self.object.teacher,
                 follower=user,
                 mode="S",
@@ -506,7 +506,7 @@ class PDFCourseDetail(URLStorageMixin, DetailView):
 
         if user.is_authenticated:
             does_course_exists_in_cart = CartItem.objects.filter(
-                cart__user=user, pdf_course=self.object, course_type="B").exists()
+                cart__user=user, pdf_course=self.object, course_type="PDF").exists()
 
             favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
                                                                                                       flat=True)
@@ -514,7 +514,7 @@ class PDFCourseDetail(URLStorageMixin, DetailView):
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
                 title="درخواست فالو",
-                visibility="P",
+                visibility="PV",
                 following=self.object.teacher,
                 follower=user,
                 mode="S",

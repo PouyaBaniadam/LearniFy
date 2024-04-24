@@ -1,5 +1,5 @@
 from Account.models import CustomUser
-from Cart.models import Cart
+from Cart.models import Cart, CartItem, DepositSlip
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.models import Category, Exam, VideoCourse, PDFCourse
 from Us.models import SocialMedia, AboutUs
@@ -73,6 +73,20 @@ def cart_items_count(request):
 
     context = {
         'cart_items_count': count
+    }
+
+    return context
+
+
+def cart_is_allowed(request):
+    user = request.user
+    has_user_added_deposit_slip = False
+
+    if user.is_authenticated:
+        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user).exists()
+
+    context = {
+        "has_user_added_deposit_slip": has_user_added_deposit_slip
     }
 
     return context

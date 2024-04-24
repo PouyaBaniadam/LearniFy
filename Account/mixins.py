@@ -36,25 +36,39 @@ class AuthenticatedUsersOnlyMixin(View):
 
 class FollowersForPVAccountsOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
-        user = request.user
+        username = request.user.username
+        user = CustomUser.objects.get(username=username)
         slug = kwargs.get('slug')
-        owner = CustomUser.objects.get(slug=slug)
 
-        if owner != request.user:
+        try:
+            owner = CustomUser.objects.get(slug=slug)
+
+            if owner != user:
+                if user.is_authenticated:
+                    user = CustomUser.objects.get(username=user.username)
+                    if owner.account_status == "PV" and user.id not in owner.followers.all().values_list(
+                            "follower_id", flat=True
+                    ):
+                        messages.error(request, "جهت ورود به این صفحه، ابتدا باید کاربر را فالو کنید.")
+
+                        return redirect(reverse("account:temp_follow", kwargs={"slug": owner.slug}))
+
+                else:
+                    if owner.account_status == "PV":
+                        messages.error(request, "جهت ورود به این صفحه، ابتدا باید کاربر را فالو کنید.")
+
+                        return redirect(reverse("account:temp_follow", kwargs={"slug": owner.slug}))
+
+        except CustomUser.DoesNotExist:
+            messages.error(request, f"چنین کاربری یافت نشد!")
+
+            redirect_url = request.session.get('current_url')
+
             if user.is_authenticated:
-                user = CustomUser.objects.get(username=user.username)
-                if owner.account_status == "PV" and user.id not in owner.followers.all().values_list(
-                        "follower_id", flat=True
-                ):
-                    messages.error(request, "جهت ورود به این صفحه، ابتدا باید کاربر را فالو کنید.")
+                if redirect_url is not None:
+                    return redirect(redirect_url)
 
-                    return redirect(reverse("account:temp_follow", kwargs={"slug": owner.slug}))
-
-            else:
-                if owner.account_status == "PV":
-                    messages.error(request, "جهت ورود به این صفحه، ابتدا باید کاربر را فالو کنید.")
-
-                    return redirect(reverse("account:temp_follow", kwargs={"slug": owner.slug}))
+                return redirect("home:home")
 
         return super(FollowersForPVAccountsOnlyMixin, self).dispatch(request, *args, **kwargs)
 
@@ -74,7 +88,6 @@ class NonFollowersOnlyMixin(View):
                     messages.error(request, f"شما مجوز ورود به این صفحه را ندارید!")
 
                     redirect_url = request.session.get('current_url')
-                    print(redirect_url)
 
                     if redirect_url is not None:
                         if request.resolver_match.url_name != "temp_follow":

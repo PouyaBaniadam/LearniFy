@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
+from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip, BoughtCourse
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -14,9 +14,9 @@ class CartItemTabularInline(admin.TabularInline):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ("user", "payment_method", "created_at", "updated_at")
+    list_display = ("user", "created_at", "updated_at")
 
-    readonly_fields = ("user", "payment_method")
+    readonly_fields = ("user", "penalty_counter")
 
     inlines = [CartItemTabularInline]
 
@@ -47,14 +47,35 @@ class DiscountAdmin(admin.ModelAdmin):
     formatted_ends_at.short_description = 'تاریخ انقضا'
 
 
+@admin.register(BoughtCourse)
+class BoughtCourseAdmin(admin.ModelAdmin):
+    list_display = ('user', 'cost', 'pdf_course', 'video_course', 'formatted_created_at')
+    readonly_fields = ('user', 'cost', 'pdf_course', 'video_course')
+    search_fields = ("user", "pdf_course", "video_course")
+    search_help_text = "جستجو بر اساس کاربر، دوره ویدئویی و دوره پی‌دی‌افی"
+
+    def formatted_created_at(self, obj):
+        return j_date_formatter(obj.created_at)
+
+    formatted_created_at.short_description = 'تاریخ خرید'
+
 @admin.register(DepositSlip)
 class DepositSlipAdmin(admin.ModelAdmin):
     list_display = ("cart", "is_valid", "admin", "formatted_created_at")
+    readonly_fields = ("cart", "tracking_number", "total_cost")
+    search_fields = ("cart__user__username", "tracking_number")
+    search_help_text = "جستجو بر اساس کاربر یا شماره پیگیری"
 
-    readonly_fields = ("cart", "tracking_number")
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        search_term = search_term.strip()
+        if search_term:
+            queryset |= self.model.objects.filter(cart__user__username__icontains=search_term)
+        return queryset, use_distinct
 
     def save_model(self, request, obj, form, change):
-        obj.admin = request.user
+        if obj.is_fake or obj.is_valid:
+            obj.admin = request.user
         super().save_model(request, obj, form, change)
 
     def formatted_created_at(self, obj):

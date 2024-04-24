@@ -9,14 +9,14 @@ from django.views.generic import View, ListView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser, Wallet
-from Cart.mixins import AllowedDiscountCodesOnlyMixin
+from Cart.mixins import AllowedDiscountCodesOnlyMixin, DisallowedCarActionsMixin
 from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
 from Course.models import VideoCourse, PDFCourse
 from Home.mixins import URLStorageMixin
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ToggleCart(View):
+class ToggleCart(AuthenticatedUsersOnlyMixin, DisallowedCarActionsMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
         course_type = request.POST.get('course_type')
@@ -25,26 +25,26 @@ class ToggleCart(View):
 
         cart = Cart.objects.get(user=user)
 
-        if course_type == "V":
+        if course_type == "VID":
             video_course = VideoCourse.objects.get(id=course_id)
             does_cart_item_exists = CartItem.objects.filter(
                 cart=cart, video_course=video_course, course_type=course_type
             ).exists()
 
-        if course_type == "B":
+        if course_type == "PDF":
             pdf_course = PDFCourse.objects.get(id=course_id)
             does_cart_item_exists = CartItem.objects.filter(
                 cart=cart, pdf_course=pdf_course, course_type=course_type
             ).exists()
 
         if does_cart_item_exists:
-            if course_type == "V":
+            if course_type == "VID":
                 cart_item = CartItem.objects.filter(
                     cart=cart, video_course=video_course, course_type=course_type
                 )
                 cart_item.delete()
 
-            if course_type == "B":
+            if course_type == "PDF":
                 cart_item = CartItem.objects.filter(
                     cart=cart, pdf_course=pdf_course, course_type=course_type
                 )
@@ -57,14 +57,14 @@ class ToggleCart(View):
             )
 
         else:
-            if course_type == "V":
+            if course_type == "VID":
                 video_course = VideoCourse.objects.get(id=course_id)
                 CartItem.objects.create(
                     cart=cart, course_type=course_type,
                     video_course=video_course
                 )
 
-            if course_type == "B":
+            if course_type == "PDF":
                 pdf_course = PDFCourse.objects.get(id=course_id)
                 CartItem.objects.create(
                     cart=cart, course_type=course_type,
@@ -118,8 +118,6 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
             Q(video_course__has_discount=True) | Q(pdf_course__has_discount=True)
         ).exists()
 
-        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user).exists()
-
         can_be_paid_with_wallet = (wallet.fund - total_price_with_discount) >= 0
 
         context['favorite_video_courses'] = favorite_video_courses
@@ -130,7 +128,6 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
         context['formatted_total_price_with_discount'] = "{:,}".format(total_price_with_discount)
         context['cost_difference'] = total_price_without_discount - total_price_with_discount
         context['items_count'] = items_count
-        context['has_user_added_deposit_slip'] = has_user_added_deposit_slip
         context['can_be_paid_with_wallet'] = can_be_paid_with_wallet
 
         return context
@@ -138,9 +135,14 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     def get_template_names(self):
         user = self.request.user
         cart_items = CartItem.objects.filter(cart__user=user)
+        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user).exists()
+
+        if has_user_added_deposit_slip:
+            return ['Cart/temporary_disabled_cart.html']
 
         if cart_items.exists():
             return ['Cart/cart_items.html']
+
         else:
             return ['Cart/empty_cart.html']
 
@@ -192,11 +194,11 @@ class DeleteItemFromCartItemsPage(AuthenticatedUsersOnlyMixin, View):
         username = request.user.username
         user = CustomUser.objects.get(username=username)
 
-        if course_type == "V":
+        if course_type == "VID":
             video_course = VideoCourse.objects.get(id=course_id)
             CartItem.objects.get(cart__user=user, video_course=video_course).delete()
 
-        if course_type == "B":
+        if course_type == "PDF":
             pdf_course = PDFCourse.objects.get(id=course_id)
             CartItem.objects.get(cart__user=user, pdf_course=pdf_course).delete()
 
@@ -213,7 +215,24 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
         image = request.FILES.get("image")
         cart = Cart.objects.get(user=user)
 
-        DepositSlip.objects.create(cart=cart, receipt=image)
+        cart_items = CartItem.objects.filter(cart__user=user)
+
+        total_price_without_discount = 0
+        total_price_with_discount = 0
+
+        for item in cart_items:
+            if item.video_course:
+                total_price_with_discount += item.video_course.price_after_discount
+            elif item.pdf_course:
+                total_price_with_discount += item.pdf_course.price_after_discount
+
+        for item in cart_items:
+            if item.video_course:
+                total_price_without_discount += item.video_course.price
+            elif item.pdf_course:
+                total_price_without_discount += item.pdf_course.price
+
+        DepositSlip.objects.create(cart=cart, receipt=image, total_cost=total_price_with_discount)
 
         return JsonResponse(
             data={

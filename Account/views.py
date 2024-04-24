@@ -240,7 +240,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                 is_follow_request_pending = Notification.objects.filter(
                     users=owner,
                     title="درخواست فالو",
-                    visibility="P",
+                    visibility="PV",
                     following=owner,
                     follower=user,
                     mode="S",
@@ -266,7 +266,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                 is_follow_request_pending = Notification.objects.filter(
                     users=owner,
                     title="درخواست فالو",
-                    visibility="P",
+                    visibility="PV",
                     following=owner,
                     follower=user,
                     mode="S",
@@ -316,7 +316,7 @@ class TempFollowPrivateAccountFirst(NonFollowersOnlyMixin, URLStorageMixin, View
             is_follow_request_pending = Notification.objects.filter(
                 users=owner,
                 title="درخواست فالو",
-                visibility="P",
+                visibility="PV",
                 following=owner,
                 follower=user,
                 mode="S",
@@ -389,7 +389,7 @@ class VideoCoursesView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                 is_follow_request_pending = Notification.objects.filter(
                     users=owner,
                     title="درخواست فالو",
-                    visibility="P",
+                    visibility="PV",
                     following=owner,
                     follower=user,
                     mode="S",
@@ -485,7 +485,7 @@ class FollowPrivateAccounts(View):
         does_request_exists = Notification.objects.filter(
             users=following,
             title="درخواست فالو",
-            visibility="P",
+            visibility="PV",
             following=following,
             follower=follower,
             mode="S",
@@ -496,7 +496,7 @@ class FollowPrivateAccounts(View):
             Notification.objects.get(
                 users=following,
                 title="درخواست فالو",
-                visibility="P",
+                visibility="PV",
                 following=following,
                 follower=follower,
                 mode="S",
@@ -515,7 +515,7 @@ class FollowPrivateAccounts(View):
             notification = Notification.objects.create(
                 title="درخواست فالو",
                 message=f'<p><a href="/account/profile/{follower.username}"><span style="color:hsl(240,75%,60%);">{follower.username}</span></a> می‌خواهد شما را فالو کند.</p>',
-                visibility="P",
+                visibility="PV",
                 following=following,
                 follower=follower,
                 mode="S",
@@ -689,7 +689,7 @@ class HandleFollowRequests(AuthenticatedUsersOnlyMixin, View):
             notification = Notification.objects.get(
                 users=following,
                 title="درخواست فالو",
-                visibility="P",
+                visibility="PV",
                 following=following,
                 follower=follower,
                 mode="S",
@@ -710,7 +710,7 @@ class HandleFollowRequests(AuthenticatedUsersOnlyMixin, View):
         notification = Notification.objects.get(
             users=following,
             title="درخواست فالو",
-            visibility="P",
+            visibility="PV",
             following=following,
             follower=follower,
             mode="S",
