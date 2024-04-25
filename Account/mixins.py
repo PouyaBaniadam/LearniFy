@@ -37,8 +37,27 @@ class AuthenticatedUsersOnlyMixin(View):
 class FollowersForPVAccountsOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         username = request.user.username
-        user = CustomUser.objects.get(username=username)
         slug = kwargs.get('slug')
+
+        try:
+            user = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
+            try:
+                owner = CustomUser.objects.get(slug=slug)
+                if owner.account_status == "PV":
+                    messages.error(request, "جهت ورود به این صفحه، ابتدا باید کاربر را فالو کنید.")
+
+                    return redirect(reverse("account:temp_follow", kwargs={"slug": owner.slug}))
+
+            except CustomUser.DoesNotExist:
+                messages.error(request, f"چنین کاربری یافت نشد!")
+
+                redirect_url = request.session.get('current_url')
+
+                if redirect_url is not None:
+                    return redirect(redirect_url)
+
+                return redirect("home:home")
 
         try:
             owner = CustomUser.objects.get(slug=slug)
