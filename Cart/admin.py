@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip, BoughtCourse
+from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -46,18 +46,6 @@ class DiscountAdmin(admin.ModelAdmin):
 
     formatted_ends_at.short_description = 'تاریخ انقضا'
 
-
-@admin.register(BoughtCourse)
-class BoughtCourseAdmin(admin.ModelAdmin):
-    list_display = ('user', 'cost', 'pdf_course', 'video_course', 'formatted_created_at')
-    readonly_fields = ('user', 'cost', 'pdf_course', 'video_course')
-    search_fields = ("user", "pdf_course", "video_course")
-    search_help_text = "جستجو بر اساس کاربر، دوره ویدئویی و دوره پی‌دی‌افی"
-
-    def formatted_created_at(self, obj):
-        return j_date_formatter(obj.created_at)
-
-    formatted_created_at.short_description = 'تاریخ خرید'
 
 @admin.register(DepositSlip)
 class DepositSlipAdmin(admin.ModelAdmin):

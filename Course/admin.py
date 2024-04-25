@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, Exam, ExamAnswer, \
-    EnteredExamUser, UserFinalAnswer, PDFCourseObject, PDFCourse, PDFCourseSeason
+    EnteredExamUser, UserFinalAnswer, PDFCourseObject, PDFCourse, PDFCourseSeason, BoughtCourse
+from Home.templatetags.filters import j_date_formatter
 
 
 @admin.register(Category)
@@ -22,6 +23,20 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
     autocomplete_fields = ('video_course', 'season')
 
 
+class BoughtCourseTabularInline(admin.TabularInline):
+    model = BoughtCourse
+    readonly_fields = ("user", "cost", "formatted_created_at")
+    can_delete = False
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def formatted_created_at(self, obj):
+        return j_date_formatter(obj.created_at)
+
+    formatted_created_at.short_description = 'تاریخ خرید'
+
+
 @admin.register(VideoCourse)
 class VideoCourseAdmin(admin.ModelAdmin):
     list_display = (
@@ -35,6 +50,8 @@ class VideoCourseAdmin(admin.ModelAdmin):
     autocomplete_fields = ('teacher', 'category')
 
     prepopulated_fields = {'slug': ('name',)}
+
+    inlines = (BoughtCourseTabularInline,)
 
 
 @admin.register(VideoCourseSeason)
@@ -65,6 +82,8 @@ class PDFCourseAdmin(admin.ModelAdmin):
     autocomplete_fields = ('teacher', 'category')
 
     prepopulated_fields = {'slug': ('name',)}
+
+    inlines = (BoughtCourseTabularInline,)
 
 
 @admin.register(PDFCourseSeason)

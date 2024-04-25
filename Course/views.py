@@ -18,7 +18,7 @@ from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     NonFinishedExamsOnlyMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
-    PDFCourse, PDFCourseComment
+    PDFCourse, PDFCourseComment, BoughtCourse
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 from utils.useful_functions import get_time_difference
@@ -215,6 +215,8 @@ class RegisterInVideoCourse(AuthenticatedUsersOnlyMixin, View):
             if not VideoCourse.objects.filter(id=course_id, participated_users=user).exists():
                 video_course.participated_users.add(user)
                 video_course.save()
+
+                BoughtCourse.objects.create(user=user, video_course=video_course)
 
                 return JsonResponse(data={"message": f"ثبت نام در دوره {video_course.name} با موفقیت انجام شد."},
                                     status=200)
@@ -457,6 +459,8 @@ class RegisterInPDFCourse(AuthenticatedUsersOnlyMixin, View):
             if not PDFCourse.objects.filter(id=course_id, participated_users=user).exists():
                 pdf_course.participated_users.add(user)
                 pdf_course.save()
+
+                BoughtCourse.objects.create(user=user, pdf_course=pdf_course)
 
                 return JsonResponse(data={"message": f"ثبت نام در دوره {pdf_course.name} با موفقیت انجام شد."},
                                     status=200)

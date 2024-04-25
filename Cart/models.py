@@ -6,7 +6,7 @@ from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 
 from Account.models import CustomUser, Wallet, Notification
-from Course.models import VideoCourse, PDFCourse
+from Course.models import VideoCourse, PDFCourse, BoughtCourse
 from utils.useful_functions import generate_discount_code, generate_random_integers
 
 
@@ -174,11 +174,20 @@ class DepositSlip(models.Model):
             for item in cart.items.all():
                 if item.course_type == "VID":
                     video_course = VideoCourse.objects.get(name=item.video_course.name)
+                    video_course.participated_users.add(user)
+                    video_course.save()
+
                     BoughtCourse.objects.create(user=user, video_course=video_course)
 
                 if item.course_type == "PDF":
                     pdf_course = PDFCourse.objects.get(name=item.pdf_course.name)
+                    pdf_course.participated_users.add(user)
+                    pdf_course.save()
+
                     BoughtCourse.objects.create(user=user, pdf_course=pdf_course)
+
+            for item in cart.items.all():
+                item.delete()
 
             self.delete()
 
@@ -186,25 +195,3 @@ class DepositSlip(models.Model):
         db_table = "cart__deposit_slip"
         verbose_name = "رسید خرید"
         verbose_name_plural = "رسیدهای خرید"
-
-
-class BoughtCourse(models.Model):
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
-
-    pdf_course = models.ForeignKey(to="Course.PDFCourse", on_delete=models.PROTECT, blank=True, null=True,
-                                   verbose_name="دوره پی‌دی‌افی")
-
-    video_course = models.ForeignKey(to="Course.VideoCourse", on_delete=models.PROTECT, blank=True, null=True,
-                                     verbose_name="دوره ویدئویی")
-
-    cost = models.PositiveSmallIntegerField(default=0, verbose_name="مبلغ")
-
-    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
-
-    def __str__(self):
-        return f"{self.user}"
-
-    class Meta:
-        db_table = "cart__bought_course"
-        verbose_name = "دوره خریداری شده"
-        verbose_name_plural = "دوره‌های خریداری شده"

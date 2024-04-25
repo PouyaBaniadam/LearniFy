@@ -490,3 +490,25 @@ class UserFinalAnswer(models.Model):
         db_table = 'course__user_final_answer'
         verbose_name = "پاسخ نهایی کاربر"
         verbose_name_plural = "پاسخ‌های نهایی کابران"
+
+
+class BoughtCourse(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    pdf_course = models.ForeignKey(to=PDFCourse, on_delete=models.PROTECT, blank=True, null=True,
+                                   verbose_name="دوره پی‌دی‌افی", editable=False)
+
+    video_course = models.ForeignKey(to=VideoCourse, on_delete=models.PROTECT, blank=True, null=True,
+                                     verbose_name="دوره ویدئویی", editable=False)
+
+    cost = models.PositiveSmallIntegerField(default=0, verbose_name="قیمت خرید")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user}"
+
+    class Meta:
+        db_table = "course__bought_course"
+        verbose_name = "دوره خریداری شده"
+        verbose_name_plural = "دوره‌های خریداری شده"
