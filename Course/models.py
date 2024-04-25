@@ -354,7 +354,6 @@ class PDFCourseObject(models.Model):
 
             # Get the total number of pages
             total_pages = pdf_document.page_count
-            print(total_pages)
 
             # Update the 'pages' field with the total number of pages
             self.pages = total_pages

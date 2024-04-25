@@ -624,7 +624,6 @@ class TogglePDFCourseFavorite(View):
     def post(self, request, *args, **kwargs):
         course_id = request.POST.get('id')
         user_id = request.POST.get('user')
-        print(user_id)
         user = CustomUser.objects.get(username=user_id)
 
         try:

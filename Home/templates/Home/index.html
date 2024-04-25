@@ -584,12 +584,13 @@
                 </div>
                 <!-- end container -->
 
-                <!-- feedback -->
-                <div class="overflow-x-hidden py-20">
-                    <!-- container -->
-                    <div class="max-w-7xl px-4 mx-auto">
-                        <div class="md:grid md:grid-cols-12 md:gap-10 md:space-y-0 space-y-5">
-                            <div class="md:col-span-4 flex items-center gap-5">
+                {% if attitudes %}
+                    <!-- feedback -->
+                    <div class="overflow-x-hidden py-20">
+                        <!-- container -->
+                        <div class="max-w-7xl px-4 mx-auto">
+                            <div class="md:grid md:grid-cols-12 md:gap-10 md:space-y-0 space-y-5">
+                                <div class="md:col-span-4 flex items-center gap-5">
                                 <span
                                         class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-full">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
@@ -599,84 +600,85 @@
                                               clip-rule="evenodd"></path>
                                     </svg>
                                 </span>
-                                <div class="flex flex-col space-y-2">
+                                    <div class="flex flex-col space-y-2">
                                     <span class="font-black xs:text-2xl text-lg text-primary">در مورد LearniFy چه
                                         میشنویم؟</span>
-                                    <span class="font-semibold xs:text-base text-sm text-muted">این‌ها، بخش خیلی کوچکی
+                                        <span class="font-semibold xs:text-base text-sm text-muted">این‌ها، بخش خیلی کوچکی
                                         از نظراتی
                                         هستند
                                         که افراد
                                         مختلف در مورد نابغه دارند.</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="md:col-span-8 w-full max-w-xl mx-auto">
-                                <div class="swiper card-swiper-slider">
-                                    <div class="swiper-wrapper">
-                                        {% for attitude in attitudes %}
-                                            {% if attitude.user %}
-                                                <div class="swiper-slide pb-8">
-                                                    <div class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
-                                                        <div class="font-semibold text-sm text-muted text-center">{{ attitude.message }}
-                                                        </div>
-                                                        <div class="flex items-center gap-3">
-                                                            <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                                {% if attitude.user.image %}
-                                                                    <img src="{{ attitude.user.image.url }}"
-                                                                         class="w-full h-full object-cover"
-                                                                         alt="{{ attitude.useer.username }}">
-                                                                {% else %}
-                                                                    <img src="{% static 'images/avatars/default_user.JPG' %}"
-                                                                         class="w-full h-full object-cover"
-                                                                         alt="{{ attitude.useer.username }}">
-                                                                {% endif %}
+                                <div class="md:col-span-8 w-full max-w-xl mx-auto">
+                                    <div class="swiper card-swiper-slider">
+                                        <div class="swiper-wrapper">
+                                            {% for attitude in attitudes %}
+                                                {% if attitude.user %}
+                                                    <div class="swiper-slide pb-8">
+                                                        <div class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
+                                                            <div class="font-semibold text-sm text-muted text-center">{{ attitude.message }}
                                                             </div>
-                                                            <div class="flex flex-col items-start space-y-1">
+                                                            <div class="flex items-center gap-3">
+                                                                <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                    {% if attitude.user.image %}
+                                                                        <img src="{{ attitude.user.image.url }}"
+                                                                             class="w-full h-full object-cover"
+                                                                             alt="{{ attitude.useer.username }}">
+                                                                    {% else %}
+                                                                        <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                             class="w-full h-full object-cover"
+                                                                             alt="{{ attitude.useer.username }}">
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="flex flex-col items-start space-y-1">
                                                         <span class="line-clamp-1 font-bold text-xs text-foreground">
                                                             {{ attitude.user.username }}
                                                         </span>
-                                                                <span class="font-semibold text-xs text-muted">
+                                                                    <span class="font-semibold text-xs text-muted">
                                                             {{ attitude.created_at|j_date_formatter }}
                                                         </span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                            {% else %}
-                                                <div class="swiper-slide pb-8">
-                                                    <div class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
-                                                        <div class="font-semibold text-sm text-muted text-center">{{ attitude.message }}
-                                                        </div>
-                                                        <div class="flex items-center gap-3">
-                                                            <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                                <img src="{% static 'images/avatars/author.JPG' %}"
-                                                                     class="w-full h-full object-cover"
-                                                                     alt="کاربر ناشناس">
+                                                {% else %}
+                                                    <div class="swiper-slide pb-8">
+                                                        <div class="flex flex-col items-center justify-center bg-background border border-border rounded-2xl shadow-xl shadow-black/5 space-y-8 p-8">
+                                                            <div class="font-semibold text-sm text-muted text-center">{{ attitude.message }}
                                                             </div>
-                                                            <div class="flex flex-col items-start space-y-1">
+                                                            <div class="flex items-center gap-3">
+                                                                <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                    <img src="{% static 'images/avatars/author.JPG' %}"
+                                                                         class="w-full h-full object-cover"
+                                                                         alt="کاربر ناشناس">
+                                                                </div>
+                                                                <div class="flex flex-col items-start space-y-1">
                                                         <span class="line-clamp-1 font-bold text-xs text-foreground">
                                                             کاربر ناشناس
                                                         </span>
-                                                                <span class="font-semibold text-xs text-muted">
+                                                                    <span class="font-semibold text-xs text-muted">
                                                             {{ attitude.created_at|j_date_formatter }}
                                                         </span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
 
-                                    <div class="swiper-button-prev"></div>
-                                    <div class="swiper-button-next"></div>
+                                        <div class="swiper-button-prev"></div>
+                                        <div class="swiper-button-next"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <!-- end container -->
                     </div>
-                    <!-- end container -->
-                </div>
-                <!-- end feedback -->
+                    <!-- end feedback -->
+                {% endif %}
 
                 <!-- container -->
                 <div class="max-w-7xl space-y-14 px-4 mx-auto">
