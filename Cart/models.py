@@ -87,11 +87,11 @@ class Discount(models.Model):
     individual_user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
                                         verbose_name="کاربر")
 
-    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
     duration = models.DurationField(help_text="به ثانیه", verbose_name="مدت تخفیف")
 
-    ends_at = jDateTimeField(blank=True, null=True, editable=False, verbose_name='تاریخ انقضا')
+    ends_at = models.DateTimeField(blank=True, null=True, editable=False, verbose_name='تاریخ انقضا')
 
     usage_limits = models.PositiveSmallIntegerField(default=10, validators=[MinValueValidator(1)],
                                                     verbose_name="محدودیت استفاده به نفر")

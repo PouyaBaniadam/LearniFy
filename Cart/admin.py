@@ -31,20 +31,10 @@ class DiscountUsageTabularInline(admin.TabularInline):
 
 @admin.register(Discount)
 class DiscountAdmin(admin.ModelAdmin):
-    list_display = ("code", "type", "percent", "duration", "formatted_created_at", "formatted_ends_at")
+    list_display = ("code", "type", "percent", "duration", "created_at", "ends_at")
     autocomplete_fields = ("individual_user",)
     list_filter = ("type",)
     inlines = [DiscountUsageTabularInline]
-
-    def formatted_created_at(self, obj):
-        return j_date_formatter(obj.created_at)
-
-    formatted_created_at.short_description = 'تاریخ شروع'
-
-    def formatted_ends_at(self, obj):
-        return j_date_formatter(obj.ends_at)
-
-    formatted_ends_at.short_description = 'تاریخ انقضا'
 
 
 @admin.register(DepositSlip)

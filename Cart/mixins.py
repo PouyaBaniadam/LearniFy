@@ -1,8 +1,11 @@
+import pytz
+from datetime import datetime
 from django.http import JsonResponse
 from django.views.generic import View
 
 from Account.models import CustomUser
 from Cart.models import Discount, DiscountUsage, DepositSlip
+from utils.useful_functions import get_time_difference
 
 
 class AllowedDiscountCodesOnlyMixin(View):
@@ -22,6 +25,23 @@ class AllowedDiscountCodesOnlyMixin(View):
             discount = Discount.objects.get(code=discount_code)
 
             if discount.type == "PU":
+                date_1 = discount.created_at
+                date_2 = datetime.now(pytz.timezone('Iran'))
+
+                total_duration = discount.duration.total_seconds()
+
+                difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+                time_left = int(total_duration - difference)
+
+                if time_left < discount.duration.total_seconds():
+                    discount.delete()
+
+                    return JsonResponse(
+                        data={"message": "مهلت استفاده از این کد تخفیف تمام شده است."},
+                        status=400
+                    )
+
                 discount_code_usages = DiscountUsage.objects.filter(discount=discount)
                 discount_code_usages_count = discount_code_usages.count()
 
