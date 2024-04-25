@@ -3,7 +3,7 @@ $(document).ready(function () {
         var discountCode = $('#discountInput').val();
 
         var formData = {
-            'discount_code': discountCode
+            'discount_code': discountCode,
         };
 
         $.ajax({
@@ -12,6 +12,11 @@ $(document).ready(function () {
             data: formData,
             dataType: 'json',
             success: function (response) {
+                console.log(response.integer_final_price)
+
+                const finalPricePlaceholder = document.getElementById("finalPricePlaceholder")
+                finalPricePlaceholder.value = response.integer_final_price
+
                 var span = document.getElementById("total_price_with_discount");
                 span.innerText = response.final_price;
 
@@ -35,7 +40,7 @@ $(document).ready(function () {
                 Swal.fire({
                     icon: 'error',
                     title: 'خطا',
-                    text: error.responseJSON.message,
+                    text: error.responseJSON.error,
                     confirmButtonText: 'باشه',
                     confirmButtonColor: '#d33',
                     timer: 3000

@@ -58,7 +58,7 @@ class DiscountUsage(models.Model):
 
     user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
 
-    usage_date = models.DateTimeField(verbose_name="تاریخ استفاده")
+    usage_date = jDateTimeField(auto_now_add=True, verbose_name="تاریخ استفاده")
 
     def __str__(self):
         return f"{self.user.username} - {self.usage_date}"
@@ -126,6 +126,8 @@ class DepositSlip(models.Model):
                               verbose_name="ادمین", editable=False)
 
     receipt = models.ImageField(upload_to="Cart/DepositSlips/receipts", verbose_name="تصویر رسید")
+
+    discount_code = models.CharField(max_length=10, blank=True, null=True, verbose_name="کد تخفیف")
 
     total_cost = models.PositiveSmallIntegerField(default=0, verbose_name="مبلغ کل")
 

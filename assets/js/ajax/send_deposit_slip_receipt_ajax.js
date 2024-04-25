@@ -30,11 +30,15 @@ function showAddDepositSlipReceiptForm() {
             }
 
             const formData = new FormData();
+            discount_code = document.getElementById("discountInput")
             formData.append('image', imageInput.files[0]);
+            formData.append('discount_code', discount_code.value);
 
             return fetch('/cart/deposit/slip/add/', {
-                method: 'POST', body: formData,
-            })
+                    method: 'POST',
+                    body: formData,
+                }
+            )
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.error) {

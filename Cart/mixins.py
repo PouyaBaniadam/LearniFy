@@ -17,7 +17,7 @@ class AllowedDiscountCodesOnlyMixin(View):
 
         if not discount_code:
             return JsonResponse(
-                data={"message": "کد تخفیف بدون مقدار است!"},
+                data={"error": "کد تخفیف بدون مقدار است!"},
                 status=404
             )
 
@@ -34,9 +34,10 @@ class AllowedDiscountCodesOnlyMixin(View):
 
                 time_left = int(total_duration - difference)
 
-                if time_left < discount.duration.total_seconds():
+                if time_left < 0:
+                    print(time_left)
                     return JsonResponse(
-                        data={"message": "مهلت استفاده از این کد تخفیف تمام شده است."},
+                        data={"error": "مهلت استفاده از این کد تخفیف تمام شده است."},
                         status=400
                     )
 
@@ -49,20 +50,20 @@ class AllowedDiscountCodesOnlyMixin(View):
 
                 if has_user_used_discount:
                     return JsonResponse(
-                        data={"message": "این کد تخفیف قبلا توسط شما مورد استفاده قرار گرفته است."},
+                        data={"error": "این کد تخفیف قبلا توسط شما مورد استفاده قرار گرفته است."},
                         status=400
                     )
 
                 if discount.usage_limits <= discount_code_usages_count:
                     return JsonResponse(
-                        data={"message": "این کد تخفیف قابل استفاده نیست."},
+                        data={"error": "این کد تخفیف قابل استفاده نیست."},
                         status=400
                     )
 
         except Discount.DoesNotExist:
             return JsonResponse(
-                data={"message": "چنین کد تخفیفی وجود ندارد!"},
-                status=404
+                data={"error": "چنین کد تخفیفی وجود ندارد!"},
+                status=400
             )
 
         return super().dispatch(request, *args, **kwargs)

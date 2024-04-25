@@ -289,17 +289,10 @@
                                                                     <span class="line-through text-muted">{{ course.pdf_course.price|price_splitter }}</span>
                                                                 {% endif %}
                                                                 <div class="flex items-center gap-1">
-                                                                    {% if course.pdf_course.payment_type == "P" %}
-                                                                        {% if course.pdf_course.has_discount %}
-                                                                            <span class="font-black text-xl text-foreground">{{ course.pdf_course.price_after_discount|price_splitter }}</span>
-                                                                        {% else %}
-                                                                            <span class="font-black text-xl text-foreground">{{ course.pdf_course.price|price_splitter }}</span>
-                                                                        {% endif %}
-                                                                        {% comment %}
-                                                                        The next 2 lines will never be reached. but I leave it there!
-                                                                        {% endcomment %}
+                                                                    {% if course.pdf_course.has_discount %}
+                                                                        <span class="font-black text-xl text-foreground">{{ course.pdf_course.price_after_discount|price_splitter }}</span>
                                                                     {% else %}
-                                                                        <span class="font-black text-xl text-success">رایگان!</span>
+                                                                        <span class="font-black text-xl text-foreground">{{ course.pdf_course.price|price_splitter }}</span>
                                                                     {% endif %}
                                                                     <span class="text-xs text-muted">تومان</span>
                                                                 </div>
@@ -390,6 +383,8 @@
                                             <input type="text" id="discountInput"
                                                    class="form-input w-full h-11 !ring-0 !ring-offset-0 bg-background border-0 focus:border-border rounded-xl text-sm text-foreground pr-10"
                                                    placeholder="کد تخفیف"/>
+
+                                            <input type="hidden" id="finalPricePlaceholder">
 
                                             <button type="button"
                                                     onclick="deleteDiscountCode('{{ formatted_total_price_with_discount }}')"
@@ -487,7 +482,8 @@
                                     </svg>
                                 </button>
                                 {% if can_be_paid_with_wallet %}
-                                    <button type="button" onclick="showAddDepositSlipReceiptForm()" id="can-use-wallet-btn"
+                                    <button type="button" onclick="showAddDepositSlipReceiptForm()"
+                                            id="can-use-wallet-btn"
                                             class="w-full h-11 inline-flex items-center justify-center gap-1 bg-warning rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                         <span class="font-semibold text-sm">پرداخت از کیف پول</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -1005,19 +1001,7 @@
     <script src="{% static 'js/ajax/apply_discount_ajax.js' %}"></script>
     <script src="{% static 'js/ajax/send_deposit_slip_receipt_ajax.js' %}"></script>
 
-    <script>
-        function deleteDiscountCode(formatted_total_price_with_discount) {
-            divToHide = document.getElementById("discount-code-percent");
-            divToHide.style.display = "none";
-
-            finalPriceSpan = document.getElementById("total_price_with_discount");
-            finalPriceSpan.innerText = formatted_total_price_with_discount;
-
-            discount_input = document.getElementById("discountInput");
-            discount_input.value = "";
-
-        }
-    </script>
+    <script src="{% static 'js/delete_discount_code.js' %}"></script>
 
     <script>
         function confirmAndDelete(course_type, course_id) {

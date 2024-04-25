@@ -1,5 +1,7 @@
+from datetime import datetime
 from time import sleep
 
+import pytz
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -13,6 +15,7 @@ from Cart.mixins import AllowedDiscountCodesOnlyMixin, DisallowedCarActionsMixin
 from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
 from Course.models import VideoCourse, PDFCourse
 from Home.mixins import URLStorageMixin
+from utils.useful_functions import get_time_difference
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -182,6 +185,7 @@ class ApplyDiscount(AllowedDiscountCodesOnlyMixin, View):
             data={
                 "message": "کد تخفیف با موفقیت اعمال شد.",
                 "final_price": "{:,}".format(final_price),
+                "integer_final_price": int(final_price),
                 "discount_percent": discount.percent
             }
         )
@@ -209,6 +213,7 @@ class DeleteItemFromCartItemsPage(AuthenticatedUsersOnlyMixin, View):
 class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
     def post(self, request, *args, **kwargs):
         username = request.user.username
+        discount_code = request.POST.get("discount_code")
 
         user = CustomUser.objects.get(username=username)
 
@@ -232,11 +237,62 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
             elif item.pdf_course:
                 total_price_without_discount += item.pdf_course.price
 
-        DepositSlip.objects.create(cart=cart, receipt=image, total_cost=total_price_with_discount)
+        if discount_code:
+            try:
+                discount = Discount.objects.get(code=discount_code)
+
+                if discount.type == "PU":
+                    date_1 = discount.created_at
+                    date_2 = datetime.now(pytz.timezone('Iran'))
+
+                    total_duration = discount.duration.total_seconds()
+
+                    difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+                    time_left = int(total_duration - difference)
+
+                    if time_left < 0:
+                        print(time_left)
+                        return JsonResponse(
+                            data={"error": "مهلت استفاده از این کد تخفیف تمام شده است."},
+                            status=400
+                        )
+
+                    discount_code_usages = DiscountUsage.objects.filter(discount=discount)
+                    discount_code_usages_count = discount_code_usages.count()
+
+                    has_user_used_discount = discount_code_usages.filter(
+                        user=user, discount=discount
+                    ).exists()
+
+                    if has_user_used_discount:
+                        return JsonResponse(
+                            data={"error": "این کد تخفیف قبلا توسط شما مورد استفاده قرار گرفته است."},
+                            status=400
+                        )
+
+                    if discount.usage_limits <= discount_code_usages_count:
+                        return JsonResponse(
+                            data={"error": "این کد تخفیف قابل استفاده نیست."},
+                            status=400
+                        )
+
+                discount_amount = (discount.percent / 100) * total_price_with_discount
+                total_price_without_discount = int(total_price_with_discount - discount_amount)
+
+                DiscountUsage.objects.create(user=user, discount=discount)
+
+            except Discount.DoesNotExist:
+                return JsonResponse(
+                    data={"error": "چنین کد تخفیفی وجود ندارد!"},
+                    status=400
+                )
+
+        DepositSlip.objects.create(cart=cart, receipt=image, total_cost=total_price_without_discount)
 
         return JsonResponse(
             data={
-                "message": "فیش واریزی با موفقیت آپلود شد."
+                "message": "فیش واریزی با موفقیت آپلود شد.",
             },
             status=200
         )

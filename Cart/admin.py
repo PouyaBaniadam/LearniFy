@@ -23,10 +23,16 @@ class CartAdmin(admin.ModelAdmin):
 
 class DiscountUsageTabularInline(admin.TabularInline):
     model = DiscountUsage
-    readonly_fields = ('user', 'discount', 'usage_date')
+    readonly_fields = ('user', 'discount', 'formatted_usage_date')
+    can_delete = False
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    def formatted_usage_date(self, obj):
+        return j_date_formatter(obj.usage_date)
+
+    formatted_usage_date.short_description = "تاریخ استفاده"
 
 
 @admin.register(Discount)
