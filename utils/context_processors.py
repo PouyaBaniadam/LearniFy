@@ -1,13 +1,13 @@
 from Account.models import CustomUser
-from Cart.models import Cart, CartItem, DepositSlip
+from Financial.models import Cart, CartItem, DepositSlip
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.models import Category, Exam, VideoCourse, PDFCourse
-from Us.models import SocialMedia, AboutUs
+from Us.models import SocialMedia, About
 
 
 def social_media(request):
     social_media = SocialMedia.objects.last()
-    about_us = AboutUs.objects.last()
+    about_us = About.objects.last()
 
     context = {
         'social_media': social_media,
@@ -83,10 +83,24 @@ def cart_is_allowed(request):
     has_user_added_deposit_slip = False
 
     if user.is_authenticated:
-        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user).exists()
+        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user, type="BUY").exists()
 
     context = {
         "has_user_added_deposit_slip": has_user_added_deposit_slip
     }
+
+    return context
+
+
+def card_number_info(request):
+    try:
+        about = About.objects.last()
+
+        context = {
+            'bank_card_number': about.bank_card_number,
+            'bank_card_owner_name': about.bank_card_owner_name
+        }
+    except AttributeError:
+        context = {}
 
     return context

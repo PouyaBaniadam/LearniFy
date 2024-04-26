@@ -64,7 +64,10 @@
                     <!-- end form:submit button -->
                 </form>
 
-                <button type="button" onclick="showAddDepositSlipReceiptForm()"
+                <input type="hidden" id="submittedDiscount">
+
+                <button type="button"
+                        onclick="showAddDepositSlipReceiptForm('{{ bank_card_number }}', '{{ bank_card_owner_name }}', 'WAL')"
                         class="w-full h-11 inline-flex items-center justify-center gap-1 bg-success rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                     <span class="font-semibold text-sm">کارت به کارت</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -82,12 +85,14 @@
 
     {% include 'includes/footer.html' %}
 
+    <script src="{% static 'js/ajax/send_deposit_slip_receipt_ajax.js' %}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const amountInput = document.querySelector('#id_amount');
 
             amountInput.addEventListener('input', function () {
-                var value = this.value.replace(/,/g, '').replace(/\D/g, '');
+                let value = this.value.replace(/,/g, '').replace(/\D/g, '');
 
                 value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 

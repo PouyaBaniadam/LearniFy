@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from Account.models import Notification
-from Cart.models import BoughtCourse
+from Financial.models import BoughtCourse
 
 
 @receiver(post_save, sender=BoughtCourse)

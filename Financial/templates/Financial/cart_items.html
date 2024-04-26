@@ -471,7 +471,8 @@
                                     </svg>
                                 </button>
 
-                                <button type="button" onclick="showAddDepositSlipReceiptForm()"
+                                <button type="button"
+                                        onclick="showAddDepositSlipReceiptForm('{{ bank_card_number }}', '{{ bank_card_owner_name }}', 'BUY')"
                                         class="w-full h-11 inline-flex items-center justify-center gap-1 bg-success rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                     <span class="font-semibold text-sm">کارت به کارت</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -482,7 +483,7 @@
                                     </svg>
                                 </button>
                                 {% if can_be_paid_with_wallet %}
-                                    <button type="button" onclick="showAddDepositSlipReceiptForm()"
+                                    <button type="button"
                                             id="can-use-wallet-btn"
                                             class="w-full h-11 inline-flex items-center justify-center gap-1 bg-warning rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                         <span class="font-semibold text-sm">پرداخت از کیف پول</span>
@@ -1015,7 +1016,7 @@
                 cancelButtonColor: '#d33'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `/cart/delete/${course_type}/${course_id}`;
+                    window.location.href = `../../delete/${course_type}/${course_id}`;
                 }
             });
         }

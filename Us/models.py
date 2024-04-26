@@ -88,7 +88,7 @@ class SocialMedia(models.Model):
         verbose_name_plural = 'شبکه‌های اجتماعی'
 
 
-class AboutUs(models.Model):
+class About(models.Model):
     name = models.CharField(max_length=75, verbose_name='نام')
 
     short_description = CKEditor5Field(config_name="extends", verbose_name="توضیح مختصر")
@@ -96,6 +96,8 @@ class AboutUs(models.Model):
     what_we_do = CKEditor5Field(config_name="extends", verbose_name="چی کار می‌کنیم")
 
     bank_card_number = models.CharField(max_length=20, verbose_name="شماره کارت")
+
+    bank_card_owner_name = models.CharField(max_length=75, verbose_name="نام مالک کارت")
 
     def __str__(self):
         return f"{self.name}"

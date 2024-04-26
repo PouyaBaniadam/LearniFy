@@ -10,8 +10,8 @@ from django.views.generic import View, ListView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser, Wallet
-from Cart.mixins import AllowedDiscountCodesOnlyMixin, DisallowedCarActionsMixin
-from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
+from Financial.mixins import AllowedDiscountCodesOnlyMixin, DisallowedCarActionsMixin
+from Financial.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
 from Course.models import VideoCourse, PDFCourse
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
@@ -140,13 +140,13 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
         has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user).exists()
 
         if has_user_added_deposit_slip:
-            return ['Cart/temporary_disabled_cart.html']
+            return ['Financial/temporary_disabled_cart.html']
 
         if cart_items.exists():
-            return ['Cart/cart_items.html']
+            return ['Financial/cart_items.html']
 
         else:
-            return ['Cart/empty_cart.html']
+            return ['Financial/empty_cart.html']
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -205,7 +205,7 @@ class DeleteItemFromCartItemsPage(AuthenticatedUsersOnlyMixin, View):
             pdf_course = PDFCourse.objects.get(id=course_id)
             CartItem.objects.get(cart__user=user, pdf_course=pdf_course).delete()
 
-        return redirect("cart:items")
+        return redirect("financial:cart_items")
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -217,7 +217,7 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
         user = CustomUser.objects.get(username=username)
 
         image = request.FILES.get("image")
-        cart = Cart.objects.get(user=user)
+        cart = Cart.objects.filter(user=user).last()
 
         cart_items = CartItem.objects.filter(cart__user=user)
 
@@ -287,7 +287,13 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
                     status=400
                 )
 
-        DepositSlip.objects.create(cart=cart, receipt=image, discount_code=discount_code, total_cost=total_price_with_discount)
+        DepositSlip.objects.create(
+            user=user,
+            cart=cart,
+            receipt=image,
+            type="BUY",
+            discount_code=discount_code,
+            total_cost=total_price_with_discount)
 
         return JsonResponse(
             data={

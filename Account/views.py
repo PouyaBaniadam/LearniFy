@@ -10,7 +10,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, UpdateView, ListView, View, TemplateView
+from django.views.generic import FormView, UpdateView, ListView, View
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm, \
     ChargeWalletForm
@@ -18,7 +18,7 @@ from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnl
     NonFollowersOnlyMixin, OwnerOnlyMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
     FavoritePDFCourse
-from Cart.models import Cart
+from Financial.models import Cart, DepositSlip
 from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import summarize_entry
@@ -441,7 +441,8 @@ class VideoCoursesView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
 @method_decorator(csrf_exempt, name='dispatch')
 class ToggleFollow(View):
     def post(self, request):
-        follower = CustomUser.objects.get(username=request.user.username)
+        username = request.user.username
+        follower = CustomUser.objects.get(username=username)
 
         following_id = request.POST.get("following_id")
         following = CustomUser.objects.get(id=following_id)
@@ -470,7 +471,7 @@ class ToggleFollow(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class UnfollowPrivateAccounts(View):
+class UnfollowPrivateAccounts(AuthenticatedUsersOnlyMixin, View):
     def post(self, request):
         follower = CustomUser.objects.get(username=request.user.username)
 
@@ -490,7 +491,7 @@ class UnfollowPrivateAccounts(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class FollowPrivateAccounts(View):
+class FollowPrivateAccounts(AuthenticatedUsersOnlyMixin, View):
     def post(self, request):
         follower = CustomUser.objects.get(username=request.user.username)
         following_id = request.POST.get("following_id")
@@ -553,8 +554,8 @@ class FollowPrivateAccounts(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class ToggleAccountStatus(AuthenticatedUsersOnlyMixin, View):
     def post(self, request):
-        user = request.user
-        user = CustomUser.objects.get(username=user.username)
+        username = request.user.username
+        user = CustomUser.objects.get(username=username)
 
         if user.account_status == "PU":
             user.account_status = "PV"
@@ -840,6 +841,27 @@ class UpdateCaptionView(View):
             )
 
 
-class ChargeWallet(FormView):
+@method_decorator(csrf_exempt, name='dispatch')
+class ChargeWallet(AuthenticatedUsersOnlyMixin, FormView):
     form_class = ChargeWalletForm
     template_name = "Account/charge_wallet.html"
+
+    def post(self, request, *args, **kwargs):
+        image = self.request.FILES.get('image')
+        username = self.request.user.username
+
+        user = CustomUser.objects.get(username=username)
+
+        DepositSlip.objects.create(
+            user=user,
+            receipt=image,
+            type="WAL",
+            total_cost=0
+        )
+
+        return JsonResponse(
+            data={
+                "message": "فیش واریزی با موفقیت آپلود شد.",
+            },
+            status=200
+        )

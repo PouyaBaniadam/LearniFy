@@ -13,7 +13,7 @@ from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification, FavoritePDFCourse
-from Cart.models import CartItem
+from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     NonFinishedExamsOnlyMixin

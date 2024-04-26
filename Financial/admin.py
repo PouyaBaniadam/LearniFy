@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Cart.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
+from Financial.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -16,7 +16,9 @@ class CartItemTabularInline(admin.TabularInline):
 class CartAdmin(admin.ModelAdmin):
     list_display = ("user", "created_at", "updated_at")
 
-    readonly_fields = ("user", "penalty_counter")
+    readonly_fields = ("penalty_counter",)
+
+    autocomplete_fields = ("user",)
 
     inlines = [CartItemTabularInline]
 
@@ -45,14 +47,15 @@ class DiscountAdmin(admin.ModelAdmin):
 
 @admin.register(DepositSlip)
 class DepositSlipAdmin(admin.ModelAdmin):
-    list_display = ("cart", "is_valid", "admin", "formatted_created_at")
-    readonly_fields = ("cart", "discount_code", "formatted_total_cost")
+    list_display = ("user", "is_valid", "admin", "formatted_created_at")
+    readonly_fields = ("user", "type", "discount_code", "formatted_total_cost")
     search_fields = ("cart__user__username", "tracking_number")
     search_help_text = "جستجو بر اساس کاربر یا شماره پیگیری"
 
     def formatted_total_cost(self, obj):
         return "{:,}".format(obj.total_cost)
-    formatted_total_cost.short_description = "مبلغ کل"
+
+    formatted_total_cost.short_description = "مبلغ قابل پرداخت"
 
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)

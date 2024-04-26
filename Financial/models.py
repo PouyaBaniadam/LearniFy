@@ -23,7 +23,7 @@ class Cart(models.Model):
         return f"{self.user}"
 
     class Meta:
-        db_table = 'cart__cart'
+        db_table = 'financial__cart'
         verbose_name = 'سبد خرید'
         verbose_name_plural = 'سبدهای خرید'
 
@@ -48,7 +48,7 @@ class CartItem(models.Model):
         return f"{self.video_course or self.pdf_course}"
 
     class Meta:
-        db_table = 'cart__cart_item'
+        db_table = 'financial__cart_item'
         verbose_name = 'آیتم سبد خرید'
         verbose_name_plural = 'آیتم‌های سبد خرید'
 
@@ -64,7 +64,7 @@ class DiscountUsage(models.Model):
         return f"{self.user.username} - {self.usage_date}"
 
     class Meta:
-        db_table = 'cart__discount_usage'
+        db_table = 'financial__discount_usage'
         verbose_name = 'مورد استفاده کد تخفیف'
         verbose_name_plural = 'موارد استفاده کد تخفیف'
 
@@ -114,40 +114,50 @@ class Discount(models.Model):
         return self.code
 
     class Meta:
-        db_table = "cart__discount"
+        db_table = "financial__discount"
         verbose_name = "تخفیف"
         verbose_name_plural = "تخفیفات"
 
 
 class DepositSlip(models.Model):
-    cart = models.ForeignKey(to=Cart, on_delete=models.PROTECT, verbose_name="سبد خرید")
+    TYPE_CHOICES = (
+        ('BUY', 'خرید'),
+        ('WAL', 'شارژ کیف پول')
+    )
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.PROTECT, verbose_name="کاربر", related_name="+")
+
+    cart = models.ForeignKey(to=Cart, on_delete=models.PROTECT, blank=True, null=True, verbose_name="سبد خرید",
+                             editable=False)
 
     admin = models.ForeignKey(to="Account.CustomUser", on_delete=models.PROTECT, blank=True, null=True,
-                              verbose_name="ادمین", editable=False)
+                              verbose_name="ادمین", editable=False, related_name="+")
 
-    receipt = models.ImageField(upload_to="Cart/DepositSlips/receipts", verbose_name="تصویر رسید")
+    receipt = models.ImageField(upload_to="Financial/DepositSlips/receipts", verbose_name="تصویر رسید")
 
     discount_code = models.CharField(max_length=10, blank=True, null=True, verbose_name="کد تخفیف")
 
-    total_cost = models.PositiveBigIntegerField(default=0, verbose_name="مبلغ کل", editable=False)
+    total_cost = models.PositiveBigIntegerField(default=0, verbose_name="مبلغ قابل پرداخت", editable=False)
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     difference_cash = models.PositiveBigIntegerField(default=0, verbose_name="ما به تفاوت")
 
+    type = models.CharField(max_length=3, choices=TYPE_CHOICES, verbose_name="نوع")
+
     tracking_number = models.CharField(max_length=10, default=generate_random_integers, verbose_name="شماره پیگیری")
+
+    is_valid = models.BooleanField(default=False, verbose_name="آیا رسید معتبر است؟")
 
     is_fake = models.BooleanField(default=False, verbose_name="آیا رسید فیک است؟")
 
-    is_valid = models.BooleanField(default=False, verbose_name="آیا معتبر است؟")
-
     def __str__(self):
-        return f"{self.cart.user}"
+        return f"{self.user.username}"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        user = self.user
 
-        user = self.cart.user
         wallet = Wallet.objects.get(user=user)
         cart = Cart.objects.get(user=user)
 
@@ -220,6 +230,6 @@ class DepositSlip(models.Model):
             self.delete()
 
     class Meta:
-        db_table = "cart__deposit_slip"
+        db_table = "financial__deposit_slip"
         verbose_name = "رسید خرید"
         verbose_name_plural = "رسیدهای خرید"

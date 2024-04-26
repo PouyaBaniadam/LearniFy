@@ -1,12 +1,12 @@
 function toggleCart(courseId, courseType) {
-    var data = {
+    const data = {
         course_type: courseType,
         course_id: courseId,
     };
 
     $.ajax({
         type: "POST",
-        url: "/cart/toggle/",
+        url: "/financial/cart/toggle/",
         data: data,
         dataType: "json",
         success: function (response) {

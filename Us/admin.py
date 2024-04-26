@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Us.models import AboutUs, SocialMedia, Message
+from Us.models import About, SocialMedia, Message
 
 
 @admin.register(Message)
@@ -15,6 +15,6 @@ class SocialMediaAdmin(admin.ModelAdmin):
     list_display = ['__str__']
 
 
-@admin.register(AboutUs)
-class AboutUsAdmin(admin.ModelAdmin):
-    list_display = ['name']
+@admin.register(About)
+class AboutAdmin(admin.ModelAdmin):
+    list_display = ['name', 'bank_card_number', 'bank_card_owner_name']

@@ -13,60 +13,115 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function showAddDepositSlipReceiptForm() {
-    Swal.fire({
-        icon: "info",
-        text: "چنانچه مبلغ مذکور را کارت به کارت کردید، فیش واریزی را در این بخش آپلود کنید.",
-        title: 'آپلود رسید خرید',
-        confirmButtonText: 'آپلود',
-        html: '<input id="imageInput" type="file" accept="image/*" required>',
-        focusConfirm: false,
-        preConfirm: () => {
-            const imageInput = document.getElementById('imageInput');
+function showAddDepositSlipReceiptForm(cardNumber, ownerName, type) {
+    if (type === "BUY") {
+        Swal.fire({
+            icon: "info",
+            title: 'آپلود فیش واریزی',
+            confirmButtonText: 'آپلود',
+            html: `<p>چنانچه مبلغ مذکور را به شماره کارت <span class="text-primary">${cardNumber}</span> (به نام <span class="text-primary">${ownerName}</span>) کارت به کارت کردید، فیش واریزی را در این بخش آپلود کنید.</p>` +
+                '<br>' +
+                '<input id="imageInput" type="file" accept="image/*" required>',
+            focusConfirm: false,
+            preConfirm: () => {
+                const imageInput = document.getElementById('imageInput');
 
-            if (!imageInput || !imageInput.files || !imageInput.files[0]) {
-                Swal.showValidationMessage('لطفاً یک تصویر انتخاب کنید');
-                return;
-            }
-
-            const formData = new FormData();
-            discount_code = document.getElementById("submittedDiscount")
-            formData.append('image', imageInput.files[0]);
-            formData.append('discount_code', discount_code.value);
-
-            return fetch('/cart/deposit/slip/add/', {
-                    method: 'POST',
-                    body: formData,
+                if (!imageInput || !imageInput.files || !imageInput.files[0]) {
+                    Swal.showValidationMessage('لطفاً یک تصویر انتخاب کنید');
+                    return;
                 }
-            )
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.error) {
-                        throw new Error(data.error);
-                    } else {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'موفقیت',
-                            text: 'فیش واریزی با موفقیت آپلود شد و بعد از تایید توسط تیم پشتیبانی، شما در دوره‌ها ثبت نام خواهید شد.',
-                            confirmButtonText: 'باشه',
-                        }).then(() => {
-                            location.reload();
-                        });
-                    }
-                })
-                .catch(error => {
-                    discountInput = document.getElementById("discountInput");
-                    discountInput.value = "";
 
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'خطا در افزودن پست',
-                        text: error.message || 'خطای ناشناخته رخ داده است',
-                        confirmButtonText: 'باشه',
-                        confirmButtonColor: '#d33',
-                        timer:3000
+                const formData = new FormData();
+                let discount_code = document.getElementById("submittedDiscount")
+                formData.append('image', imageInput.files[0]);
+                formData.append('discount_code', discount_code.value);
+
+                return fetch('/financial/deposit/slip/add/', {
+                        method: 'POST',
+                        body: formData,
+                    }
+                )
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.error) {
+                            throw new Error(data.error);
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'موفقیت',
+                                text: data.message,
+                                confirmButtonText: 'باشه',
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        discountInput = document.getElementById("discountInput");
+                        discountInput.value = "";
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطا در آپلود فیش واریزی',
+                            text: error.message || 'خطای ناشناخته رخ داده است',
+                            confirmButtonText: 'باشه',
+                            confirmButtonColor: '#d33',
+                            timer: 3000
+                        });
                     });
-                });
-        }
-    });
+            }
+        });
+    } else {
+        Swal.fire({
+            icon: "info",
+            title: 'آپلود فیش واریزی',
+            confirmButtonText: 'آپلود',
+            html: `<p>چنانچه مبلغ مذکور را به شماره کارت <span class="text-primary">${cardNumber}</span> (به نام <span class="text-primary">${ownerName}</span>) کارت به کارت کردید، فیش واریزی را در این بخش آپلود کنید.</p>` +
+                '<br>' +
+                '<input id="imageInput" type="file" accept="image/*" required>',
+            focusConfirm: false,
+            preConfirm: () => {
+                const imageInput = document.getElementById('imageInput');
+
+                if (!imageInput || !imageInput.files || !imageInput.files[0]) {
+                    Swal.showValidationMessage('لطفاً یک تصویر انتخاب کنید');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('image', imageInput.files[0]);
+
+                return fetch('/account/wallet/charge/', {
+                        method: 'POST',
+                        body: formData,
+                    }
+                )
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.error) {
+                            throw new Error(data.error);
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'موفقیت',
+                                text: data.message,
+                                confirmButtonText: 'باشه',
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطا در آپلود فیش واریزی',
+                            text: error.message || 'خطای ناشناخته رخ داده است',
+                            confirmButtonText: 'باشه',
+                            confirmButtonColor: '#d33',
+                            timer: 3000
+                        });
+                    });
+            }
+        });
+    }
 }

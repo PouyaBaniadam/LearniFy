@@ -89,6 +89,9 @@ class FollowersForPVAccountsOnlyMixin(View):
 
                 return redirect("home:home")
 
+        except UnboundLocalError:
+            pass
+
         return super(FollowersForPVAccountsOnlyMixin, self).dispatch(request, *args, **kwargs)
 
 

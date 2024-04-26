@@ -8,7 +8,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: '/cart/discount/apply/',
+            url: '/financial/cart/discount/apply/',
             data: formData,
             dataType: 'json',
             success: function (response) {

@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.generic import View
 
 from Account.models import CustomUser
-from Cart.models import Discount, DiscountUsage, DepositSlip
+from Financial.models import Discount, DiscountUsage, DepositSlip
 from utils.useful_functions import get_time_difference
 
 
@@ -74,7 +74,7 @@ class DisallowedCarActionsMixin(View):
         username = request.user.username
 
         user = CustomUser.objects.get(username=username)
-        dose_deposit_slip_exists = DepositSlip.objects.filter(cart__user=user).exists()
+        dose_deposit_slip_exists = DepositSlip.objects.filter(cart__user=user, type="BUY").exists()
 
         if dose_deposit_slip_exists:
             return JsonResponse(

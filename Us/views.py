@@ -1,28 +1,27 @@
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.views.generic import TemplateView, FormView
 
 from Account.models import CustomUser
 from Home.mixins import URLStorageMixin
 from Us.forms import ContactForm
-from Us.models import AboutUs
+from Us.models import About
 
 
-class About(URLStorageMixin,TemplateView):
+class AboutView(URLStorageMixin, TemplateView):
     template_name = "Us/about.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        about = AboutUs.objects.last()
+        about = About.objects.last()
 
         context['about'] = about
 
         return context
 
 
-class Contact(URLStorageMixin,FormView):
+class Contact(URLStorageMixin, FormView):
     form_class = ContactForm
     template_name = "Us/contact.html"
     success_url = "/"

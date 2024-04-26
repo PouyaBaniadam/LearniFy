@@ -50,13 +50,12 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "News.apps.NewsConfig",
     "Us.apps.UsConfig",
-
+    "Financial.apps.FinancialConfig",
 
     # Third party packages
     "widget_tweaks",
     "hitcount",
     "star_ratings",
-    "Cart.apps.CartConfig",
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -113,6 +112,7 @@ TEMPLATES = [
                 'utils.context_processors.filter_courses',
                 'utils.context_processors.cart_items_count',
                 'utils.context_processors.cart_is_allowed',
+                'utils.context_processors.card_number_info',
             ],
         },
     },
