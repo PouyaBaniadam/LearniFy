@@ -174,7 +174,7 @@ class Wallet(models.Model):
 
     user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, related_name="wallets", verbose_name="مالک")
 
-    fund = models.PositiveSmallIntegerField(default=0, verbose_name="سرمایه")
+    fund = models.PositiveBigIntegerField(default=0, verbose_name="سرمایه")
 
     level = models.CharField(max_length=1, choices=wallet_choices, default="B", verbose_name="سطح")
 

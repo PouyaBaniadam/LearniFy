@@ -75,14 +75,14 @@ class VideoCourse(models.Model):
 
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE_CHOICES, default='F', verbose_name='نوع دوره')
 
-    price = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت')
+    price = models.PositiveBigIntegerField(default=0, verbose_name='قیمت')
 
     has_discount = models.BooleanField(default=False, verbose_name='تخفیف دارد؟')
 
     discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
                                                            validators=[MaxValueValidator(100)])
 
-    price_after_discount = models.PositiveSmallIntegerField(default=0, editable=False, verbose_name='قیمت بعد از تخفیف')
+    price_after_discount = models.PositiveBigIntegerField(default=0, editable=False, verbose_name='قیمت بعد از تخفیف')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
@@ -243,14 +243,14 @@ class PDFCourse(models.Model):
 
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE_CHOICES, default='F', verbose_name='نوع دوره')
 
-    price = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت')
+    price = models.PositiveBigIntegerField(default=0, verbose_name='قیمت')
 
     has_discount = models.BooleanField(default=False, verbose_name='تخفیف دارد؟')
 
     discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
                                                            validators=[MaxValueValidator(100)])
 
-    price_after_discount = models.PositiveSmallIntegerField(default=0, editable=False, verbose_name='قیمت بعد از تخفیف')
+    price_after_discount = models.PositiveBigIntegerField(default=0, editable=False, verbose_name='قیمت بعد از تخفیف')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
@@ -500,7 +500,7 @@ class BoughtCourse(models.Model):
     video_course = models.ForeignKey(to=VideoCourse, on_delete=models.PROTECT, blank=True, null=True,
                                      verbose_name="دوره ویدئویی", editable=False)
 
-    cost = models.PositiveSmallIntegerField(default=0, verbose_name="قیمت خرید")
+    cost = models.PositiveBigIntegerField(default=0, verbose_name="قیمت خرید", editable=False)
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 

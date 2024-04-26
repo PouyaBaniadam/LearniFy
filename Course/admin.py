@@ -25,7 +25,7 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
 
 class BoughtCourseTabularInline(admin.TabularInline):
     model = BoughtCourse
-    readonly_fields = ("user", "cost", "formatted_created_at")
+    readonly_fields = ("user", "formatted_cost", "formatted_created_at")
     can_delete = False
 
     def has_add_permission(self, request, obj):
@@ -36,6 +36,9 @@ class BoughtCourseTabularInline(admin.TabularInline):
 
     formatted_created_at.short_description = 'تاریخ خرید'
 
+    def formatted_cost(self, obj):
+        return "{:,}".format(obj.cost)
+    formatted_cost.short_description = "قیمت خرید"
 
 @admin.register(VideoCourse)
 class VideoCourseAdmin(admin.ModelAdmin):

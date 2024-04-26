@@ -46,9 +46,13 @@ class DiscountAdmin(admin.ModelAdmin):
 @admin.register(DepositSlip)
 class DepositSlipAdmin(admin.ModelAdmin):
     list_display = ("cart", "is_valid", "admin", "formatted_created_at")
-    readonly_fields = ("cart", "tracking_number", "total_cost")
+    readonly_fields = ("cart", "discount_code", "formatted_total_cost")
     search_fields = ("cart__user__username", "tracking_number")
     search_help_text = "جستجو بر اساس کاربر یا شماره پیگیری"
+
+    def formatted_total_cost(self, obj):
+        return "{:,}".format(obj.total_cost)
+    formatted_total_cost.short_description = "مبلغ کل"
 
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)

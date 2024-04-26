@@ -16,7 +16,7 @@ function getCookie(name) {
 function showAddDepositSlipReceiptForm() {
     Swal.fire({
         icon: "info",
-        text: 'چنانچه مبلغ مذکور را کارت به کارت کردید، فیش واریزی را در این بخش آپلود کنید.',
+        text: "چنانچه مبلغ مذکور را کارت به کارت کردید، فیش واریزی را در این بخش آپلود کنید.",
         title: 'آپلود رسید خرید',
         confirmButtonText: 'آپلود',
         html: '<input id="imageInput" type="file" accept="image/*" required>',
@@ -30,7 +30,7 @@ function showAddDepositSlipReceiptForm() {
             }
 
             const formData = new FormData();
-            discount_code = document.getElementById("discountInput")
+            discount_code = document.getElementById("submittedDiscount")
             formData.append('image', imageInput.files[0]);
             formData.append('discount_code', discount_code.value);
 
@@ -55,12 +55,16 @@ function showAddDepositSlipReceiptForm() {
                     }
                 })
                 .catch(error => {
+                    discountInput = document.getElementById("discountInput");
+                    discountInput.value = "";
+
                     Swal.fire({
                         icon: 'error',
                         title: 'خطا در افزودن پست',
                         text: error.message || 'خطای ناشناخته رخ داده است',
                         confirmButtonText: 'باشه',
-                        confirmButtonColor: 'red',
+                        confirmButtonColor: '#d33',
+                        timer:3000
                     });
                 });
         }

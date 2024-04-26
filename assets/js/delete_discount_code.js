@@ -8,7 +8,7 @@ function deleteDiscountCode(formatted_total_price_with_discount) {
     discount_input = document.getElementById("discountInput");
     discount_input.value = "";
 
-    let finalPricePlaceholder = document.getElementById("finalPricePlaceholder")
-    finalPricePlaceholder.value = ""
+    let submittedDiscount = document.getElementById("submittedDiscount")
+    submittedDiscount.value = ""
 
 }

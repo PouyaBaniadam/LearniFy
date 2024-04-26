@@ -1,5 +1,4 @@
 from datetime import datetime
-from time import sleep
 
 import pytz
 from django.db.models import Q
@@ -278,7 +277,7 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
                         )
 
                 discount_amount = (discount.percent / 100) * total_price_with_discount
-                total_price_without_discount = int(total_price_with_discount - discount_amount)
+                total_price_with_discount = int(total_price_with_discount - discount_amount)
 
                 DiscountUsage.objects.create(user=user, discount=discount)
 
@@ -288,7 +287,7 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
                     status=400
                 )
 
-        DepositSlip.objects.create(cart=cart, receipt=image, total_cost=total_price_without_discount)
+        DepositSlip.objects.create(cart=cart, receipt=image, discount_code=discount_code, total_cost=total_price_with_discount)
 
         return JsonResponse(
             data={

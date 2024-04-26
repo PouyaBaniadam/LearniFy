@@ -12,10 +12,10 @@ $(document).ready(function () {
             data: formData,
             dataType: 'json',
             success: function (response) {
-                console.log(response.integer_final_price)
+                const submittedDiscount = document.getElementById("submittedDiscount")
+                const discountInput = document.getElementById("discountInput")
 
-                const finalPricePlaceholder = document.getElementById("finalPricePlaceholder")
-                finalPricePlaceholder.value = response.integer_final_price
+                submittedDiscount.value = discountInput.value
 
                 var span = document.getElementById("total_price_with_discount");
                 span.innerText = response.final_price;
@@ -37,6 +37,9 @@ $(document).ready(function () {
                 });
             },
             error: function (error) {
+                discountInput = document.getElementById("discountInput");
+                discountInput.value = "";
+
                 Swal.fire({
                     icon: 'error',
                     title: 'خطا',

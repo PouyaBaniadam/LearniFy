@@ -129,11 +129,11 @@ class DepositSlip(models.Model):
 
     discount_code = models.CharField(max_length=10, blank=True, null=True, verbose_name="کد تخفیف")
 
-    total_cost = models.PositiveSmallIntegerField(default=0, verbose_name="مبلغ کل")
+    total_cost = models.PositiveBigIntegerField(default=0, verbose_name="مبلغ کل", editable=False)
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
-    difference_cash = models.PositiveSmallIntegerField(default=0, verbose_name="ما به تفاوت")
+    difference_cash = models.PositiveBigIntegerField(default=0, verbose_name="ما به تفاوت")
 
     tracking_number = models.CharField(max_length=10, default=generate_random_integers, verbose_name="شماره پیگیری")
 
@@ -179,14 +179,40 @@ class DepositSlip(models.Model):
                     video_course.participated_users.add(user)
                     video_course.save()
 
-                    BoughtCourse.objects.create(user=user, video_course=video_course)
+                    if self.discount_code:
+                        discount = Discount.objects.get(code=self.discount_code)
+                        discount_amount = (discount.percent / 100) * video_course.price_after_discount
+
+                        BoughtCourse.objects.create(
+                            user=user,
+                            video_course=video_course,
+                            cost=video_course.price_after_discount - discount_amount)
+
+                    else:
+                        BoughtCourse.objects.create(
+                            user=user,
+                            video_course=video_course,
+                            cost=video_course.price_after_discount)
 
                 if item.course_type == "PDF":
                     pdf_course = PDFCourse.objects.get(name=item.pdf_course.name)
                     pdf_course.participated_users.add(user)
                     pdf_course.save()
 
-                    BoughtCourse.objects.create(user=user, pdf_course=pdf_course)
+                    if self.discount_code:
+                        discount = Discount.objects.get(code=self.discount_code)
+                        discount_amount = (discount.percent / 100) * pdf_course.price_after_discount
+
+                        BoughtCourse.objects.create(
+                            user=user,
+                            pdf_course=pdf_course,
+                            cost=pdf_course.price_after_discount - discount_amount)
+
+                    else:
+                        BoughtCourse.objects.create(
+                            user=user,
+                            pdf_course=pdf_course,
+                            cost=pdf_course.price_after_discount)
 
             for item in cart.items.all():
                 item.delete()
