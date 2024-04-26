@@ -81,3 +81,14 @@ def generate_random_integers(length=10):
     random_value = "".join(random.choice(string.digits) for _ in range(length))
 
     return random_value
+
+
+def summarize_entry(entry: str):
+    """
+    This function removes some characters from the middle of the entry.
+    :param entry: Can be anything! E-mail or mobile number is great for it.
+    :return: formatted entry with some characters removed from the middle.
+    """
+
+    middle = len(entry) // 2
+    return f"{entry[:middle - 2]} *** {entry[middle + 3:]}"

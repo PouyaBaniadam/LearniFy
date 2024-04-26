@@ -37,7 +37,7 @@ class OTPAdmin(admin.ModelAdmin):
 
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
-    list_display = ("user", "fund", "level", "usage_count")
+    list_display = ("user", "fund", "level",)
 
     autocomplete_fields = ("user",)
 

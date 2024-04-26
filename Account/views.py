@@ -10,9 +10,10 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, UpdateView, ListView, View
+from django.views.generic import FormView, UpdateView, ListView, View, TemplateView
 
-from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
+from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm, \
+    ChargeWalletForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
     NonFollowersOnlyMixin, OwnerOnlyMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
@@ -20,6 +21,7 @@ from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Fa
 from Cart.models import Cart
 from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
+from utils.useful_functions import summarize_entry
 
 
 class RegisterView(NonAuthenticatedUsersOnlyMixin, FormView):
@@ -39,7 +41,7 @@ class RegisterView(NonAuthenticatedUsersOnlyMixin, FormView):
         # send_register_sms(receptor=mobile_phone, sms_code=sms_code)
         print(sms_code)
 
-        return redirect(reverse("account:check_otp") + f"?uuid={uuid}&mobile_phone={mobile_phone}")
+        return redirect(reverse("account:check_otp") + f"?uuid={uuid}")
 
     def form_invalid(self, form):
         return super().form_invalid(form)
@@ -169,6 +171,19 @@ class ForgetPasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
 class CheckOTPView(FormView):
     form_class = CheckOTPForm
     template_name = 'Account/check_otp.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        request = self.request
+        uuid = request.GET.get('uuid')
+
+        otp = OTP.objects.get(uuid=uuid)
+        summarized_mobile_phone = summarize_entry(entry=otp.mobile_phone)
+
+        context["mobile_phone"] = summarized_mobile_phone
+
+        return context
 
     def form_valid(self, form):
         request = self.request
@@ -823,3 +838,8 @@ class UpdateCaptionView(View):
                 },
                 status=200
             )
+
+
+class ChargeWallet(FormView):
+    form_class = ChargeWalletForm
+    template_name = "Account/charge_wallet.html"

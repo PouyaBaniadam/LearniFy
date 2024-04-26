@@ -178,7 +178,9 @@ class Wallet(models.Model):
 
     level = models.CharField(max_length=1, choices=wallet_choices, default="B", verbose_name="سطح")
 
-    usage_count = models.PositiveSmallIntegerField(default=0, verbose_name="دفعات استفاده")
+    def charge_wallet(self, amount):
+        self.fund += amount
+        self.save()
 
     def __str__(self):
         return f"{self.user.username}"

@@ -496,7 +496,7 @@
 
                                 {% else %}
                                     <button type="button" onclick="lackOfFundPopUp()" id="cant-use-wallet-btn"
-                                            class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                            class="w-full h-11 inline-flex items-center justify-center gap-1 bg-warning rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                         <span class="font-semibold text-sm">پرداخت از کیف پول</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -1032,8 +1032,9 @@
                 text: "بودجه شما جهت پرداخت این سبد خرید کافی نیست!",
                 confirmButtonText: 'باشه',
                 confirmButtonColor: '#d33',
+                timer: 3000,
                 // TODO: Add URL to footer
-                footer: '<a href="" class="text-primary">شارژ کیف پول</a>',
+                footer: '<a href="/account/wallet/charge" class="text-primary">شارژ کیف پول</a>',
             })
         }
     </script>

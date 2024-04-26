@@ -174,3 +174,7 @@ class ChangePasswordForm(forms.Form):
 
         if has_errors:
             raise ValidationError(message=message, code=code)
+
+
+class ChargeWalletForm(forms.Form):
+    amount = forms.CharField(max_length=9, label="مقدار شارژ")
