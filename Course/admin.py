@@ -37,8 +37,10 @@ class BoughtCourseTabularInline(admin.TabularInline):
     formatted_created_at.short_description = 'تاریخ خرید'
 
     def formatted_cost(self, obj):
-        return "{:,}".format(obj.cost)
+        return "{:,}".format(obj.cost) + " تومان "
+
     formatted_cost.short_description = "قیمت خرید"
+
 
 @admin.register(VideoCourse)
 class VideoCourseAdmin(admin.ModelAdmin):

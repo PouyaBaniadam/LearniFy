@@ -37,19 +37,33 @@ class OTPAdmin(admin.ModelAdmin):
 
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
-    list_display = ("user", "fund", "level",)
+    list_display = ("user", "formatted_fund", "level",)
+
+    readonly_fields = ("formatted_fund",)
 
     autocomplete_fields = ("user",)
+
+    def formatted_fund(self, obj):
+        return "{:,}".format(obj.fund) + " تومان "
+
+    formatted_fund.short_description = "سرمایه"
 
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'title', 'message', 'mode', 'visibility', 'has_been_read', 'formatted_created_at')
+    list_display = ('uuid', 'title', 'admin', 'mode', 'visibility', 'has_been_read', 'formatted_created_at')
+
+    readonly_fields = ('admin',)
 
     def formatted_created_at(self, obj):
         return j_date_formatter(obj.created_at)
 
     formatted_created_at.short_description = 'ایجاد شده در تاریخ'
+
+    def save_model(self, request, obj, form, change):
+        obj.admin = request.user
+
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(NewsLetter)

@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from Account.models import Follow, Notification
+from Account.models import Follow, Notification, Wallet
 
 
 @receiver(post_save, sender=Follow)
@@ -75,3 +75,23 @@ def create_follow_notification(sender, instance, created, **kwargs):
             ).first()
 
             first_follow_notification.delete()
+
+
+@receiver(post_save, sender=Wallet)
+def my_model_post_save(sender, instance, created, **kwargs):
+    user = instance.user
+
+    if not created:
+        if instance.difference > 0:
+            print()
+            formatted_difference = "{:,}".format(instance.difference)
+            notification = Notification.objects.create(
+                title="شارژ کیف پول",
+                message=f'<p>مبلغ <span style="color:hsl(240, 75%, 60%);">{formatted_difference}</span> تومان به کیف پول شما اضافه شد.</p>',
+                visibility="PV",
+                mode="S",
+                type="AN",
+            )
+
+            notification.users.add(user)
+            notification.save()

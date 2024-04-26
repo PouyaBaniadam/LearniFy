@@ -47,13 +47,13 @@ class DiscountAdmin(admin.ModelAdmin):
 
 @admin.register(DepositSlip)
 class DepositSlipAdmin(admin.ModelAdmin):
-    list_display = ("user", "is_valid", "admin", "formatted_created_at")
+    list_display = ("user", "type", "admin", "is_valid", "formatted_created_at")
     readonly_fields = ("user", "type", "discount_code", "formatted_total_cost")
     search_fields = ("cart__user__username", "tracking_number")
     search_help_text = "جستجو بر اساس کاربر یا شماره پیگیری"
 
     def formatted_total_cost(self, obj):
-        return "{:,}".format(obj.total_cost)
+        return "{:,}".format(obj.total_cost) + " تومان "
 
     formatted_total_cost.short_description = "مبلغ قابل پرداخت"
 

@@ -74,7 +74,11 @@ class DisallowedCarActionsMixin(View):
         username = request.user.username
 
         user = CustomUser.objects.get(username=username)
-        dose_deposit_slip_exists = DepositSlip.objects.filter(cart__user=user, type="BUY").exists()
+        dose_deposit_slip_exists = DepositSlip.objects.filter(
+            cart__user=user,
+            type="BUY",
+            is_valid=False
+        ).exists()
 
         if dose_deposit_slip_exists:
             return JsonResponse(

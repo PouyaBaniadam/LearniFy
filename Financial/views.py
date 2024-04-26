@@ -137,7 +137,10 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     def get_template_names(self):
         user = self.request.user
         cart_items = CartItem.objects.filter(cart__user=user)
-        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user).exists()
+        has_user_added_deposit_slip = DepositSlip.objects.filter(
+            cart__user=user,
+            is_valid=False
+        ).exists()
 
         if has_user_added_deposit_slip:
             return ['Financial/temporary_disabled_cart.html']

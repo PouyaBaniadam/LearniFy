@@ -83,7 +83,11 @@ def cart_is_allowed(request):
     has_user_added_deposit_slip = False
 
     if user.is_authenticated:
-        has_user_added_deposit_slip = DepositSlip.objects.filter(cart__user=user, type="BUY").exists()
+        has_user_added_deposit_slip = DepositSlip.objects.filter(
+            cart__user=user,
+            type="BUY",
+            is_valid=False
+        ).exists()
 
     context = {
         "has_user_added_deposit_slip": has_user_added_deposit_slip

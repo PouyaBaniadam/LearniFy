@@ -161,7 +161,11 @@ class CantChargeWalletYetMixin(View):
         username = request.user.username
         user = CustomUser.objects.get(username=username)
 
-        if DepositSlip.objects.filter(user=user, type="WAL").exists():
+        if DepositSlip.objects.filter(
+                user=user,
+                type="WAL",
+                is_valid=False
+        ).exists():
             messages.error(request, f"تیم پشتیبانی در حال بررسی درخواست قبلی شما می‌‌باشد.")
 
             redirect_url = request.session.get('current_url')

@@ -174,13 +174,14 @@ class Wallet(models.Model):
 
     user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, related_name="wallets", verbose_name="مالک")
 
-    fund = models.PositiveBigIntegerField(default=0, verbose_name="سرمایه")
+    fund = models.PositiveBigIntegerField(default=0, verbose_name="سرمایه", editable=False)
 
     level = models.CharField(max_length=1, choices=wallet_choices, default="B", verbose_name="سطح")
 
+    difference = models.IntegerField(default=0, verbose_name="میزان تفاوت", editable=False)
+
     def charge_wallet(self, amount):
         self.fund += amount
-        self.save()
 
     def __str__(self):
         return f"{self.user.username}"
@@ -228,11 +229,14 @@ class Notification(models.Model):
         ("AN", "اطلاعیه"),
     )
 
-    uuid = models.UUIDField(default=uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid4, verbose_name="یو‌‌یو‌‌آی‌‌دی", editable=False)
 
     title = models.CharField(max_length=100, verbose_name="تیتر")
 
     message = CKEditor5Field(config_name='extends', verbose_name="پیام")
+
+    admin = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+                              verbose_name="ادمین", related_name="notifications")
 
     image = models.ImageField(upload_to="Account/Notification/image", blank=True, null=True, verbose_name="تصویر")
 

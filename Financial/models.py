@@ -1,3 +1,4 @@
+import django
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -151,6 +152,8 @@ class DepositSlip(models.Model):
 
     is_fake = models.BooleanField(default=False, verbose_name="آیا رسید فیک است؟")
 
+    has_been_finished = models.BooleanField(default=False, verbose_name="کارها انجام شده؟", editable=False)
+
     def __str__(self):
         return f"{self.user.username}"
 
@@ -166,6 +169,7 @@ class DepositSlip(models.Model):
             cart.save()
 
             notification = Notification.objects.create(
+                admin=self.admin,
                 title="عدم تایید رسید خرید",
                 message=f'رسید واریزی شما مورد تایید نبود. در صورت وجود هر گونه مشکلی، با تیم پشتیبانی تماس بگیرید.',
                 visibility="PV",
@@ -179,8 +183,10 @@ class DepositSlip(models.Model):
 
             self.delete()
 
-        if self.is_valid and self.admin:
-            wallet.fund += self.difference_cash
+        if self.is_valid and self.has_been_finished is False:
+            self.has_been_finished = True
+            wallet.charge_wallet(self.difference_cash)
+            wallet.difference = self.difference_cash
             wallet.save()
 
             for item in cart.items.all():
@@ -227,7 +233,10 @@ class DepositSlip(models.Model):
             for item in cart.items.all():
                 item.delete()
 
-            self.delete()
+        try:
+            super().save(*args, **kwargs)
+        except django.db.utils.IntegrityError:
+            pass
 
     class Meta:
         db_table = "financial__deposit_slip"
