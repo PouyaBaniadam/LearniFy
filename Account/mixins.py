@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.views.generic import View
 
 from Account.models import CustomUser
+from Financial.models import DepositSlip
 
 
 class NonAuthenticatedUsersOnlyMixin(View):
@@ -153,3 +154,22 @@ class OwnerOnlyMixin(View):
                 return redirect("home:home")
 
         return super(OwnerOnlyMixin, self).dispatch(request, *args, **kwargs)
+
+
+class CantChargeWalletYetMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        username = request.user.username
+        user = CustomUser.objects.get(username=username)
+
+        if DepositSlip.objects.filter(user=user, type="WAL").exists():
+            messages.error(request, f"تیم پشتیبانی در حال بررسی درخواست قبلی شما می‌‌باشد.")
+
+            redirect_url = request.session.get('current_url')
+
+            if request.user.is_authenticated:
+                if redirect_url is not None:
+                    return redirect(redirect_url)
+
+                return redirect("home:home")
+
+        return super(CantChargeWalletYetMixin, self).dispatch(request, *args, **kwargs)

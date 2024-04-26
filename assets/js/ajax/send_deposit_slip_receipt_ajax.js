@@ -13,7 +13,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function showAddDepositSlipReceiptForm(cardNumber, ownerName, type) {
+function showAddDepositSlipReceiptForm(cardNumber, ownerName, type, redirectUrl) {
     if (type === "BUY") {
         Swal.fire({
             icon: "info",
@@ -107,7 +107,7 @@ function showAddDepositSlipReceiptForm(cardNumber, ownerName, type) {
                                 text: data.message,
                                 confirmButtonText: 'باشه',
                             }).then(() => {
-                                location.reload();
+                                window.location.href = redirectUrl;
                             });
                         }
                     })

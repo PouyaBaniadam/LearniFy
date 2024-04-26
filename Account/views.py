@@ -15,7 +15,7 @@ from django.views.generic import FormView, UpdateView, ListView, View
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm, \
     ChargeWalletForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
-    NonFollowersOnlyMixin, OwnerOnlyMixin
+    NonFollowersOnlyMixin, OwnerOnlyMixin, CantChargeWalletYetMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
     FavoritePDFCourse
 from Financial.models import Cart, DepositSlip
@@ -842,9 +842,18 @@ class UpdateCaptionView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ChargeWallet(AuthenticatedUsersOnlyMixin, FormView):
+class ChargeWallet(AuthenticatedUsersOnlyMixin, CantChargeWalletYetMixin, FormView):
     form_class = ChargeWalletForm
     template_name = "Account/charge_wallet.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        redirect_url = self.request.session.get('current_url')
+
+        context["redirect_url"] = redirect_url
+
+        return context
 
     def post(self, request, *args, **kwargs):
         image = self.request.FILES.get('image')
