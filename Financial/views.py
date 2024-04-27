@@ -440,5 +440,5 @@ class BuyCourseWithWalletFundView(AuthenticatedUsersOnlyMixin, View):
                 data={
                     "error": "موجودی شما برای پرداخت این سبد خرید کافی نیست.",
                 },
-                status=200
+                status=400
             )
