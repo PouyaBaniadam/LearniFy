@@ -83,13 +83,25 @@ def my_model_post_save(sender, instance, created, **kwargs):
 
     if not created:
         if instance.difference > 0:
-            print()
             formatted_difference = "{:,}".format(instance.difference)
             notification = Notification.objects.create(
                 title="شارژ کیف پول",
                 message=f'<p>مبلغ <span style="color:hsl(240, 75%, 60%);">{formatted_difference}</span> تومان به کیف پول شما اضافه شد.</p>',
                 visibility="PV",
                 mode="S",
+                type="AN",
+            )
+
+            notification.users.add(user)
+            notification.save()
+
+        if instance.difference < 0:
+            formatted_difference = "{:,}".format(-instance.difference)
+            notification = Notification.objects.create(
+                title="برداشت از کیف پول",
+                message=f'<p>مبلغ <span style="color:hsl(240, 75%, 60%);">{formatted_difference}</span> تومان از حساب شما کسر شد.</p>',
+                visibility="PV",
+                mode="D",
                 type="AN",
             )
 

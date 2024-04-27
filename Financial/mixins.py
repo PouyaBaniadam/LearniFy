@@ -35,7 +35,6 @@ class AllowedDiscountCodesOnlyMixin(View):
                 time_left = int(total_duration - difference)
 
                 if time_left < 0:
-                    print(time_left)
                     return JsonResponse(
                         data={"error": "مهلت استفاده از این کد تخفیف تمام شده است."},
                         status=400

@@ -183,6 +183,9 @@ class Wallet(models.Model):
     def charge_wallet(self, amount):
         self.fund += amount
 
+    def use_wallet(self, amount):
+        self.fund -= amount
+
     def __str__(self):
         return f"{self.user.username}"
 

@@ -11,4 +11,5 @@ urlpatterns = [
     path('cart/delete/<str:course_type>/<int:course_id>', views.DeleteItemFromCartItemsPage.as_view(),
          name='delete_from_cart_page'),
     path('deposit/slip/add/', views.AddDepositSlipView.as_view(), name='add_deposit_slip'),
+    path('wallet/pay/', views.BuyCourseWithWalletFundView.as_view(), name='buy_with_wallet'),
 ]

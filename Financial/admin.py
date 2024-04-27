@@ -26,8 +26,8 @@ class CartAdmin(admin.ModelAdmin):
 class DiscountUsageTabularInline(admin.TabularInline):
     model = DiscountUsage
     readonly_fields = ('user', 'discount', 'formatted_usage_date')
-    can_delete = False
-
+    # can_delete = False
+    #
     def has_add_permission(self, request, obj=None):
         return False
 

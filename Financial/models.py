@@ -183,7 +183,7 @@ class DepositSlip(models.Model):
 
             self.delete()
 
-        if self.is_valid and self.has_been_finished is False:
+        if self.is_valid and self.type == "BUY" and self.has_been_finished is False:
             self.has_been_finished = True
             wallet.charge_wallet(self.difference_cash)
             wallet.difference = self.difference_cash
@@ -232,6 +232,12 @@ class DepositSlip(models.Model):
 
             for item in cart.items.all():
                 item.delete()
+
+        if self.is_valid and self.type == "WAL" and self.has_been_finished is False:
+            self.has_been_finished = True
+            wallet.charge_wallet(self.difference_cash)
+            wallet.difference = self.difference_cash
+            wallet.save()
 
         try:
             super().save(*args, **kwargs)

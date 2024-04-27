@@ -12,7 +12,7 @@ from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser, Wallet
 from Financial.mixins import AllowedDiscountCodesOnlyMixin, DisallowedCarActionsMixin
 from Financial.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
-from Course.models import VideoCourse, PDFCourse
+from Course.models import VideoCourse, PDFCourse, BoughtCourse
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
 
@@ -254,7 +254,6 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
                     time_left = int(total_duration - difference)
 
                     if time_left < 0:
-                        print(time_left)
                         return JsonResponse(
                             data={"error": "مهلت استفاده از این کد تخفیف تمام شده است."},
                             status=400
@@ -304,3 +303,142 @@ class AddDepositSlipView(AuthenticatedUsersOnlyMixin, View):
             },
             status=200
         )
+
+
+class BuyCourseWithWalletFundView(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        username = request.user.username
+        discount_code = request.POST.get("discount_code")
+
+        user = CustomUser.objects.get(username=username)
+        wallet = Wallet.objects.get(user=user)
+        cart = Cart.objects.get(user=user)
+
+        total_price_without_discount = 0
+        total_price_with_discount = 0
+
+        for item in cart.items.all():
+            if item.video_course:
+                total_price_with_discount += item.video_course.price_after_discount
+            elif item.pdf_course:
+                total_price_with_discount += item.pdf_course.price_after_discount
+
+        for item in cart.items.all():
+            if item.video_course:
+                total_price_without_discount += item.video_course.price
+            elif item.pdf_course:
+                total_price_without_discount += item.pdf_course.price
+
+        if discount_code:
+            try:
+                discount = Discount.objects.get(code=discount_code)
+
+                if discount.type == "PU":
+                    date_1 = discount.created_at
+                    date_2 = datetime.now(pytz.timezone('Iran'))
+
+                    total_duration = discount.duration.total_seconds()
+
+                    difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+                    time_left = int(total_duration - difference)
+
+                    if time_left < 0:
+                        return JsonResponse(
+                            data={"error": "مهلت استفاده از این کد تخفیف تمام شده است."},
+                            status=400
+                        )
+
+                    discount_code_usages = DiscountUsage.objects.filter(discount=discount)
+                    discount_code_usages_count = discount_code_usages.count()
+
+                    has_user_used_discount = discount_code_usages.filter(
+                        user=user, discount=discount
+                    ).exists()
+
+                    if has_user_used_discount:
+                        return JsonResponse(
+                            data={"error": "این کد تخفیف قبلا توسط شما مورد استفاده قرار گرفته است."},
+                            status=400
+                        )
+
+                    if discount.usage_limits <= discount_code_usages_count:
+                        return JsonResponse(
+                            data={"error": "این کد تخفیف قابل استفاده نیست."},
+                            status=400
+                        )
+
+                discount_amount = (discount.percent / 100) * total_price_with_discount
+                total_price_with_discount = int(total_price_with_discount - discount_amount)
+
+                DiscountUsage.objects.create(user=user, discount=discount)
+
+            except Discount.DoesNotExist:
+                return JsonResponse(
+                    data={"error": "چنین کد تخفیفی وجود ندارد!"},
+                    status=400
+                )
+
+        if total_price_with_discount <= wallet.fund:
+            for item in cart.items.all():
+                if item.course_type == "VID":
+                    video_course = VideoCourse.objects.get(name=item.video_course.name)
+                    video_course.participated_users.add(user)
+                    video_course.save()
+
+                    if discount_code:
+                        discount = Discount.objects.get(code=discount_code)
+                        discount_amount = (discount.percent / 100) * video_course.price_after_discount
+
+                        BoughtCourse.objects.create(
+                            user=user,
+                            video_course=video_course,
+                            cost=video_course.price_after_discount - discount_amount)
+
+                    else:
+                        BoughtCourse.objects.create(
+                            user=user,
+                            video_course=video_course,
+                            cost=video_course.price_after_discount)
+
+                if item.course_type == "PDF":
+                    pdf_course = PDFCourse.objects.get(name=item.pdf_course.name)
+                    pdf_course.participated_users.add(user)
+                    pdf_course.save()
+
+                    if discount_code:
+                        discount = Discount.objects.get(code=discount_code)
+                        discount_amount = (discount.percent / 100) * pdf_course.price_after_discount
+
+                        BoughtCourse.objects.create(
+                            user=user,
+                            pdf_course=pdf_course,
+                            cost=pdf_course.price_after_discount - discount_amount)
+
+                    else:
+                        BoughtCourse.objects.create(
+                            user=user,
+                            pdf_course=pdf_course,
+                            cost=pdf_course.price_after_discount)
+
+            for item in cart.items.all():
+                item.delete()
+
+            wallet.use_wallet(total_price_with_discount)
+            wallet.difference = -total_price_with_discount
+            wallet.save()
+
+            return JsonResponse(
+                data={
+                    "message": "سبد خرید شما با موفقیت تسویه شد.",
+                },
+                status=200
+            )
+
+        else:
+            return JsonResponse(
+                data={
+                    "error": "موجودی شما برای پرداخت این سبد خرید کافی نیست.",
+                },
+                status=200
+            )

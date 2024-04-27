@@ -483,8 +483,7 @@
                                     </svg>
                                 </button>
                                 {% if can_be_paid_with_wallet %}
-                                    <button type="button"
-                                            id="can-use-wallet-btn"
+                                    <button type="button" onclick="payWithWallet()"
                                             class="w-full h-11 inline-flex items-center justify-center gap-1 bg-warning rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                         <span class="font-semibold text-sm">پرداخت از کیف پول</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -494,7 +493,6 @@
                                             </path>
                                         </svg>
                                     </button>
-
                                 {% else %}
                                     <button type="button" onclick="lackOfFundPopUp()" id="cant-use-wallet-btn"
                                             class="w-full h-11 inline-flex items-center justify-center gap-1 bg-warning rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
@@ -1039,5 +1037,66 @@
             })
         }
     </script>
+
+    <script>
+        function payWithWallet(amount) {
+            let discount_code = document.getElementById("submittedDiscount")
+
+            Swal.fire({
+                title: 'اطمینان از پرداخت؟',
+                text: 'آیا از پرداخت به واسطه کیف پول خود اطمینان دارید؟',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'بله',
+                cancelButtonText: 'نه',
+                cancelButtonColor: "#d33"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'در انتظار پاسخ از سرور...',
+                        confirmButtonText: 'باشه',
+                        allowOutsideClick: false,
+                        onBeforeOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/financial/wallet/pay/',
+                        data: {
+                            'discount_code': discount_code.value,
+                            'amount': amount,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'پرداخت موفقیت آمیز',
+                                text: response.message,
+                                confirmButtonText: 'باشه',
+                            });
+
+                            document.body.addEventListener('click', function () {
+                                location.reload();
+                            });
+                        },
+
+                        error: function (xhr, textStatus, errorThrown) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطا در پرداخت',
+                                text: xhr.responseJSON.error,
+                                confirmButtonText: 'باشه',
+                                confirmButtonColor: "#d33",
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
 
 {% endblock %}
