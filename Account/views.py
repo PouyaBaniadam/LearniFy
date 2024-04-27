@@ -576,7 +576,7 @@ class ToggleAccountStatus(AuthenticatedUsersOnlyMixin, View):
             )
 
 
-class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerOnlyMixin, URLStorageMixin, UpdateView):
+class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
     model = CustomUser
     template_name = 'Account/edit_profile.html'
     fields = ("full_name", "email", "about_me")
@@ -585,6 +585,8 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerOnlyMixin, URLStorageMix
     success_url = "/"
 
     def form_valid(self, form):
+        messages.success(request=self.request, message=f"حساب کاربری شما با موفقیت تغییر یافت.")
+
         return super().form_valid(form)
 
     def get_success_url(self):
