@@ -4,9 +4,9 @@ from django.views.generic import TemplateView
 
 from Course.models import VideoCourse, Exam, PDFCourse
 from Home.mixins import URLStorageMixin
-from Home.models import HeroBanner, Banner1, Banner2, Banner3
+from Home.models import IntroBanner
 from News.models import News
-from Us.models import Message
+from Us.models import Message, WhyUs
 from Weblog.models import Weblog
 
 
@@ -65,13 +65,7 @@ class HomeView(URLStorageMixin, TemplateView):
 
         latest_weblogs = Weblog.objects.all().order_by('-created_at')
 
-        hero_banners = HeroBanner.objects.filter(can_be_shown=True).order_by('-created_at')
-
-        banner_1 = Banner1.objects.filter(can_be_shown=True).order_by('-created_at')[:2]
-
-        banner_2 = Banner2.objects.filter(can_be_shown=True).last()
-
-        banner_3 = Banner3.objects.filter(can_be_shown=True).order_by('-created_at')[:2]
+        intro_banner = IntroBanner.objects.first()
 
         attitudes = Message.objects.filter(can_be_shown=True).order_by('-created_at')
 
@@ -80,23 +74,27 @@ class HomeView(URLStorageMixin, TemplateView):
                                                                                                             flat=True)
 
             favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
-                                                                                                            flat=True)
+                                                                                                      flat=True)
 
         else:
             favorite_video_courses = []
             favorite_pdf_courses = []
 
+        why_us_part_1 = WhyUs.objects.values_list("id", "title", "icon")
+        why_us_part_2 = WhyUs.objects.values_list("id", "image", "description")
+        default_why_us_id = WhyUs.objects.first().id
+
         context['latest_video_courses'] = latest_video_courses  # Is a queryset
         context['latest_pdf_courses'] = latest_pdf_courses  # Is a queryset
         context['latest_news'] = latest_news  # Is a queryset
         context['latest_weblogs'] = latest_weblogs  # Is a queryset
-        context['hero_banners'] = hero_banners  # Is a queryset
-        context['banner_1'] = banner_1  # Is a queryset
-        context['banner_2'] = banner_2  # Is a single object
-        context['banner_3'] = banner_3  # Is a queryset
+        context['intro_banner'] = intro_banner  # Is a single object
         context['attitudes'] = attitudes  # Is a queryset
         context['favorite_video_courses'] = favorite_video_courses  # Is a queryset
         context['favorite_pdf_courses'] = favorite_pdf_courses  # Is a queryset
+        context['why_us_part_1'] = why_us_part_1  # Is a queryset
+        context['why_us_part_2'] = why_us_part_2  # Is a queryset
+        context['default_why_us_id'] = default_why_us_id  # Is a single object
 
         return context
 

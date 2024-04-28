@@ -20,7 +20,6 @@ from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, All
 from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
     PDFCourse, PDFCourseComment, BoughtCourse
 from Home.mixins import URLStorageMixin
-from Home.models import Banner4, Banner5
 from utils.useful_functions import get_time_difference
 
 

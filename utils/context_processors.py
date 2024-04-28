@@ -2,12 +2,12 @@ from Account.models import CustomUser
 from Financial.models import Cart, CartItem, DepositSlip
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.models import Category, Exam, VideoCourse, PDFCourse
-from Us.models import SocialMedia, About
+from Us.models import SocialMedia, AboutUs
 
 
 def social_media(request):
     social_media = SocialMedia.objects.last()
-    about_us = About.objects.last()
+    about_us = AboutUs.objects.last()
 
     context = {
         'social_media': social_media,
@@ -98,7 +98,7 @@ def cart_is_allowed(request):
 
 def card_number_info(request):
     try:
-        about = About.objects.last()
+        about = AboutUs.objects.last()
 
         context = {
             'bank_card_number': about.bank_card_number,

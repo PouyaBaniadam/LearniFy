@@ -5,7 +5,7 @@ from django.views.generic import TemplateView, FormView
 from Account.models import CustomUser
 from Home.mixins import URLStorageMixin
 from Us.forms import ContactForm
-from Us.models import About
+from Us.models import AboutUs
 
 
 class AboutView(URLStorageMixin, TemplateView):
@@ -14,7 +14,7 @@ class AboutView(URLStorageMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        about = About.objects.last()
+        about = AboutUs.objects.last()
 
         context['about'] = about
 

@@ -88,7 +88,7 @@ class SocialMedia(models.Model):
         verbose_name_plural = 'شبکه‌های اجتماعی'
 
 
-class About(models.Model):
+class AboutUs(models.Model):
     name = models.CharField(max_length=75, verbose_name='نام')
 
     short_description = CKEditor5Field(config_name="extends", verbose_name="توضیح مختصر")
@@ -106,3 +106,21 @@ class About(models.Model):
         db_table = 'us__about_us'
         verbose_name = 'درباره'
         verbose_name_plural = 'درباره ما'
+
+
+class WhyUs(models.Model):
+    title = models.CharField(max_length=20, verbose_name="تیتر")
+
+    icon = models.ImageField(upload_to="Us/WhyUs/icons", verbose_name="آیکون", help_text="64x64")
+
+    image = models.ImageField(upload_to="Us/WhyUs/images", verbose_name="تصویر", help_text="500x700")
+
+    description = CKEditor5Field(config_name="extends", verbose_name="توضیحات")
+
+    def __str__(self):
+        return f"{self.title}"
+
+    class Meta:
+        db_table = 'us__why_us'
+        verbose_name = "چرا ما"
+        verbose_name_plural = "چرا ما"
