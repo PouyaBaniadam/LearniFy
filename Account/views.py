@@ -170,6 +170,72 @@ class ForgetPasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
         return super().form_invalid(form)
 
 
+class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
+    model = CustomUser
+    template_name = 'Account/edit_profile.html'
+    fields = ("full_name", "email", "about_me")
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    success_url = "/"
+
+    def form_valid(self, form):
+        messages.success(request=self.request, message=f"حساب کاربری شما با موفقیت تغییر یافت.")
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('account:profile', kwargs={'slug': self.request.user.username})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        user = CustomUser.objects.get(username=user.username)
+
+        account_status = user.account_status
+
+        context['account_status'] = account_status
+        context["mobile_phone"] = user.mobile_phone
+
+        return context
+
+
+class ChangeMobilePhoneView(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        sms_code = random.randint(a=1000, b=9999)
+        username = request.user.username
+        user = CustomUser.objects.get(username=username)
+
+        old_mobile_phone = request.POST.get('old_mobile_phone')
+        new_mobile_phone = request.POST.get('new_mobile_phone')
+        uuid = str(uuid4())
+
+        if old_mobile_phone == new_mobile_phone:
+            error_message = "شماره تلفن جدید و قدیم یکسان است."
+            context = {
+                "mobile_phone": user.mobile_phone,
+                "error_message": error_message
+            }
+
+            return render(request, 'Account/edit_profile.html', context=context)
+
+        if not CustomUser.objects.filter(mobile_phone=new_mobile_phone).exists():
+            OTP.objects.create(username=username, mobile_phone=new_mobile_phone, sms_code=sms_code, uuid=uuid,
+                               otp_type="UPH")
+            # send_register_sms(receptor=mobile_phone, sms_code=sms_code)
+            print(sms_code)
+
+            return redirect(reverse("account:check_otp") + f"?uuid={uuid}")
+
+        else:
+            error_message = "این شماره تلفن قبلا ثبت شده!"
+            context = {
+                "mobile_phone": user.mobile_phone,
+                "error_message": error_message
+            }
+
+            return render(request, 'Account/edit_profile.html', context=context)
+
+
 class CheckOTPView(FormView):
     form_class = CheckOTPForm
     template_name = 'Account/check_otp.html'
@@ -226,6 +292,26 @@ class CheckOTPView(FormView):
 
             user_to_be_deleted.delete()
             otp.delete()
+
+            return redirect("home:home")
+
+        elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="UPH").exists():
+            otp = OTP.objects.get(uuid=uuid)
+            mobile_phone = otp.mobile_phone
+            username = otp.username
+
+            user = CustomUser.objects.get(username=username)
+            user.mobile_phone = mobile_phone
+            user.save()
+
+            otp.delete()
+
+            messages.success(request=request, message=f"شماره تلفن با موفقیت تغییر یافت.")
+
+            redirect_url = request.session.get('current_url')
+
+            if redirect_url is not None:
+                return redirect(redirect_url)
 
             return redirect("home:home")
 
@@ -576,34 +662,6 @@ class ToggleAccountStatus(AuthenticatedUsersOnlyMixin, View):
                 {'account_status': "public"},
                 status=200
             )
-
-
-class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
-    model = CustomUser
-    template_name = 'Account/edit_profile.html'
-    fields = ("full_name", "email", "about_me")
-    slug_field = "slug"
-    slug_url_kwarg = "slug"
-    success_url = "/"
-
-    def form_valid(self, form):
-        messages.success(request=self.request, message=f"حساب کاربری شما با موفقیت تغییر یافت.")
-
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('account:profile', kwargs={'slug': self.request.user.username})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        user = CustomUser.objects.get(username=user.username)
-
-        account_status = user.account_status
-
-        context['account_status'] = account_status
-
-        return context
 
 
 class NotificationListView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):

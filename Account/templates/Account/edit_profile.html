@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
-    {% include 'includes/header.html' %}
+        {% include 'includes/header.html' %}
 
         <main class="flex-auto py-5">
             <div class="max-w-7xl space-y-14 px-4 mx-auto">
@@ -34,8 +34,7 @@
                                     <!-- tabs:list-container -->
                                     <div class="relative overflow-x-auto">
                                         <!-- tabs:list -->
-                                        <ul
-                                                class="inline-flex gap-2 bg-secondary border border-border rounded-full p-1">
+                                        <ul class="inline-flex gap-2 bg-secondary border border-border rounded-full p-1">
                                             <!-- tabs:list:item -->
                                             <li>
                                                 <button type="button"
@@ -151,6 +150,7 @@
                                     </div><!-- end tabs:list-container -->
                                     <!-- tabs:contents -->
                                     <div class="bg-background rounded-3xl p-5">
+
                                         <!-- tabs:contents:tabOne -->
                                         <div class="space-y-5" x-show="activeTab === 'tabOne'">
                                             <div class="flex items-center gap-3">
@@ -228,7 +228,7 @@
                                                 <div class="flex justify-end gap-5">
                                                     <button type="submit"
                                                             class="h-11 inline-flex items-center justify-center gap-3 bg-primary rounded-full text-white px-4 mr-auto">
-                                                        <span class="font-semibold text-sm">بروزرسانی</span>
+                                                        <span class="font-semibold text-sm">به‌‌روز‌‌رسانی</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
                                                             <path fill-rule="evenodd"
@@ -238,7 +238,8 @@
                                                     </button>
                                                 </div>
                                             </form>
-                                        </div><!-- end tabs:contents:tabOne -->
+                                        </div>
+                                        <!-- end tabs:contents:tabOne -->
 
                                         <!-- tabs:contents:tabTwo -->
                                         <div class="space-y-5" x-show="activeTab === 'tabTwo'">
@@ -261,82 +262,37 @@
                                                               clip-rule="evenodd"></path>
                                                     </svg>
                                                 </span><!-- alert:icon -->
-
-                                                <!-- alert:content -->
-                                                <div class="flex flex-col items-start">
-                                                    <!-- alert:title -->
-                                                    <div class="font-bold text-sm text-blue-500 mb-2">
-                                                        توجه :‌
-                                                    </div><!-- end alert:title -->
-
-                                                    <!-- alert:desc -->
-                                                    <div class="font-semibold text-xs text-zinc-400">
-                                                        <p class="mb-3">
-                                                            شماره تلفن شما برای کارهای مختلفی در سایت مورد استفاده قرار
-                                                            میگیرد با وارد کردن شماره تلفن خود و فعال کردن آن میتوانید
-                                                            بخشی
-                                                            از فعالیت های خود را در نابغه سریع تر انجام دهید. در زیر
-                                                            لیست
-                                                            کارهای که با شماره تلفن شما در سایت انجام میشود، را برایتان
-                                                            آورده ایم.
-                                                        </p>
-
-                                                        <ul>
-                                                            <li>
-                                                                ۱.در آینده نزدیک ورود به سایت تماما با شماره تلفن همراه
-                                                                انجام
-                                                                خواهد شد. (به زودی)
-                                                            </li>
-                                                            <li>
-                                                                ۲.در هنگام ورود به سایت پیامکی برای شما ارسال میشود تا
-                                                                از
-                                                                ورود‌های بدون اجازه مطلع شوید. کنید
-                                                            </li>
-                                                            <li>
-                                                                ۳.در صورت فعال‌سازی نوتیفیکشن یک دوره، قسمت‌های جدید آن
-                                                                دوره
-                                                                با پیامک به شما اطلاع داده خواهد شد. (به زودی)
-                                                            </li>
-                                                            <li>
-                                                                ۴.در صورت اضافه شدن مورد جدید در این لیست اضافه خواهد شد
-                                                                ...
-                                                            </li>
-                                                        </ul>
-                                                    </div><!-- end alert:desc -->
-
-                                                    <!-- alert:actions -->
-                                                    <div class="flex flex-wrap items-center gap-3 mt-5">
-                                                        <button type="button"
-                                                                class="flex items-center gap-x-1 text-zinc-400 underline-offset-1 hover:underline"
-                                                                x-on:click="open = false">
-                                                            <span class="font-bold text-xs">فهمیدم</span>
-                                                        </button>
-                                                    </div><!-- end alert:actions -->
-                                                </div><!-- end alert:content -->
                                             </div><!-- end alert -->
 
-                                            <form action="#" class="space-y-5">
+                                            <form method="post" action="{% url 'account:change_mobile_phone' %}"
+                                                  class="space-y-5" id="change-mobile-phone">
+                                                {% csrf_token %}
                                                 <div class="flex flex-col gap-5">
                                                     <div class="space-y-1 sm:w-1/2">
                                                         <label for="phone_number"
                                                                class="block font-medium text-xs text-muted">شماره تماس
                                                             فعلی</label>
-                                                        <input type="text" dir="ltr" id="phone_number"
+                                                        <input type="text" dir="ltr" name="old_mobile_phone"
                                                                class="form-input w-full h-11 !ring-0 !ring-offset-0 bg-secondary border-border focus:border-border rounded-xl text-sm text-foreground disabled:text-muted px-5"
-                                                               value="09123456789" disabled/>
+                                                               value="{{ mobile_phone }}" disabled/>
                                                     </div>
                                                     <div class="space-y-1 sm:w-1/2">
                                                         <label for="phone_number_new"
                                                                class="block font-medium text-xs text-muted">شماره تماس
                                                             جدید</label>
-                                                        <input type="text" dir="ltr" id="phone_number_new"
+                                                        <input type="text" dir="ltr" name="new_mobile_phone"
                                                                class="form-input w-full h-11 !ring-0 !ring-offset-0 bg-secondary border-border focus:border-border rounded-xl text-sm text-foreground px-5"/>
                                                     </div>
+                                                </div>
+                                                <div class="text-red-500">
+                                                    {% if error_message %}
+                                                        {{ error_message }}
+                                                    {% endif %}
                                                 </div>
                                                 <div class="flex justify-end gap-5">
                                                     <button type="submit"
                                                             class="h-11 inline-flex items-center justify-center gap-3 bg-primary rounded-full text-white px-4 mr-auto">
-                                                        <span class="font-semibold text-sm">بروزرسانی</span>
+                                                        <span class="font-semibold text-sm">به‌‌روز‌‌رسانی</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
                                                             <path fill-rule="evenodd"
@@ -346,7 +302,9 @@
                                                     </button>
                                                 </div>
                                             </form>
-                                        </div><!-- end tabs:contents:tabTwo -->
+
+                                        </div>
+                                        <!-- end tabs:contents:tabTwo -->
 
                                         <!-- tabs:contents:tabTwo -->
                                         <div class="space-y-5" x-show="activeTab === 'tabThree'">
@@ -418,7 +376,7 @@
                                                 <div class="flex justify-end gap-5">
                                                     <button type="submit"
                                                             class="h-11 inline-flex items-center justify-center gap-3 bg-primary rounded-full text-white px-4 mr-auto">
-                                                        <span class="font-semibold text-sm">بروزرسانی</span>
+                                                        <span class="font-semibold text-sm">به‌‌روز‌‌رسانی</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
                                                             <path fill-rule="evenodd"
@@ -522,7 +480,7 @@
                                                 <div class="flex justify-end gap-5">
                                                     <button type="submit"
                                                             class="h-11 inline-flex items-center justify-center gap-3 bg-primary rounded-full text-white px-4 mr-auto">
-                                                        <span class="font-semibold text-sm">بروزرسانی</span>
+                                                        <span class="font-semibold text-sm">به‌‌روز‌‌رسانی</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
                                                             <path fill-rule="evenodd"
@@ -542,6 +500,6 @@
             </div>
         </main>
 
-    {% include 'includes/footer.html' %}
+        {% include 'includes/footer.html' %}
     </div>
 {% endblock %}

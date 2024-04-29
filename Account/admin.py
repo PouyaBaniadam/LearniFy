@@ -39,8 +39,6 @@ class OTPAdmin(admin.ModelAdmin):
 class WalletAdmin(admin.ModelAdmin):
     list_display = ("user", "formatted_fund", "level",)
 
-    readonly_fields = ("formatted_fund",)
-
     autocomplete_fields = ("user",)
 
     def formatted_fund(self, obj):

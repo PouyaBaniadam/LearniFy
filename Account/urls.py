@@ -18,6 +18,7 @@ urlpatterns = [
     path("check/otp", views.CheckOTPView.as_view(), name="check_otp"),
     path("password/forget", views.ForgetPasswordView.as_view(), name="forget_password"),
     path("password/change", views.ChangePasswordView.as_view(), name="change_password"),
+    path("mobile_phone/change", views.ChangeMobilePhoneView.as_view(), name="change_mobile_phone"),
     path("notifications", views.NotificationListView.as_view(), name="notifications"),
     path("enter_newsletters", views.EnterNewsletters.as_view(), name="enter_newsletters"),
     path('toggle/follow/', views.ToggleFollow.as_view(), name='toggle_follow'),

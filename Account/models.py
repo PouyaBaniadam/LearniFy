@@ -135,21 +135,23 @@ class OTP(models.Model):
         ("R", "ثبت نام"),
         ("F", "فراموشی رمز عبور"),
         ("D", "حذف حساب کاربری"),
+        ("UPH", "به‌‌روز‌‌رسانی شماره تلفن"),  # Update phone number
     )
 
     username = models.CharField(max_length=75, blank=True, null=True, verbose_name='نام کاربری')
 
     slug = models.SlugField(blank=True, null=True, verbose_name='اسلاگ')
 
-    mobile_phone = models.CharField(max_length=11, verbose_name='شمارع تلفن')
+    mobile_phone = models.CharField(max_length=11, blank=True, null=True, verbose_name='شماره تلفن')
 
-    password = models.CharField(max_length=100, verbose_name='رمز عبور')
+    password = models.CharField(max_length=100, blank=True, null=True, verbose_name='رمز عبور')
 
-    sms_code = models.CharField(max_length=4, verbose_name='کد تایید')
+    sms_code = models.CharField(max_length=4, blank=True, null=True, verbose_name='کد تایید')
 
     uuid = models.UUIDField(blank=True, null=True, verbose_name="یو یو آی دی")
 
-    otp_type = models.CharField(max_length=1, choices=otp_type_choices)
+    otp_type = models.CharField(max_length=3, blank=True, null=True, choices=otp_type_choices,
+                                verbose_name="نوع رمز یکبار مصرف")
 
     class Meta:
         verbose_name = "رمز یکبار مصرف"
@@ -173,7 +175,7 @@ class Wallet(models.Model):
 
     user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, related_name="wallets", verbose_name="مالک")
 
-    fund = models.PositiveBigIntegerField(default=0, verbose_name="سرمایه", editable=False)
+    fund = models.PositiveBigIntegerField(default=0, verbose_name="سرمایه")
 
     level = models.CharField(max_length=1, choices=wallet_choices, default="B", verbose_name="سطح")
 

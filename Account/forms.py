@@ -122,7 +122,6 @@ class ForgetPasswordForm(forms.Form):
 
         else:
             username = mobile_phone_or_username
-            field_name = "username"
 
         try:
             if mobile_phone:
