@@ -20,6 +20,7 @@ from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnl
     NonFollowersOnlyMixin, OwnerOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
     FavoritePDFCourse, Follow
+from Account.validator_utilities import validate_mobile_phone_handler
 from Financial.models import Cart, DepositSlip
 from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
@@ -209,13 +210,15 @@ class ChangeMobilePhoneView(AuthenticatedUsersOnlyMixin, View):
         new_mobile_phone = request.POST.get('new_mobile_phone')
         uuid = str(uuid4())
 
-        if old_mobile_phone == new_mobile_phone:
-            error_message = "شماره تلفن جدید و قدیم یکسان است."
+        has_errors = validate_mobile_phone_handler(mobile_phone=new_mobile_phone).get("has_errors")
+        message = validate_mobile_phone_handler(mobile_phone=new_mobile_phone).get("message")
+
+        if has_errors:
+            error_message = message
             context = {
                 "mobile_phone": user.mobile_phone,
                 "error_message": error_message
             }
-
             return render(request, 'Account/edit_profile.html', context=context)
 
         if not CustomUser.objects.filter(mobile_phone=new_mobile_phone).exists():
