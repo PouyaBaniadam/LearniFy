@@ -28,4 +28,6 @@ urlpatterns = [
     path('favorite/videos/', views.FavoriteVideoCourses.as_view(), name='favorite_videos'),
     path('favorite/pdfs/', views.FavoritePDFCourses.as_view(), name='favorite_pdfs'),
     path('wallet/charge/', views.ChargeWallet.as_view(), name='charge_wallet'),
+    path('followers/list/', views.FollowersList.as_view(), name='followers_list'),
+    path('followings/list/', views.FollowingList.as_view(), name='followings_list'),
 ]

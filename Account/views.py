@@ -2,11 +2,13 @@ import json
 import random
 from uuid import uuid4
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.core.files.uploadedfile import UploadedFile
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
+from django.templatetags.static import static
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -15,9 +17,9 @@ from django.views.generic import FormView, UpdateView, ListView, View
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm, \
     ChargeWalletForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
-    NonFollowersOnlyMixin, OwnerOnlyMixin, CantChargeWalletYetMixin
+    NonFollowersOnlyMixin, OwnerOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
-    FavoritePDFCourse
+    FavoritePDFCourse, Follow
 from Financial.models import Cart, DepositSlip
 from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
@@ -873,6 +875,54 @@ class ChargeWallet(AuthenticatedUsersOnlyMixin, CantChargeWalletYetMixin, FormVi
         return JsonResponse(
             data={
                 "message": "فیش واریزی با موفقیت آپلود شد.",
+            },
+            status=200
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class FollowersList(AuthenticatedUsersOnlyMixin, CheckFollowingMixin, View):
+    def post(self, request, *args, **kwargs):
+        owner_id = request.POST.get('owner')
+        owner = CustomUser.objects.get(id=owner_id)
+
+        followers_qs = Follow.objects.filter(following=owner)
+        followers_list = []
+        for follower_username, follower_image, follower_stars in followers_qs.values_list("follower__username",
+                                                                                          "follower__image",
+                                                                                          "follower__stars"):
+            if follower_image:
+                follower_image_url = f"{settings.MEDIA_URL}{follower_image}"
+            else:
+                follower_image_url = static('../assets/images/avatars/default_user.JPG')
+            followers_list.append((follower_username, follower_image_url, follower_stars))
+
+        return JsonResponse(
+            data={
+                "followers": followers_list
+            },
+            status=200
+        )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class FollowingList(AuthenticatedUsersOnlyMixin, CheckFollowingMixin, View):
+    def post(self, request, *args, **kwargs):
+        owner_id = request.POST.get('owner')
+        owner = CustomUser.objects.get(id=owner_id)
+
+        followings_qs = Follow.objects.filter(follower=owner).select_related('following')
+        followings_list = []
+        for following in followings_qs:
+            following_username = following.following.username
+            following_image = following.following.image.url if following.following.image else static(
+                '../assets/images/avatars/default_user.JPG')
+            following_stars = following.following.stars
+            followings_list.append((following_username, following_image, following_stars))
+
+        return JsonResponse(
+            data={
+                "followings": followings_list
             },
             status=200
         )

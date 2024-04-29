@@ -8,6 +8,8 @@ class IntroBanner(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name='توضیحات')
 
+    button_text = models.CharField(max_length=30, verbose_name="متن دکمه")
+
     link = models.URLField(blank=True, null=True, unique=True, verbose_name="لینک")
 
     file = models.FileField(upload_to="Home/HeroBanner/files", verbose_name="فایل", help_text="1300x400")

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import View
@@ -177,3 +178,22 @@ class CantChargeWalletYetMixin(View):
                 return redirect("home:home")
 
         return super(CantChargeWalletYetMixin, self).dispatch(request, *args, **kwargs)
+
+
+class CheckFollowingMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        user_id = request.POST.get('user')
+        owner_id = request.POST.get('owner')
+
+        user = CustomUser.objects.get(id=user_id)
+        owner = CustomUser.objects.get(id=owner_id)
+
+        if owner.account_status == "PV" and not user.is_following(owner) and user != owner:
+            return JsonResponse(
+                data={
+                    "error": "شما مجوز مشاهده این بخش ندارید."
+                },
+                status=400
+            )
+
+        return super(CheckFollowingMixin, self).dispatch(request, *args, **kwargs)

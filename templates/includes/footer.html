@@ -93,25 +93,40 @@
                         </div>
                         <ul class="flex flex-col space-y-1">
                             <li>
-                                <a href="#"
-                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary">قوانین
-                                    و
-                                    مقررات</a>
+                                <a href="{% url 'course:all_video_courses' %}"
+                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary ">
+                                    <span class="font-semibold text-sm">دوره‌های ویدئویی</span>
+                                </a>
                             </li>
                             <li>
-                                <a href="#"
-                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary">مدرسان</a>
+                                <a href="{% url 'course:all_pdf_courses' %}"
+                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary ">
+                                    <span class="font-semibold text-sm">دوره‌های پی‌دی‌افی</span>
+                                </a>
                             </li>
                             <li>
-                                <a href="#"
-                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary">درباره
-                                    LearniFy</a>
+                                <a href="{% url 'news:all' %}"
+                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary ">
+                                    <span class="font-semibold text-sm">اخبار</span>
+                                </a>
                             </li>
                             <li>
-                                <a href="#"
-                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary">ارتباط
-                                    با
-                                    ما</a>
+                                <a href="{% url 'weblog:all' %}"
+                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary ">
+                                    <span class="font-semibold text-sm">وبلاگ‌ها</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'us:about' %}"
+                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary ">
+                                    <span class="font-semibold text-sm">درباره ما</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'us:contact' %}"
+                                   class="inline-flex font-semibold text-sm text-muted hover:text-primary ">
+                                    <span class="font-semibold text-sm">ارتباط با ما</span>
+                                </a>
                             </li>
                         </ul>
                     </div>

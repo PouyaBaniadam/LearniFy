@@ -56,8 +56,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     authentication_token = models.UUIDField(unique=True, default=uuid4, verbose_name="یو یو آی دی")
 
-    email = models.EmailField(max_length=254, unique=True, validators=[validate_email], blank=True, null=True,
-                              verbose_name='آدرس ایمیل')
+    email = models.EmailField(max_length=254, unique=True, blank=True, null=True, verbose_name='آدرس ایمیل')
 
     full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
 
@@ -128,7 +127,7 @@ class Follow(models.Model):
         unique_together = ('follower', 'following')
 
     def __str__(self):
-        return f'{self.follower.username}، {self.following.username} را از تاریخ {self.followed_at} فالو می‌کند.'
+        return f'Follower: {self.follower.username} ~ Following: {self.following.username}'
 
 
 class OTP(models.Model):
