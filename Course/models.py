@@ -5,15 +5,17 @@ from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 from moviepy.editor import VideoFileClip
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 
-class Category(models.Model):
+class Category(MPTTModel):
     name = models.CharField(max_length=50, unique=True, verbose_name='نام')
 
     slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
 
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', blank=True, null=True,
-                               verbose_name='والد')
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
+                            verbose_name='والد')
 
     icon = models.ImageField(upload_to='Course/Category/icons/', verbose_name='آیکون', blank=True, null=True)
 
@@ -24,7 +26,8 @@ class Category(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-    class Meta:
+    class MPTTMeta:
+        order_insertion_by = ['name']
         db_table = 'course__category'
         verbose_name = 'دسته بندی'
         verbose_name_plural = 'دسته بندی‌ها'

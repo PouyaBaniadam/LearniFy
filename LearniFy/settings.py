@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "hitcount",
     "star_ratings",
+    "mptt",
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -113,6 +114,7 @@ TEMPLATES = [
                 'utils.context_processors.cart_items_count',
                 'utils.context_processors.cart_is_allowed',
                 'utils.context_processors.card_number_info',
+                'utils.context_processors.categories',
             ],
         },
     },
