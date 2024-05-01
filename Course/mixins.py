@@ -101,3 +101,18 @@ class NonFinishedExamsOnlyMixin(View):
             return redirect(reverse('course:exam_detail', kwargs={'slug': slug}))
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class RedirectToPDFCourseEpisodesForParticipatedUsersMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        is_user_participated = PDFCourse.objects.filter(
+            slug=slug, participated_users=user
+        ).exists()
+
+        if is_user_participated:
+            return redirect(reverse("course:pdf_course_episodes", kwargs={"slug": slug}))
+
+        return super().dispatch(request, *args, **kwargs)

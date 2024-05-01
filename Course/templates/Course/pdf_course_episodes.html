@@ -16,14 +16,18 @@
                         <!-- section:title -->
                         <div class="flex items-center gap-5 mb-5">
                             <!-- back to course -->
-                            <a href="#"
-                               class="flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"></path>
-                                </svg>
-                            </a>
+
+                            {% if request.user == course.teacher %}
+                                <button type="button" id="openAdminPanel"
+                                        class="flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M12 4.5v15m7.5-7.5h-15"></path>
+                                    </svg>
+                                </button>
+                            {% endif %}
+
                             <div class="flex flex-col space-y-2">
                                 <!-- episode:title -->
                                 <span class="font-black text-2xl text-primary">معرفی دوره</span>
@@ -469,7 +473,7 @@
                                 </span>
                                 <div class="flex flex-col items-center justify-center text-center space-y-1">
                                     <span class="font-bold text-xs text-muted line-clamp-1">تعداد صفحات</span>
-                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.total_pages }}</span>
+                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ total_pages }}</span>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
@@ -547,5 +551,10 @@
     </div>
 
     <script src="{% static 'js/ajax/download_course_object.js' %}"></script>
+    <script>
+        document.getElementById('openAdminPanel').addEventListener('click', function () {
+            window.open('http://{{ request.get_host }}/admin/Course/pdfcourseobject/add/');
+        });
+    </script>
 
 {% endblock %}

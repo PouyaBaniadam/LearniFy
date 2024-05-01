@@ -1,3 +1,5 @@
+import string
+
 import fitz
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
@@ -239,8 +241,6 @@ class PDFCourse(models.Model):
 
     total_sessions = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد قسمت‌ها')
 
-    total_pages = models.PositiveIntegerField(default=0, verbose_name='تعداد صفحات دوره')
-
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
@@ -332,7 +332,7 @@ class PDFCourseObject(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
-    download_file_name = models.CharField(max_length=50, verbose_name="اسم فایل دانلودی")
+    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="ققط انگلیسی")
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
@@ -353,22 +353,26 @@ class PDFCourseObject(models.Model):
     def __str__(self):
         return f"{self.title}"
 
+    def clean(self, *args, **kwargs):
+        allowed_characters = string.ascii_letters + string.digits
+
+        for letter in self.download_file_name:
+            if letter not in allowed_characters:
+                raise ValidationError(message="نام فایل دانلودی فقط می‌‌تواند شامل حروف انگلیسی یا ارقام باشد.")
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        try:
-            pdf_path = self.pdf_file.path
 
-            # Open the PDF file using PyMuPDF
-            pdf_document = fitz.open(pdf_path)
+        pdf_path = self.pdf_file.path
 
-            # Get the total number of pages
-            total_pages = pdf_document.page_count
+        # Open the PDF file using PyMuPDF
+        pdf_document = fitz.open(pdf_path)
 
-            # Update the 'pages' field with the total number of pages
-            self.pages = total_pages
+        # Get the total number of pages
+        total_pages = pdf_document.page_count
 
-        except Exception as e:
-            print(f"Error processing PDF: {e}")
+        # Update the 'pages' field with the total number of pages
+        self.pages = total_pages
 
         super().save(*args, **kwargs)
 

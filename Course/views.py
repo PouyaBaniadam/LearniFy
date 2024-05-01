@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pytz
 from django.contrib import messages
+from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
 from django.urls import reverse
@@ -16,7 +17,8 @@ from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification
 from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
-    NonFinishedExamsOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin
+    NonFinishedExamsOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin, \
+    RedirectToPDFCourseEpisodesForParticipatedUsersMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
     PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject
 from Home.mixins import URLStorageMixin
@@ -486,7 +488,7 @@ class PDFCourseFilterView(View):
         return render(request=request, template_name=self.template_name, context=context)
 
 
-class PDFCourseDetail(URLStorageMixin, DetailView):
+class PDFCourseDetail(RedirectToPDFCourseEpisodesForParticipatedUsersMixin, URLStorageMixin, DetailView):
     model = PDFCourse
     context_object_name = 'course'
     template_name = 'Course/pdf_course_detail.html'
@@ -533,12 +535,15 @@ class PDFCourseDetail(URLStorageMixin, DetailView):
             user_likes = []
             is_following = False
 
+        total_pages = self.object.pdfcourseobject_set.aggregate(total_pages=Sum('pages'))['total_pages']
+
         context['does_course_exists_in_cart'] = does_course_exists_in_cart
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['comments'] = comments
         context['user_likes'] = user_likes
         context['is_following'] = is_following
         context['is_follow_request_pending'] = is_follow_request_pending
+        context['total_pages'] = total_pages
 
         return context
 
@@ -677,11 +682,14 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
             user_likes = []
             is_following = False
 
+        total_pages = self.object.pdfcourseobject_set.aggregate(total_pages=Sum('pages'))['total_pages']
+
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['comments'] = comments
         context['user_likes'] = user_likes
         context['is_following'] = is_following
         context['is_follow_request_pending'] = is_follow_request_pending
+        context['total_pages'] = total_pages
 
         return context
 

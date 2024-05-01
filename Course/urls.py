@@ -8,6 +8,7 @@ urlpatterns = [
     path('videos', views.AllVideoCourses.as_view(), name='all_video_courses'),
     path('video/register/', views.RegisterInVideoCourse.as_view(), name='register_video_course'),
     path('videos/filter', views.VideoCourseFilterView.as_view(), name='filter_video_courses'),
+    path('video/<slug>', views.VideoCourseDetail.as_view(), name='video_course_detail'),
     # path('video/<slug>/episodes', views.VideoCourseEpisodes.as_view(), name='video_course_episodes'),
     path('videos/category/<slug>', views.VideoCourseByCategory.as_view(), name='videos_by_category'),
     path('video/favorite/toggle/', views.ToggleVideoCourseFavorite.as_view(), name='toggle_video_course_favorite'),
