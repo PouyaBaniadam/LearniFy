@@ -206,7 +206,6 @@ class ChangeMobilePhoneView(AuthenticatedUsersOnlyMixin, View):
         username = request.user.username
         user = CustomUser.objects.get(username=username)
 
-        old_mobile_phone = request.POST.get('old_mobile_phone')
         new_mobile_phone = request.POST.get('new_mobile_phone')
         uuid = str(uuid4())
 
@@ -217,7 +216,7 @@ class ChangeMobilePhoneView(AuthenticatedUsersOnlyMixin, View):
             error_message = message
             context = {
                 "mobile_phone": user.mobile_phone,
-                "error_message": error_message
+                "error_message": error_message,
             }
             return render(request, 'Account/edit_profile.html', context=context)
 

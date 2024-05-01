@@ -1,0 +1,552 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% load static %}
+
+{% block content %}
+    <div class="flex flex-col min-h-screen bg-background">
+
+        {% include 'includes/header.html' %}
+
+        <main class="flex-auto py-5">
+            <!-- container -->
+            <div class="max-w-7xl space-y-14 px-4 mx-auto">
+                <div class="flex lg:flex-nowrap flex-wrap items-start gap-5">
+                    <div class="lg:w-8/12 w-full">
+
+                        <!-- section:title -->
+                        <div class="flex items-center gap-5 mb-5">
+                            <!-- back to course -->
+                            <a href="#"
+                               class="flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"></path>
+                                </svg>
+                            </a>
+                            <div class="flex flex-col space-y-2">
+                                <!-- episode:title -->
+                                <span class="font-black text-2xl text-primary">معرفی دوره</span>
+                                <!-- course:title -->
+                                <span class="font-semibold text-xs text-muted">{{ course.name }}</span>
+                            </div>
+                        </div>
+                        <!-- end section:title -->
+
+                        <!-- episode:video:wrapper -->
+                        <div class="relative max-w-full rounded-3xl overflow-hidden z-10">
+                            <img src="{{ course.cover_image.url }}" alt="تصویر دوره {{ course.cover_image.url }}">
+                        </div>
+                        <!-- end episode:video:wrapper -->
+                    </div>
+                    <div class="lg:w-4/12 w-full lg:sticky lg:top-24 space-y-8">
+                        <div class="bg-background rounded-2xl">
+                            <!-- course:sections:wrapper -->
+
+                            <div class="flex flex-col space-y-1">
+
+                                {% for season in course.pdfcourseseason_set.all %}
+                                    <!-- course:section:accordion -->
+                                    <div class="w-full space-y-1" x-data="{ open: false }">
+                                        <!-- accordion:button -->
+                                        <button type="button"
+                                                class="w-full h-14 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-foreground px-5"
+                                                x-bind:class="open ? 'text-foreground' : 'text-muted'"
+                                                x-on:click="open = !open">
+                                        <span class="flex items-center gap-3 text-right">
+                                            <span class="font-semibold text-xs line-clamp-1">
+                                                فصل {{ season.number }}</span>
+                                            <div class="w-1 h-1 bg-muted-foreground rounded-full"></div>
+                                            <span class="font-semibold text-xs">{{ season.name }}</span>
+                                        </span>
+                                            <span class="" x-bind:class="open ? 'rotate-180' : ''">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+                                            </svg>
+                                        </span>
+                                        </button>
+                                        <!-- end accordion:button -->
+
+                                        <!-- accordion:content -->
+                                        <div class="flex flex-col relative" x-show="open">
+                                            <!-- course:section:episodes:wrapper -->
+                                            {% if season.pdfcourseobject_set.all %}
+                                                {% for session in season.pdfcourseobject_set.all %}
+                                                    <!-- episode -->
+                                                    <div class="flex sm:flex-nowrap flex-wrap items-center gap-3 sm:h-12 border border-border rounded-xl p-3">
+                                                        <span class="text-xs text-muted">{{ forloop.counter }}</span>
+                                                        <div class="w-1 h-1 bg-muted-foreground rounded-full">
+                                                        </div>
+                                                        <p
+                                                           class="font-semibold text-xs text-foreground line-clamp-1 transition-all">
+                                                            {{ session.title }}
+                                                        </p>
+                                                        <div class="flex items-center justify-end gap-3 sm:w-auto w-full mr-auto">
+                                                                        <span class="flex items-center gap-1 text-muted">
+                                                                            <span class="text-xs">{{ session.pages }} صفحه</span>
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 fill="none" viewBox="0 0 24 24"
+                                                                                 stroke-width="1.5"
+                                                                                 stroke="currentColor"
+                                                                                 class="w-4 h-4">
+                                                                                <path stroke-linecap="round"
+                                                                                      stroke-linejoin="round"
+                                                                                      d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z">
+                                                                                </path>
+                                                                            </svg>
+                                                                        </span>
+                                                            <button onclick="downloadPDFCourse('{{ course.slug }}','{{ session.id }}')"
+                                                                    class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
+                                                                <span class="text-xs">دانلود پی‌‌دی‌‌اف</span>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                     viewBox="0 0 24 24" stroke-width="1.5"
+                                                                     stroke="currentColor" class="w-4 h-4">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                          d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3">
+                                                                    </path>
+                                                                </svg>
+
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end episode -->
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="flex items-center gap-1">
+                                                    <span class="font-black text-xl text-red-500">هنوز قسمتی منتشر نشده است!</span>
+                                                </div>
+                                            {% endif %}
+                                            <!-- end course:section:episodes:wrapper -->
+                                        </div>
+                                        <!-- end accordion:content -->
+                                    </div>
+                                    <!-- end course:section:accordion -->
+                                {% endfor %}
+
+                            </div>
+
+                            <!-- end course:sections:wrapper -->
+                        </div>
+                    </div>
+                </div>
+                <div class="flex md:flex-nowrap flex-wrap items-start gap-5">
+                    <div class="md:w-8/12 w-full">
+                        <div class="relative">
+                            <div class="space-y-10">
+                                <!-- tabs container -->
+                                <div class="space-y-5"
+                                     x-data="{ activeTab: 'tabOne', scroll: function() { document.getElementById(this.activeTab).scrollIntoView({ behavior: 'smooth' }) } }">
+
+                                    <!-- tabs:contents -->
+                                    <div class="space-y-8">
+                                        <!-- tabs:contents:tabOne -->
+                                        <div class="bg-background rounded-3xl p-5" id="tabOne">
+                                            <!-- episode:description -->
+                                            <div class="description">
+                                                {{ course.description|safe }}
+                                            </div>
+                                            <!-- end episode:description -->
+                                        </div>
+                                        <!-- end tabs:contents:tabOne -->
+
+                                        <!-- tabs:contents:tabTwo -->
+                                        <div class="bg-background rounded-3xl p-5" id="tabThree">
+                                            <!-- section:title -->
+                                            <div id="reply_section" class="flex items-center gap-3 mb-5">
+                                                <div class="flex items-center gap-1">
+                                                    <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                                    <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                                </div>
+                                                <div class="font-black text-foreground">دیدگاه و پرسش</div>
+                                            </div>
+                                            <!-- end section:title -->
+
+                                            <!-- course:comments:form:wrapper -->
+                                            <div class="bg-background border border-border rounded-3xl p-5 mb-5">
+                                                <div class="flex items-center gap-3 mb-5">
+                                                    <div class="flex items-center gap-1">
+                                                        <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                                        <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                                    </div>
+                                                    <div class="font-black text-xs text-foreground">
+                                                        ارسال دیدگاه یا پرسش
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-wrap items-center gap-3 mb-5">
+                                                    <div class="flex items-center gap-3 sm:w-auto w-full">
+                                                        <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                            <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                 class="w-full h-full object-cover" alt="..."/>
+                                                        </div>
+                                                        <div class="flex flex-col items-start space-y-1">
+                                                            <p class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ request.user.username }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span class="block w-1 h-1 bg-border rounded-full"></span>
+                                                    <span id="cancel_reply_to?" style="display: none"
+                                                          class="font-semibold text-xs text-muted">در پاسخ به</span>
+                                                    <span class="block w-1 h-1 bg-border rounded-full"></span>
+                                                    <p id="reply_comment_id"
+                                                       class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary"></p>
+
+                                                    <button id="cancel_reply_btn" type="button"
+                                                            style="display: none"
+                                                            class="line-clamp-1 font-semibold text-sm text-red-500 mr-auto"
+                                                            onclick="cancelReply()">لغو پاسخ
+                                                    </button>
+                                                </div>
+
+                                                <!-- course:comments:form -->
+                                                <form method="post"
+                                                      action="{% url 'course:add_pdf_course_comment' course.slug %}"
+                                                      class="flex flex-col space-y-5">
+                                                    {% csrf_token %}
+
+                                                    <input type="hidden" id="parent_id" name="parent_id" value="">
+
+                                                    <textarea required name="text" id="text" rows="10"
+                                                              class="form-textarea w-full !ring-0 !ring-offset-0 bg-secondary border-0 focus:border-border border-border rounded-xl text-sm text-foreground p-5"
+                                                              placeholder="متن مورد نظر خود را وارد کنید ..."></textarea>
+                                                    <button type="submit"
+                                                            class="h-10 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4 mr-auto">
+                                                        <span class="font-semibold text-sm">ثبت دیدگاه</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                             fill="currentColor" class="w-5 h-5">
+                                                            <path fill-rule="evenodd"
+                                                                  d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                                  clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                                <!-- end course:comments:form -->
+                                            </div>
+                                            <!-- end course:comments:form:wrapper -->
+
+                                            <!-- course:comments:wrapper -->
+                                            <div class="space-y-3">
+                                                <!-- course:comment -->
+                                                <div class="space-y-3">
+
+                                                    {% for comment in comments %}
+                                                        {% if comment.parent == None %}
+                                                            <div class="comment-container bg-background border border-border rounded-3xl space-y-3 p-5">
+                                                                <div class="flex sm:flex-nowrap flex-wrap sm:flex-row flex-col sm:items-center sm:justify-between gap-5 border-b border-border pb-3">
+                                                                    <div class="flex items-center gap-3">
+                                                                        <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                            {% if comment.user.image %}
+                                                                                <img src="{{ comment.user.image.url }}"
+                                                                                     class="w-full h-full object-cover"
+                                                                                     alt="تصویر پروفایل"/>
+                                                                            {% else %}
+                                                                                <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                                     class="w-full h-full object-cover"
+                                                                                     alt="تصویر پروفایل"/>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="flex flex-col items-start space-y-1">
+                                                                            <a href="{% url 'account:profile' comment.user.username %}"
+                                                                               class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ comment.user.username }}</a>
+                                                                            <span class="text-xs text-muted">{{ comment.created_at|j_date_formatter }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="flex items-center gap-3 sm:mr-0 mr-auto">
+                                                                        {% if request.user == comment.user %}
+                                                                            <button onclick="submit_deletion('{{ comment.id }}', 'course/pdf')"
+                                                                                    class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-red-700 px-4">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                     fill="none" viewBox="0 0 24 24"
+                                                                                     stroke-width="1.5"
+                                                                                     stroke="currentColor"
+                                                                                     class="w-5 h-5">
+                                                                                    <path stroke-linecap="round"
+                                                                                          stroke-linejoin="round"
+                                                                                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+                                                                                </svg>
+                                                                            </button>
+
+                                                                        {% else %}
+                                                                            <button onclick="setValue('{{ comment.id }}', '{{ comment.user.username }}')"
+                                                                                    class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
+                                                                                <span class="text-xs">پاسخ</span>
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                     viewBox="0 0 20 20"
+                                                                                     fill="currentColor"
+                                                                                     class="w-5 h-5">
+                                                                                    <path fill-rule="evenodd"
+                                                                                          d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z"
+                                                                                          clip-rule="evenodd"></path>
+                                                                                </svg>
+                                                                            </button>
+                                                                        {% endif %}
+
+                                                                        {% if request.user.is_authenticated %}
+                                                                            {% if comment.id in user_likes %}
+                                                                                <button onclick="toggleLike('{{ comment.id }}', 'course/pdf')"
+                                                                                        id="likeBtn-{{ comment.id }}"
+                                                                                        type="button"
+                                                                                        class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         viewBox="0 0 20 20"
+                                                                                         fill="currentColor"
+                                                                                         class="w-5 h-5">
+                                                                                        <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                        </path>
+                                                                                    </svg>
+                                                                                    <span id="likeCount-{{ comment.id }}"
+                                                                                          class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ comment.likes.count }}
+                                                                                    </span>
+                                                                                </button>
+                                                                            {% else %}
+                                                                                <button onclick="toggleLike('{{ comment.id }}', 'course/pdf')"
+                                                                                        id="likeBtn-{{ comment.id }}"
+                                                                                        type="button"
+                                                                                        class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         viewBox="0 0 20 20"
+                                                                                         fill="currentColor"
+                                                                                         class="w-5 h-5">
+                                                                                        <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                        </path>
+                                                                                    </svg>
+                                                                                    <span id="likeCount-{{ comment.id }}"
+                                                                                          class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ comment.likes.count }}
+                                                                                    </span>
+                                                                                </button>
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            <button type="button"
+                                                                                    class="login-first flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                     viewBox="0 0 20 20"
+                                                                                     fill="currentColor"
+                                                                                     class="w-5 h-5">
+                                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                    </path>
+                                                                                </svg>
+                                                                                <span id="likeCount-{{ comment.id }}"
+                                                                                      class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ comment.likes.count }}
+                                                                                    </span>
+                                                                            </button>
+                                                                        {% endif %}
+
+                                                                    </div>
+                                                                </div>
+                                                                <p class="text-sm text-muted">{{ comment.text }}
+                                                                </p>
+                                                            </div>
+                                                            {% for reply in comment.replies.all %}
+                                                                <!-- course:comment replies -->
+                                                                <div class="relative before:content-[''] before:absolute before:-top-3 before:right-8 before:w-px before:h-[calc(100%-24px)] before:bg-border after:content-[''] after:absolute after:bottom-9 after:right-8 after:w-8 after:h-px after:bg-border space-y-3 pr-16">
+                                                                    <!-- course:comment reply -->
+                                                                    <div class="bg-background border border-border rounded-3xl space-y-3 p-5">
+                                                                        <div class="flex sm:flex-nowrap flex-wrap sm:flex-row flex-col sm:items-center sm:justify-between gap-5 border-b border-border pb-3">
+                                                                            <div class="flex items-center gap-3">
+                                                                                <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                                    {% if reply.user.image %}
+                                                                                        <img src="{{ reply.user.image.url }}"
+                                                                                             class="w-full h-full object-cover"
+                                                                                             alt="تصویر پروفایل"/>
+                                                                                    {% else %}
+                                                                                        <img src="{% static "images/avatars/default_user.JPG" %}"
+                                                                                             class="w-full h-full object-cover"
+                                                                                             alt="تصویر پروفایل"/>
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                                <div class="flex flex-col items-start space-y-1">
+                                                                                    <a href="{% url 'account:profile' reply.user.username %}"
+                                                                                       class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">{{ reply.user.username }}</a>
+                                                                                    <span class="text-xs text-muted">{{ reply.created_at|j_date_formatter }}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="flex items-center gap-3 sm:mr-0 mr-auto">
+                                                                                {% if request.user == reply.user %}
+                                                                                    <button onclick="submit_deletion('{{ reply.id }}', 'course/pdf')"
+                                                                                            class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-red-700 px-4">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                             fill="none"
+                                                                                             viewBox="0 0 24 24"
+                                                                                             stroke-width="1.5"
+                                                                                             stroke="currentColor"
+                                                                                             class="w-5 h-5">
+                                                                                            <path stroke-linecap="round"
+                                                                                                  stroke-linejoin="round"
+                                                                                                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+                                                                                        </svg>
+                                                                                    </button>
+                                                                                {% endif %}
+
+                                                                                {% if request.user.is_authenticated %}
+                                                                                    {% if reply.id in user_likes %}
+                                                                                        <button onclick="toggleLike('{{ reply.id }}', 'course/pdf')"
+                                                                                                id="likeBtn-{{ reply.id }}"
+                                                                                                type="button"
+                                                                                                class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
+                                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                 viewBox="0 0 20 20"
+                                                                                                 fill="currentColor"
+                                                                                                 class="w-5 h-5">
+                                                                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                            <span id="likeCount-{{ reply.id }}"
+                                                                                                  class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ reply.likes.count }}
+                                                                                                </span>
+                                                                                        </button>
+                                                                                    {% else %}
+                                                                                        <button onclick="toggleLike('{{ reply.id }}', 'course/pdf')"
+                                                                                                id="likeBtn-{{ reply.id }}"
+                                                                                                type="button"
+                                                                                                class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
+                                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                 viewBox="0 0 20 20"
+                                                                                                 fill="currentColor"
+                                                                                                 class="w-5 h-5">
+                                                                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                            <span id="likeCount-{{ reply.id }}"
+                                                                                                  class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ reply.likes.count }}
+                                                                                                </span>
+                                                                                        </button>
+                                                                                    {% endif %}
+                                                                                {% else %}
+                                                                                    <button type="button"
+                                                                                            class="login-first flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                             viewBox="0 0 20 20"
+                                                                                             fill="currentColor"
+                                                                                             class="w-5 h-5">
+                                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                            </path>
+                                                                                        </svg>
+                                                                                        <span id="likeCount-{{ reply.id }}"
+                                                                                              class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                    {{ reply.likes.count }}
+                                                                                                </span>
+                                                                                    </button>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                        </div>
+                                                                        <p class="text-sm text-muted">{{ reply.text }}
+                                                                        </p>
+                                                                    </div>
+                                                                    <!-- end course:comment reply -->
+                                                                </div>
+                                                                <!-- end course:comment replies -->
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <!-- end course:comment -->
+                                            </div>
+                                            <!-- course:comments:wrapper -->
+
+                                        </div>
+                                        <!-- end tabs:contents:tabTwo -->
+                                    </div>
+                                    <!-- end tabs:contents -->
+                                </div>
+                                <!-- end tabs container -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-4/12 w-full md:sticky md:top-24 md:order-2 -order-1 space-y-8">
+                        <div class="grid lg:grid-cols-3 grid-cols-2 gap-5">
+                            <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                              <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z">
+                                              </path>
+                                            </svg>
+                                </span>
+                                <div class="flex flex-col items-center justify-center text-center space-y-1">
+                                    <span class="font-bold text-xs text-muted line-clamp-1">تعداد صفحات</span>
+                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.total_pages }}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                         class="w-5 h-5">
+                                        <path fill-rule="evenodd"
+                                              d="M4.25 2A2.25 2.25 0 0 0 2 4.25v2.5A2.25 2.25 0 0 0 4.25 9h2.5A2.25 2.25 0 0 0 9 6.75v-2.5A2.25 2.25 0 0 0 6.75 2h-2.5Zm0 9A2.25 2.25 0 0 0 2 13.25v2.5A2.25 2.25 0 0 0 4.25 18h2.5A2.25 2.25 0 0 0 9 15.75v-2.5A2.25 2.25 0 0 0 6.75 11h-2.5Zm9-9A2.25 2.25 0 0 0 11 4.25v2.5A2.25 2.25 0 0 0 13.25 9h2.5A2.25 2.25 0 0 0 18 6.75v-2.5A2.25 2.25 0 0 0 15.75 2h-2.5Zm0 9A2.25 2.25 0 0 0 11 13.25v2.5A2.25 2.25 0 0 0 13.25 18h2.5A2.25 2.25 0 0 0 18 15.75v-2.5A2.25 2.25 0 0 0 15.75 11h-2.5Z"
+                                              clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                <div class="flex flex-col items-center justify-center text-center space-y-1">
+                                    <span class="font-bold text-xs text-muted line-clamp-1">تعداد جلسات</span>
+                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.total_sessions }}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                         viewBox="0 0 24 24" stroke-width="1.5"
+                                         stroke="currentColor" class="w-5 h-5">
+                                                                      <path stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+                                                                    </svg>
+                                </span>
+                                <div class="flex flex-col items-center justify-center text-center space-y-1">
+                                    <span class="font-bold text-xs text-muted line-clamp-1">نوع دوره</span>
+                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.get_payment_type_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-1">
+                                    <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                    <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                </div>
+                                <div class="font-black text-sm text-foreground">مدرس دوره:</div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    {% if course.teacher.image %}
+                                        <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                            <img src="{{ course.teacher.image.url }}" class="w-full h-full object-cover"
+                                                 alt="عکس مدرس دوره {{ course.name }}"/>
+                                        </div>
+                                    {% else %}
+                                        <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                            <img src="{% static 'images/avatars/teacher.JPG' %}"
+                                                 class="w-full h-full object-cover"
+                                                 alt="عکس مدرس دوره {{ course.name }}"/>
+                                        </div>
+                                    {% endif %}
+                                    <div class="flex flex-col items-start space-y-1">
+                                        <a href="{% url 'account:profile' course.teacher.slug %}"
+                                           class="line-clamp-1 font-bold text-sm text-foreground hover:text-primary">{{ course.teacher.full_name }}</a>
+                                        <a href="{% url 'account:profile' course.teacher.slug %}"
+                                           class="line-clamp-1 font-semibold text-xs text-primary">پروفایل مدرس</a>
+                                    </div>
+                                </div>
+                                {% if course.teacher.about_me %}
+                                    <div class="bg-secondary rounded-tl-3xl rounded-b-3xl text-sm text-muted p-5">
+                                        {{ course.teacher.about_me|safe }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end container -->
+        </main>
+        {% include 'includes/footer.html' %}
+    </div>
+
+    <script src="{% static 'js/ajax/download_course_object.js' %}"></script>
+
+{% endblock %}

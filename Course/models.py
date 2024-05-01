@@ -28,6 +28,8 @@ class Category(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by = ['name']
+
+    class Meta:
         db_table = 'course__category'
         verbose_name = 'دسته بندی'
         verbose_name_plural = 'دسته بندی‌ها'
@@ -330,10 +332,14 @@ class PDFCourseObject(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
+    download_file_name = models.CharField(max_length=50, verbose_name="اسم فایل دانلودی")
+
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
     season = models.ForeignKey(to=PDFCourseSeason, on_delete=models.CASCADE, blank=True, null=True,
                                verbose_name="فصل")
+
+    session = models.PositiveSmallIntegerField(default=1, verbose_name="قسمت")
 
     can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
 

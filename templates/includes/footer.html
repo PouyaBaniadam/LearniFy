@@ -45,7 +45,9 @@
                                 </span>
                         <div class="flex flex-col font-black space-y-2">
                             <span class="text-sm text-primary">شماره تلفن</span>
-                            <span class="text-foreground">۰۲۱−۱۲۳۴۵۶۷</span>
+                            <span class="text-foreground">
+                                <a href="tel:{{ social_media.phone_1 }}">{{ social_media.phone_1 }}</a>
+                            </span>
                         </div>
                     </div>
                     <div class="flex items-center gap-5">
@@ -60,7 +62,7 @@
                                 </span>
                         <div class="flex flex-col font-black space-y-2">
                             <span class="text-sm text-primary">ساعات کاری</span>
-                            <span class="text-foreground">۰۹:۰۰ - ۱۷:۰۰</span>
+                            <span class="text-foreground">7 روز هفته!</span>
                         </div>
                     </div>
                 </div>
@@ -76,7 +78,7 @@
                         </div>
                         <div class="font-black text-foreground">دربــــاره</div>
                     </div>
-                    <p class="font-semibold text-sm text-muted">
+                    <p class="font-semibold text-foreground text-sm text-muted">
                         {{ about_us.short_description|safe }}
                     </p>
                 </div>

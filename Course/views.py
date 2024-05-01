@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytz
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -15,10 +15,10 @@ from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification, FavoritePDFCourse
 from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
-from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
-    NonFinishedExamsOnlyMixin
+from Course.mixins import CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
+    NonFinishedExamsOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
-    PDFCourse, PDFCourseComment, BoughtCourse
+    PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
 
@@ -149,8 +149,6 @@ class ExamDetail(URLStorageMixin, DetailView):
         sections = ExamAnswer.objects.filter(exam=self.object)
 
         section_names = list(set(sections.values_list('section__name', flat=True)))
-        banner_4 = Banner4.objects.filter(can_be_shown=True).last()
-        banner_5 = Banner5.objects.filter(can_be_shown=True).last()
 
         #  Checks if user can enter exam anymore or not. (Based on entrance time)
         is_time_up = False
@@ -192,8 +190,6 @@ class ExamDetail(URLStorageMixin, DetailView):
             can_be_continued = False
             has_finished_exam = False
 
-        context['banner_4'] = banner_4  # Returns a single object
-        context['banner_5'] = banner_5  # Returns a single object
         context['is_time_up'] = is_time_up  # Returns a boolean
         context['is_user_registered'] = is_user_registered  # Returns a boolean
         context['can_be_continued'] = can_be_continued  # Returns a boolean
@@ -225,8 +221,7 @@ class RegisterInVideoCourse(AuthenticatedUsersOnlyMixin, View):
                                     status=400)
 
 
-class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
-                CheckForExamTimeMixin, NonFinishedExamsOnlyMixin,
+class EnterExam(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin, CheckForExamTimeMixin, NonFinishedExamsOnlyMixin,
                 URLStorageMixin, View):
     template_name = "Course/multiple_choice_exam.html"
 
@@ -264,7 +259,7 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
         return render(request=request, template_name=self.template_name, context=context)
 
 
-class FinalExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
+class FinalExamSubmit(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin,
                       CheckForExamTimeMixin, NonFinishedExamsOnlyMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -314,7 +309,7 @@ class FinalExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, A
         return redirect(reverse("course:exam_detail", kwargs={"slug": exam_slug}))
 
 
-class CalculateExamResult(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin, View):
+class CalculateExamResult(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin, View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         user = request.user
@@ -637,3 +632,75 @@ class TogglePDFCourseFavorite(View):
             pass
 
         return JsonResponse({'success': False}, status=400)
+
+
+class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin, URLStorageMixin, DetailView):
+    model = PDFCourse
+    context_object_name = 'course'
+    template_name = 'Course/pdf_course_episodes.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('category', 'teacher')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+
+        is_follow_request_pending = False
+
+        if user.is_authenticated:
+            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
+                                                                                                      flat=True)
+
+            is_follow_request_pending = Notification.objects.filter(
+                users=self.object.teacher,
+                title="درخواست فالو",
+                visibility="PV",
+                following=self.object.teacher,
+                follower=user,
+                mode="S",
+                type="FO",
+            ).exists()
+
+        else:
+            favorite_pdf_courses = []
+
+        comments = self.object.pdf_course_comments.all()
+
+        if self.request.user.is_authenticated:
+            user_likes = PDFCourseComment.objects.filter(likes=user).values_list('id', flat=True)
+            is_following = Follow.objects.filter(follower=user, following=self.object.teacher).exists()
+
+        else:
+            user_likes = []
+            is_following = False
+
+        context['favorite_pdf_courses'] = favorite_pdf_courses
+        context['comments'] = comments
+        context['user_likes'] = user_likes
+        context['is_following'] = is_following
+        context['is_follow_request_pending'] = is_follow_request_pending
+
+        return context
+
+    def get_object(self, queryset=None):
+        slug = uri_to_iri(self.kwargs.get(self.slug_url_kwarg))
+        queryset = self.get_queryset()
+        return get_object_or_404(queryset, **{self.slug_field: slug})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PDFCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        course_id = request.POST.get("course_id")
+        pdf_course_object = PDFCourseObject.objects.get(id=course_id)
+
+        pdf_file_path = pdf_course_object.pdf_file.path
+        with open(pdf_file_path, 'rb') as f:
+            download_file_name = f"{pdf_course_object.session} - {pdf_course_object.download_file_name}.pdf"
+            response = HttpResponse(f.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{download_file_name}"'
+
+            return response
