@@ -18,7 +18,8 @@ from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     NonFinishedExamsOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin, \
-    RedirectToPDFCourseEpisodesForParticipatedUsersMixin
+    RedirectToPDFCourseEpisodesForParticipatedUsersMixin, ParticipatedUsersVideoCoursesOnlyMixin, \
+    RedirectToVideoCourseEpisodesForParticipatedUsersMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
     PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, PDFCourseObjectDownloadedBy
 from Home.mixins import URLStorageMixin
@@ -50,7 +51,7 @@ class AllVideoCourses(URLStorageMixin, ListView):
         return video_courses
 
 
-class VideoCourseDetail(URLStorageMixin, DetailView):
+class VideoCourseDetail(RedirectToVideoCourseEpisodesForParticipatedUsersMixin, URLStorageMixin, DetailView):
     model = VideoCourse
     context_object_name = 'course'
     template_name = 'Course/video_course_detail.html'
@@ -367,6 +368,64 @@ class ToggleVideoCourseFavorite(View):
         return JsonResponse({'success': False}, status=400)
 
 
+class VideoCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoCoursesOnlyMixin, URLStorageMixin,
+                          DetailView):
+    model = VideoCourse
+    context_object_name = 'course'
+    template_name = 'Course/video_course_episodes.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('category', 'teacher')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+
+        is_follow_request_pending = False
+
+        if user.is_authenticated:
+            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
+                                                                                                            flat=True)
+
+            is_follow_request_pending = Notification.objects.filter(
+                users=self.object.teacher,
+                title="درخواست فالو",
+                visibility="PV",
+                following=self.object.teacher,
+                follower=user,
+                mode="S",
+                type="FO",
+            ).exists()
+
+        else:
+            favorite_video_courses = []
+
+        comments = self.object.video_course_comments.all()
+
+        if self.request.user.is_authenticated:
+            user_likes = VideoCourseComment.objects.filter(likes=user).values_list('id', flat=True)
+            is_following = Follow.objects.filter(follower=user, following=self.object.teacher).exists()
+
+        else:
+            user_likes = []
+            is_following = False
+
+        context['favorite_video_courses'] = favorite_video_courses
+        context['comments'] = comments
+        context['user_likes'] = user_likes
+        context['is_following'] = is_following
+        context['is_follow_request_pending'] = is_follow_request_pending
+
+        return context
+
+    def get_object(self, queryset=None):
+        slug = uri_to_iri(self.kwargs.get(self.slug_url_kwarg))
+        queryset = self.get_queryset()
+        return get_object_or_404(queryset, **{self.slug_field: slug})
+
+
 class AddVideoCourseComment(AuthenticatedUsersOnlyMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -678,7 +737,6 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
         else:
             user_likes = []
             is_following = False
-
 
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['comments'] = comments

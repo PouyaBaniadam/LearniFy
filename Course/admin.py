@@ -67,6 +67,8 @@ class VideoCourseSeasonAdmin(admin.ModelAdmin):
 
     list_filter = ('course',)
 
+    autocomplete_fields = ('course',)
+
     search_fields = ('course__name',)
 
 
