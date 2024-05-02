@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, Exam, ExamAnswer, \
     EnteredExamUser, UserFinalAnswer, PDFCourseObject, PDFCourse, PDFCourseSeason, BoughtCourse, \
-    PDFCourseObjectDownloadedBy
+    PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -15,6 +15,20 @@ class CategoryAdmin(admin.ModelAdmin):
     autocomplete_fields = ('parent',)
 
     prepopulated_fields = {'slug': ('name',)}
+
+
+class VideoCourseObjectDownloadedByInline(admin.TabularInline):
+    model = VideoCourseObjectDownloadedBy
+    can_delete = False
+    readonly_fields = ("user", "formatted_created_at")
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def formatted_created_at(self, obj):
+        return j_date_formatter(obj.created_at)
+
+    formatted_created_at.short_description = 'تاریخ ایجاد'
 
 
 @admin.register(VideoCourseObject)

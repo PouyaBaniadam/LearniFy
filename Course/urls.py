@@ -11,6 +11,7 @@ urlpatterns = [
     path('video/<slug>', views.VideoCourseDetail.as_view(), name='video_course_detail'),
     path('video/<slug>/episodes', views.VideoCourseEpisodes.as_view(), name='video_course_episodes'),
     path('videos/category/<slug>', views.VideoCourseByCategory.as_view(), name='videos_by_category'),
+    path('video/<slug>/download/', views.VideoCourseDownloadSession.as_view(), name='download_video_session'),
     path('video/favorite/toggle/', views.ToggleVideoCourseFavorite.as_view(), name='toggle_video_course_favorite'),
     path('video/add/comment/<slug>', views.AddVideoCourseComment.as_view(), name='add_video_course_comment'),
     path('video/favorite/toggle/', views.ToggleVideoCourseFavorite.as_view(), name='video_toggle_favorite'),

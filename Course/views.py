@@ -21,7 +21,8 @@ from Course.mixins import CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     RedirectToPDFCourseEpisodesForParticipatedUsersMixin, ParticipatedUsersVideoCoursesOnlyMixin, \
     RedirectToVideoCourseEpisodesForParticipatedUsersMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
-    PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, PDFCourseObjectDownloadedBy
+    PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, PDFCourseObjectDownloadedBy, VideoCourseObject, \
+    VideoCourseObjectDownloadedBy
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
 
@@ -772,6 +773,31 @@ class PDFCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDF
             if not has_user_downloaded:
                 PDFCourseObjectDownloadedBy.objects.create(
                     user=user, pdf_course_object=pdf_course_object
+                )
+
+            return response
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class VideoCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoCoursesOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.POST.get("course_id")
+        video_course_object = VideoCourseObject.objects.get(id=course_id)
+
+        video_file_path = video_course_object.video_file.path
+        with open(video_file_path, 'rb') as f:
+            download_file_name = f"{video_course_object.session} - {video_course_object.download_file_name}.mp4"
+            response = HttpResponse(f.read(), content_type='application/video')
+            response['Content-Disposition'] = f'attachment; filename="{download_file_name}"'
+
+            has_user_downloaded = VideoCourseObjectDownloadedBy.objects.filter(
+                user=user
+            ).exists()
+
+            if not has_user_downloaded:
+                VideoCourseObjectDownloadedBy.objects.create(
+                    user=user, video_course_object=video_course_object
                 )
 
             return response

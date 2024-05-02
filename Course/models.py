@@ -164,16 +164,37 @@ class VideoCourseSeason(models.Model):
         verbose_name_plural = 'فصل‌های ویدئو'
 
 
+class VideoCourseObjectDownloadedBy(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    video_course_object = models.ForeignKey(to="VideoCourseObject", on_delete=models.CASCADE,
+                                          verbose_name="جزئیات ویدئو")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ ایحاد')
+
+    def __str__(self):
+        return f"{self.user.username}"
+
+    class Meta:
+        db_table = 'course__video_course_object_downloaded_by'
+        verbose_name = 'دانلود شده توسط'
+        verbose_name_plural = 'دانلود شده توسط'
+
+
 class VideoCourseObject(models.Model):
     video_course = models.ForeignKey(VideoCourse, on_delete=models.CASCADE, verbose_name="دوره", blank=True,
                                      null=True)
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
+    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="ققط انگلیسی")
+
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
     season = models.ForeignKey(to=VideoCourseSeason, on_delete=models.CASCADE, blank=True, null=True,
                                verbose_name="فصل")
+
+    session = models.PositiveSmallIntegerField(default=1, verbose_name="قسمت")
 
     can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
 
