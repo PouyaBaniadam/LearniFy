@@ -27,16 +27,14 @@ class HomeView(URLStorageMixin, TemplateView):
                                                           "teacher__username",
                                                           "teacher__slug",
                                                           "teacher__full_name",
-                                                          "total_sessions",
-                                                          "total_seasons",
                                                           "has_discount",
                                                           "payment_type",
                                                           "price",
                                                           "slug",
                                                           "price_after_discount",
-                                                          "total_duration",
                                                           "name",
-                                                          "holding_status").order_by('-created_at').filter(
+                                                          "holding_status"
+                                                          ).order_by('-created_at').filter(
             Q(holding_status="F") | Q(holding_status="IP"))[:6]
 
         latest_pdf_courses = PDFCourse.objects.values(
@@ -49,17 +47,16 @@ class HomeView(URLStorageMixin, TemplateView):
             "teacher__slug",
             "teacher__username",
             "teacher__full_name",
-            "total_sessions",
-            "total_seasons",
             "has_discount",
             "payment_type",
             "price",
             "slug",
             "price_after_discount",
-            "total_pages",
             "name",
-            "holding_status"
-        ).order_by('-created_at')[:6]
+            "holding_status",
+            "what_we_will_learn",
+        ).order_by('-created_at').filter(
+            Q(holding_status="F") | Q(holding_status="IP"))[:6]
 
         latest_news = News.objects.all().order_by('-created_at')
 

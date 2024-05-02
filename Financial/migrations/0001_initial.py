@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 ('cart', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='Financial.cart', verbose_name='سبد خرید')),
             ],
             options={
-                'verbose_name': 'رسید خرید',
+                'verbose_name': 'فیش واریزی',
                 'verbose_name_plural': 'رسیدهای خرید',
                 'db_table': 'financial__deposit_slip',
             },

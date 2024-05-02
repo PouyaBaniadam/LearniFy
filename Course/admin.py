@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, Exam, ExamAnswer, \
-    EnteredExamUser, UserFinalAnswer, PDFCourseObject, PDFCourse, PDFCourseSeason, BoughtCourse
+    EnteredExamUser, UserFinalAnswer, PDFCourseObject, PDFCourse, PDFCourseSeason, BoughtCourse, \
+    PDFCourseObjectDownloadedBy
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -26,6 +27,7 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
 class BoughtCourseTabularInline(admin.TabularInline):
     model = BoughtCourse
     readonly_fields = ("user", "formatted_cost", "formatted_created_at")
+
     # can_delete = False
 
     def has_add_permission(self, request, obj):
@@ -68,11 +70,27 @@ class VideoCourseSeasonAdmin(admin.ModelAdmin):
     search_fields = ('course__name',)
 
 
+class PDFCourseObjectDownloadedByInline(admin.TabularInline):
+    model = PDFCourseObjectDownloadedBy
+    can_delete = False
+    readonly_fields = ("user", "formatted_created_at")
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def formatted_created_at(self, obj):
+        return j_date_formatter(obj.created_at)
+
+    formatted_created_at.short_description = 'تاریخ ایجاد'
+
+
 @admin.register(PDFCourseObject)
 class PDFCourseObjectAdmin(admin.ModelAdmin):
     list_display = ("title",)
 
     autocomplete_fields = ('pdf_course', 'season')
+
+    inlines = (PDFCourseObjectDownloadedByInline,)
 
 
 @admin.register(PDFCourse)

@@ -66,33 +66,14 @@
                                                         <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
 
                                                             <h2 class="font-bold text-sm">
-                                                                <a href="#"
+                                                                <a href="{% url 'course:video_course_detail' course.video_course.slug %}"
                                                                    class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ course.video_course.name }}</a>
                                                             </h2>
                                                         </div>
                                                         <div class="space-y-3 p-5">
                                                             <div class="flex flex-wrap items-center gap-3">
-                                                                <div class="flex items-center gap-1 text-muted">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                         viewBox="0 0 24 24" stroke-width="1.5"
-                                                                         stroke="currentColor" class="w-5 h-5">
-                                                                        <path stroke-linecap="round"
-                                                                              stroke-linejoin="round"
-                                                                              d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"></path>
-                                                                    </svg>
-                                                                    <span class="font-semibold text-xs">{{ course.video_course.examanswer_set.count }} سوال </span>
-                                                                </div>
-
-                                                                <span class="block w-1 h-1 bg-muted-foreground rounded-full"></span>
-                                                                <div class="flex items-center gap-1 text-muted">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                                         viewBox="0 0 20 20"
-                                                                         fill="currentColor" class="w-5 h-5">
-                                                                        <path fill-rule="evenodd"
-                                                                              d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
-                                                                              clip-rule="evenodd"></path>
-                                                                    </svg>
-                                                                    <span class="font-semibold text-xs"> زمان آزمون: {{ course.video_course.total_duration }}</span>
+                                                                <div class="flex flex-wrap items-center gap-3">
+                                                                    <p class="text-foreground text-sm font-bold">{{ course.video_course.what_we_will_learn|truncatechars:50 }}</p>
                                                                 </div>
                                                             </div>
                                                             <div class="flex items-center justify-between gap-5">

@@ -18,7 +18,7 @@
 
     <li>
         <a href="{% url 'account:favorite_videos' %}"
-           class="w-full h-11 inline-flex items-center text-right gap-3 rounded-full px-4 {% if request.resolver_match.url_name == 'favorites' %}bg-primary text-primary-foreground{% else %}bg-background text-muted hover:bg-primary hover:text-primary-foreground transition-colors{% endif %}">
+           class="w-full h-11 inline-flex items-center text-right gap-3 rounded-full px-4 {% if request.resolver_match.url_name == 'favorite_videos' %}bg-primary text-primary-foreground{% else %}bg-background text-muted hover:bg-primary hover:text-primary-foreground transition-colors{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -31,7 +31,7 @@
 
     <li>
         <a href="{% url 'account:favorite_pdfs' %}"
-           class="w-full h-11 inline-flex items-center text-right gap-3 rounded-full px-4 {% if request.resolver_match.url_name == 'favorites' %}bg-primary text-primary-foreground{% else %}bg-background text-muted hover:bg-primary hover:text-primary-foreground transition-colors{% endif %}">
+           class="w-full h-11 inline-flex items-center text-right gap-3 rounded-full px-4 {% if request.resolver_match.url_name == 'favorite_pdfs' %}bg-primary text-primary-foreground{% else %}bg-background text-muted hover:bg-primary hover:text-primary-foreground transition-colors{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"

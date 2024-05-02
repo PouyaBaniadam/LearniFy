@@ -87,28 +87,9 @@
                                                     </div>
                                                     <div class="space-y-3 p-5">
                                                         <div class="flex flex-wrap items-center gap-3">
-                                                            <div class="flex items-center gap-1 text-muted">
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     viewBox="0 0 20 20"
-                                                                     fill="currentColor" class="w-5 h-5">
-                                                                    <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.12A1.5 1.5 0 0 1 17 6.622V12.5a1.5 1.5 0 0 1-1.5 1.5h-1v-3.379a3 3 0 0 0-.879-2.121L10.5 5.379A3 3 0 0 0 8.379 4.5H7v-1Z">
-                                                                    </path>
-                                                                    <path d="M4.5 6A1.5 1.5 0 0 0 3 7.5v9A1.5 1.5 0 0 0 4.5 18h7a1.5 1.5 0 0 0 1.5-1.5v-5.879a1.5 1.5 0 0 0-.44-1.06L9.44 6.439A1.5 1.5 0 0 0 8.378 6H4.5Z">
-                                                                    </path>
-                                                                </svg>
-                                                                <span class="font-semibold text-xs">{{ course.video_course.total_sessions }} فصل</span>
-                                                            </div>
-                                                            <span class="block w-1 h-1 bg-muted-foreground rounded-full"></span>
-                                                            <div class="flex items-center gap-1 text-muted">
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     viewBox="0 0 20 20"
-                                                                     fill="currentColor" class="w-5 h-5">
-                                                                    <path fill-rule="evenodd"
-                                                                          d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
-                                                                          clip-rule="evenodd"></path>
-                                                                </svg>
-                                                                <span class="font-semibold text-xs">{{ course.video_course.total_duration|format_seconds_to_time }}</span>
-                                                            </div>
+                                                            <div class="flex flex-wrap items-center gap-3">
+                                                        <p class="text-foreground text-sm font-bold">{{ course.video_course.what_we_will_learn|truncatechars:50 }}</p>
+                                                    </div>
                                                         </div>
                                                         <div class="flex items-center justify-between gap-5">
                                                             <div class="flex items-center gap-3">
@@ -230,6 +211,7 @@
                                                                 <span class="block w-1 h-1 bg-success rounded-full"></span>
                                                                 <span class="font-bold text-xs text-success">{{ course.pdf_course.get_holding_status_display }}</span>
                                                             {% endif %}
+
                                                         </div>
                                                         <h2 class="font-bold text-sm">
                                                             <a href="{% url 'course:pdf_course_detail' course.pdf_course.slug %}"
@@ -238,29 +220,9 @@
                                                     </div>
                                                     <div class="space-y-3 p-5">
                                                         <div class="flex flex-wrap items-center gap-3">
-                                                            <div class="flex items-center gap-1 text-muted">
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     viewBox="0 0 20 20"
-                                                                     fill="currentColor" class="w-5 h-5">
-                                                                    <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.12A1.5 1.5 0 0 1 17 6.622V12.5a1.5 1.5 0 0 1-1.5 1.5h-1v-3.379a3 3 0 0 0-.879-2.121L10.5 5.379A3 3 0 0 0 8.379 4.5H7v-1Z">
-                                                                    </path>
-                                                                    <path d="M4.5 6A1.5 1.5 0 0 0 3 7.5v9A1.5 1.5 0 0 0 4.5 18h7a1.5 1.5 0 0 0 1.5-1.5v-5.879a1.5 1.5 0 0 0-.44-1.06L9.44 6.439A1.5 1.5 0 0 0 8.378 6H4.5Z">
-                                                                    </path>
-                                                                </svg>
-                                                                <span class="font-semibold text-xs">{{ course.pdf_course.total_sessions }} فصل</span>
-                                                            </div>
-                                                            <span class="block w-1 h-1 bg-muted-foreground rounded-full"></span>
-                                                            <div class="flex items-center gap-1 text-muted">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                     viewBox="0 0 24 24"
-                                                                     stroke-width="1.5" stroke="currentColor"
-                                                                     class="w-4 h-4">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z">
-                                                                    </path>
-                                                                </svg>
-                                                                <span class="font-semibold text-xs">{{ course.pdf_course.total_pages }} صفحه </span>
-                                                            </div>
+                                                            <div class="flex flex-wrap items-center gap-3">
+                                                        <p class="text-foreground text-sm font-bold">{{ course.pdf_course.what_we_will_learn|truncatechars:50 }}</p>
+                                                    </div>
                                                         </div>
                                                         <div class="flex items-center justify-between gap-5">
                                                             <div class="flex items-center gap-3">

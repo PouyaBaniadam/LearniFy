@@ -61,13 +61,11 @@
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">تعداد صفحات</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ total_pages }}</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.calculate_total_pages }}</span>
                                             </div>
                                         </div>
-                                        <div
-                                                class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
-                                            <span
-                                                    class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
+                                        <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
+                                            <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                      fill="currentColor" class="w-5 h-5">
                                                     <path fill-rule="evenodd"
@@ -76,9 +74,8 @@
                                                 </svg>
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
-                                                <span class="font-bold text-xs text-muted line-clamp-1">تعداد
-                                                    جلسات</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.total_sessions }}</span>
+                                                <span class="font-bold text-xs text-muted line-clamp-1">وضعیت برگزاری</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.get_holding_status_display }}</span>
                                             </div>
                                         </div>
                                         <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">

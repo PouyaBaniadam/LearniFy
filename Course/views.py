@@ -20,7 +20,7 @@ from Course.mixins import CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     NonFinishedExamsOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin, \
     RedirectToPDFCourseEpisodesForParticipatedUsersMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
-    PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject
+    PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, PDFCourseObjectDownloadedBy
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
 
@@ -535,15 +535,12 @@ class PDFCourseDetail(RedirectToPDFCourseEpisodesForParticipatedUsersMixin, URLS
             user_likes = []
             is_following = False
 
-        total_pages = self.object.pdfcourseobject_set.aggregate(total_pages=Sum('pages'))['total_pages']
-
         context['does_course_exists_in_cart'] = does_course_exists_in_cart
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['comments'] = comments
         context['user_likes'] = user_likes
         context['is_following'] = is_following
         context['is_follow_request_pending'] = is_follow_request_pending
-        context['total_pages'] = total_pages
 
         return context
 
@@ -682,14 +679,12 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
             user_likes = []
             is_following = False
 
-        total_pages = self.object.pdfcourseobject_set.aggregate(total_pages=Sum('pages'))['total_pages']
 
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['comments'] = comments
         context['user_likes'] = user_likes
         context['is_following'] = is_following
         context['is_follow_request_pending'] = is_follow_request_pending
-        context['total_pages'] = total_pages
 
         return context
 
@@ -702,6 +697,7 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
 @method_decorator(csrf_exempt, name='dispatch')
 class PDFCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin, View):
     def post(self, request, *args, **kwargs):
+        user = request.user
         course_id = request.POST.get("course_id")
         pdf_course_object = PDFCourseObject.objects.get(id=course_id)
 
@@ -710,5 +706,14 @@ class PDFCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDF
             download_file_name = f"{pdf_course_object.session} - {pdf_course_object.download_file_name}.pdf"
             response = HttpResponse(f.read(), content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="{download_file_name}"'
+
+            has_user_downloaded = PDFCourseObjectDownloadedBy.objects.filter(
+                user=user
+            ).exists()
+
+            if not has_user_downloaded:
+                PDFCourseObjectDownloadedBy.objects.create(
+                    user=user, pdf_course_object=pdf_course_object
+                )
 
             return response

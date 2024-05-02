@@ -170,7 +170,7 @@ class DepositSlip(models.Model):
 
             notification = Notification.objects.create(
                 admin=self.admin,
-                title="عدم تایید رسید خرید",
+                title="رد شدن فیش واریزی",
                 message=f'رسید واریزی شما مورد تایید نبود. در صورت وجود هر گونه مشکلی، با تیم پشتیبانی تماس بگیرید.',
                 visibility="PV",
                 mode="D",
@@ -246,5 +246,5 @@ class DepositSlip(models.Model):
 
     class Meta:
         db_table = "financial__deposit_slip"
-        verbose_name = "رسید خرید"
+        verbose_name = "فیش واریزی"
         verbose_name_plural = "رسیدهای خرید"

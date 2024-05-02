@@ -4,6 +4,7 @@ import fitz
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.db.models import Sum
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 from moviepy.editor import VideoFileClip
@@ -57,7 +58,7 @@ class VideoCourse(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره دوره')
 
-    what_we_will_learn = CKEditor5Field(config_name="extends", max_length=500, verbose_name='چی یاد میگیریم؟')
+    what_we_will_learn = models.TextField(max_length=250, verbose_name='چی یاد میگیریم؟')
 
     teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='مدرس',
                                 related_name='teacher_video_courses')
@@ -68,12 +69,6 @@ class VideoCourse(models.Model):
 
     holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره',
                                       default='NS')
-
-    total_seasons = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد فصل‌ها')
-
-    total_sessions = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد قسمت‌ها')
-
-    total_duration = models.PositiveIntegerField(default=0, verbose_name='مدت دوره')
 
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
 
@@ -109,6 +104,14 @@ class VideoCourse(models.Model):
             self.price_after_discount = self.price
 
         super().save(*args, **kwargs)
+
+    def calculate_total_duration(self):
+        total_duration = self.videocourseobject_set.aggregate(total_duration=Sum('duration'))['total_duration']
+
+        if total_duration is None:
+            total_duration = 0
+
+        return total_duration
 
     class Meta:
         db_table = 'course__video_course'
@@ -225,7 +228,7 @@ class PDFCourse(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره دوره')
 
-    what_we_will_learn = CKEditor5Field(config_name="extends", max_length=500, verbose_name='چی یاد میگیریم؟')
+    what_we_will_learn = models.TextField(max_length=250, verbose_name='چی یاد میگیریم؟')
 
     teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='مدرس',
                                 related_name='teacher_pdf_courses')
@@ -236,10 +239,6 @@ class PDFCourse(models.Model):
 
     holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره',
                                       default='NS')
-
-    total_seasons = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد فصل‌ها')
-
-    total_sessions = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد قسمت‌ها')
 
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
 
@@ -274,6 +273,14 @@ class PDFCourse(models.Model):
             self.price_after_discount = self.price
 
         super().save(*args, **kwargs)
+
+    def calculate_total_pages(self):
+        total_pages = self.pdfcourseobject_set.aggregate(total_pages=Sum('pages'))['total_pages']
+
+        if total_pages is None:
+            total_pages = 0
+
+        return total_pages
 
     class Meta:
         db_table = 'course__pdf_course'
@@ -324,6 +331,23 @@ class PDFCourseSeason(models.Model):
         db_table = 'course__pdf_course_season'
         verbose_name = 'فصل پی‌دی‌اف'
         verbose_name_plural = 'فصل‌های پی‌دی‌اف'
+
+
+class PDFCourseObjectDownloadedBy(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    pdf_course_object = models.ForeignKey(to="PDFCourseObject", on_delete=models.CASCADE,
+                                          verbose_name="جزئیات پی‌دی‌اف")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ ایحاد')
+
+    def __str__(self):
+        return f"{self.user.username}"
+
+    class Meta:
+        db_table = 'course__pdf_course_object_downloaded_by'
+        verbose_name = 'دانلود شده توسط'
+        verbose_name_plural = 'دانلود شده توسط'
 
 
 class PDFCourseObject(models.Model):

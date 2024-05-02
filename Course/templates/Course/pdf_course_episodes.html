@@ -473,7 +473,7 @@
                                 </span>
                                 <div class="flex flex-col items-center justify-center text-center space-y-1">
                                     <span class="font-bold text-xs text-muted line-clamp-1">تعداد صفحات</span>
-                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ total_pages }}</span>
+                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.calculate_total_pages }}</span>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
@@ -486,8 +486,8 @@
                                     </svg>
                                 </span>
                                 <div class="flex flex-col items-center justify-center text-center space-y-1">
-                                    <span class="font-bold text-xs text-muted line-clamp-1">تعداد جلسات</span>
-                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.total_sessions }}</span>
+                                    <span class="font-bold text-xs text-muted line-clamp-1">وضعیت برگزاری</span>
+                                    <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.get_payment_type_display }}</span>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
