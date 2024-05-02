@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from LearniFy import settings
+from MediaHandling.views import serve_protected_media
 
 urlpatterns = ([
                    path("i18n/", include("django.conf.urls.i18n")),
@@ -18,6 +19,7 @@ urlpatterns = ([
                    path('weblog/', include('Weblog.urls')),
                    path('us/', include('Us.urls')),
                    path('financial/', include('Financial.urls')),
+                   path('media/', include('MediaHandling.urls')),
                ]
                + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
 urlpatterns += i18n_patterns(path("admin/", admin.site.urls))

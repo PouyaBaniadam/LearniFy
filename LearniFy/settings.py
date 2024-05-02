@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     "News.apps.NewsConfig",
     "Us.apps.UsConfig",
     "Financial.apps.FinancialConfig",
+    "MediaHandling",
+
 
     # Third party packages
     "widget_tweaks",

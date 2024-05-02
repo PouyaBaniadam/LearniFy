@@ -134,9 +134,13 @@ class RedirectToPDFCourseEpisodesForParticipatedUsersMixin(View):
         user = request.user
         slug = kwargs.get("slug")
 
-        is_user_participated = PDFCourse.objects.filter(
-            slug=slug, participated_users=user
-        ).exists()
+        if user.is_authenticated:
+            is_user_participated = PDFCourse.objects.filter(
+                slug=slug, participated_users=user
+            ).exists()
+
+        else:
+            is_user_participated = False
 
         if is_user_participated:
             return redirect(reverse("course:pdf_course_episodes", kwargs={"slug": slug}))
@@ -149,9 +153,13 @@ class RedirectToVideoCourseEpisodesForParticipatedUsersMixin(View):
         user = request.user
         slug = kwargs.get("slug")
 
-        is_user_participated = VideoCourse.objects.filter(
-            slug=slug, participated_users=user
-        ).exists()
+        if user.is_authenticated:
+            is_user_participated = VideoCourse.objects.filter(
+                slug=slug, participated_users=user
+            ).exists()
+
+        else:
+            is_user_participated = False
 
         if is_user_participated:
             return redirect(reverse("course:video_course_episodes", kwargs={"slug": slug}))
