@@ -78,7 +78,7 @@ def create_follow_notification(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Wallet)
-def my_model_post_save(sender, instance, created, **kwargs):
+def wallet_post_save(sender, instance, created, **kwargs):
     user = instance.user
 
     if not created:
