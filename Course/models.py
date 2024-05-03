@@ -263,6 +263,9 @@ class PDFCourse(models.Model):
 
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
 
+    coefficient_number = models.PositiveSmallIntegerField(default=1, verbose_name="ضریب",
+                                                          help_text="یک عدد صحیح بین 1 تا 4")
+
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
                                                 related_name='user_pdf_courses')
 
