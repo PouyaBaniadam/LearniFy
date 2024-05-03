@@ -13,7 +13,7 @@ def serve_protected_media(request, filepath):
 
     full_filepath = os.path.join(settings.MEDIA_ROOT, filepath)
     if not os.path.exists(full_filepath):
-        messages.error(request, f"چنین فایلی وجود ندارد!")
+        messages.error(request, f"چنین فایلی در دیتابیس وجود ندارد!")
 
         redirect_url = request.session.get('current_url')
 
