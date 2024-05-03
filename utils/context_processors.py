@@ -1,7 +1,7 @@
 from Account.models import CustomUser
-from Financial.models import Cart, CartItem, DepositSlip
+from Financial.models import Cart, DepositSlip
 from Course.filters import VideoCourseFilter, PDFCourseFilter
-from Course.models import Category, Exam, VideoCourse, PDFCourse
+from Course.models import Category, VideoCourse, PDFCourse
 from Us.models import SocialMedia, AboutUs
 
 

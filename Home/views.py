@@ -79,7 +79,11 @@ class HomeView(URLStorageMixin, TemplateView):
 
         why_us_part_1 = WhyUs.objects.values_list("id", "title", "icon")
         why_us_part_2 = WhyUs.objects.values_list("id", "image", "description")
-        default_why_us_id = WhyUs.objects.first().id
+
+        try:
+            default_why_us_id = WhyUs.objects.first().id
+        except AttributeError:
+            default_why_us_id = 1
 
         context['latest_video_courses'] = latest_video_courses  # Is a queryset
         context['latest_pdf_courses'] = latest_pdf_courses  # Is a queryset
