@@ -2,7 +2,7 @@ import string
 
 import fitz
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Sum
 from django_ckeditor_5.fields import CKEditor5Field
@@ -71,6 +71,10 @@ class VideoCourse(models.Model):
                                       default='NS')
 
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
+
+    coefficient_number = models.PositiveSmallIntegerField(default=1, verbose_name="ضریب",
+                                                          validators=[MinValueValidator(1), MaxValueValidator(4)],
+                                                          help_text="یک عدد صحیح بین 1 تا 4")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
                                                 related_name='user_video_courses')
@@ -264,6 +268,7 @@ class PDFCourse(models.Model):
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
 
     coefficient_number = models.PositiveSmallIntegerField(default=1, verbose_name="ضریب",
+                                                          validators=[MinValueValidator(1), MaxValueValidator(4)],
                                                           help_text="یک عدد صحیح بین 1 تا 4")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',

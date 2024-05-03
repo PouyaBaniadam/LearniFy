@@ -105,23 +105,47 @@ class SearchView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         q = request.GET.get('q')
+        selected_category = request.GET.get('category')
 
-        weblog_result = Weblog.objects.filter(
-            Q(title__icontains=q) |
-            Q(content__icontains=q))
+        if selected_category == "weblog":
+            result_type = "weblog"
+            result = Weblog.objects.filter(
+                Q(title__icontains=q) |
+                Q(content__icontains=q))
 
-        news_result = News.objects.filter(
-            Q(title__icontains=q) |
-            Q(content__icontains=q))
+        elif selected_category == "news":
+            result_type = "news"
+            result = News.objects.filter(
+                Q(title__icontains=q) |
+                Q(content__icontains=q))
 
-        video_course_result = VideoCourse.objects.filter(
-            Q(name__icontains=q) |
-            Q(description__icontains=q))
+        elif selected_category == "video_course":
+            result_type = "video_course"
+            result = VideoCourse.objects.filter(
+                Q(name__icontains=q) |
+                Q(description__icontains=q) |
+                Q(what_we_will_learn__icontains=q)
+            )
+
+        elif selected_category == "pdf_course":
+            result_type = "pdf_course"
+            result = PDFCourse.objects.filter(
+                Q(name__icontains=q) |
+                Q(description__icontains=q) |
+                Q(what_we_will_learn__icontains=q)
+            )
+
+        else:  # Default search category is pdf courses
+            result_type = "pdf_course"
+            result = PDFCourse.objects.filter(
+                Q(name__icontains=q) |
+                Q(description__icontains=q) |
+                Q(what_we_will_learn__icontains=q)
+            )
 
         context = {
-            'weblog_result': weblog_result,
-            'news_result': news_result,
-            'video_course_result': video_course_result,
+            "result_type": result_type,
+            "result": result
         }
 
         return render(request=request, template_name=self.template_name, context=context)

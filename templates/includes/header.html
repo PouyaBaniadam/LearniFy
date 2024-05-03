@@ -7,7 +7,7 @@
     <div class="max-w-7xl relative px-4 mx-auto">
         <div class="flex items-center gap-8 h-20">
             <div class="flex items-center gap-3">
-                <!-- offcanvas:button -->
+                <!-- off-canvas:button -->
                 <button type="button"
                         class="lg:hidden inline-flex items-center justify-center relative w-10 h-10 bg-secondary rounded-full text-foreground"
                         x-on:click="offcanvasOpen = true">
@@ -322,6 +322,17 @@
                     <input name="q" type="text"
                            class="form-input w-full !ring-0 !ring-offset-0 bg-background border-0 focus:border-0 text-foreground"
                            placeholder="نام دوره،مقاله و یا دسته بندی را وارد نمایید.."/>
+                    <label style="margin-left: 50px; min-width: 150px">
+                        <select name="category"
+                                class="form-select w-full h-10 !ring-0 !ring-offset-0 bg-secondary border border-border focus:border-border rounded-xl text-sm text-foreground pr-10">
+                            <option value="" selected disabled>موضوع</option>
+                            <option value="pdf_course">دوره پی‌‌دی‌‌افی</option>
+                            <option value="video_course">دوره ویدئویی</option>
+                            <option value="weblog">وبلاگ‌‌ها</option>
+                            <option value="news">اخبار</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </label>
                     <button type="button"
                             class="absolute left-0 inline-flex items-center justify-center w-9 h-9 bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
                             x-on:click="openSearchBox = false">
@@ -337,12 +348,12 @@
     </div>
     <!-- end container -->
 
-    <!-- offcanvas -->
+    <!-- off-canvas -->
     <div x-cloak>
-        <!-- offcanvas:box -->
+        <!-- off-canvas:box -->
         <div class="fixed inset-y-0 right-0 xs:w-80 w-72 h-screen bg-background rounded-l-2xl overflow-y-auto transition-transform z-50"
              x-bind:class="offcanvasOpen ? '!translate-x-0' : 'translate-x-full'">
-            <!-- offcanvas:header -->
+            <!-- off-canvas:header -->
             <div class="flex items-center justify-between gap-x-4 sticky top-0 bg-background p-4 z-10">
                 <a href="{% url 'home:home' %}" class="inline-flex items-center gap-2 text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
@@ -359,7 +370,7 @@
                             </span>
                 </a>
 
-                <!-- offcanvas:close-button -->
+                <!-- off-canvas:close-button -->
                 <button x-on:click="offcanvasOpen = false"
                         class="text-foreground focus:outline-none hover:text-red-500">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -369,10 +380,20 @@
                 </button><!-- end offcanvas:close-button -->
             </div><!-- end offcanvas header -->
 
-            <!-- offcanvas:content -->
+            <!-- off-canvas:content -->
             <div class="space-y-5 p-4">
                 <form action="{% url 'home:search' %}">
-
+                    <label>
+                        <select name="category"
+                                class="form-select w-full h-10 !ring-0 !ring-offset-0 bg-secondary border border-border focus:border-border rounded-xl text-sm text-foreground pr-10">
+                            <option value="" selected disabled>موضوع</option>
+                            <option value="pdf_course">دوره پی‌‌دی‌‌افی</option>
+                            <option value="video_course">دوره ویدئویی</option>
+                            <option value="weblog">وبلاگ‌‌ها</option>
+                            <option value="news">اخبار</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </label>
                     <div class="flex items-center relative">
                         <input name="q" type="text"
                                class="form-input w-full h-10 !ring-0 !ring-offset-0 bg-secondary border border-border focus:border-border rounded-xl text-sm text-foreground pr-10"
@@ -387,6 +408,7 @@
                                 </span>
                     </div>
                 </form>
+
                 <div class="h-px bg-border"></div>
                 <div class="relative w-full flex items-center justify-between cursor-pointer"
                      x-on:click="darkMode = !darkMode">
@@ -476,10 +498,12 @@
                     </li>
 
                 </ul>
-            </div><!-- end offcanvas:content -->
+            </div>
+            <!-- end off-canvas:content -->
+
         </div><!-- end offcanvas:box -->
 
-        <!-- offcanvas:overlay -->
+        <!-- off-canvas:overlay -->
         <div class="fixed inset-0 h-screen bg-secondary/80 cursor-pointer transition-all duration-1000 z-40"
              x-bind:class="offcanvasOpen ? 'opacity-100 visible' : 'opacity-0 invisible'"
              x-on:click="offcanvasOpen = false">

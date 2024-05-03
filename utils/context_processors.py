@@ -113,8 +113,6 @@ def card_number_info(request):
 def categories(request):
     categories_1_with_children = Category.objects.filter(parent__isnull=True)
 
-    print(categories_1_with_children)
-
     context = {'categories_1_with_children': categories_1_with_children}
 
     return context
