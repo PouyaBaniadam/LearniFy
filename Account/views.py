@@ -123,7 +123,6 @@ class DeleteAccountView(AuthenticatedUsersOnlyMixin, View):
         return redirect(reverse(viewname="account:check_otp") + f"?uuid={uuid}")
 
 
-
 class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
     form_class = ChangePasswordForm
     template_name = 'Account/change_password.html'
