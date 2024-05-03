@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.core.files.uploadedfile import UploadedFile
+from django.db.models import ProtectedError
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.templatetags.static import static
@@ -105,6 +106,24 @@ class LogOutView(AuthenticatedUsersOnlyMixin, View):
         return redirect("home:home")
 
 
+class DeleteAccountView(AuthenticatedUsersOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        print(user)
+
+        sms_code = random.randint(a=1000, b=9999)
+        uuid = str(uuid4())
+
+        OTP.objects.create(username=user.username, mobile_phone=user.mobile_phone, sms_code=sms_code, uuid=uuid,
+                           otp_type="D")
+
+        # send_delete_account_sms(receptor=mobile_phone, sms_code=sms_code)
+        print(sms_code)
+        return redirect(reverse(viewname="account:check_otp") + f"?uuid={uuid}")
+
+
+
 class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
     form_class = ChangePasswordForm
     template_name = 'Account/change_password.html'
@@ -165,10 +184,7 @@ class ForgetPasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
         # send_forget_password_sms(receptor=mobile_phone, sms_code=sms_code)
         print(sms_code)
 
-        return redirect(reverse(viewname="account:check_otp") + f"?uuid={uuid}&mobile_phone={mobile_phone}")
-
-    def form_invalid(self, form):
-        return super().form_invalid(form)
+        return redirect(reverse(viewname="account:check_otp") + f"?uuid={uuid}")
 
 
 class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
@@ -292,10 +308,16 @@ class CheckOTPView(FormView):
 
             user_to_be_deleted = CustomUser.objects.get(username=username)
 
-            user_to_be_deleted.delete()
-            otp.delete()
+            try:
+                user_to_be_deleted.delete()
+                otp.delete()
 
-            return redirect("home:home")
+                return redirect("home:home")
+
+            except ProtectedError:
+                messages.error(request, f"متاسفانه شما مجوز حدف حساب کاربری خود را ندارید. (به دلیل وجود related objects)")
+
+                return redirect(reverse("account:profile", kwargs={"slug": request.user.username}))
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="UPH").exists():
             otp = OTP.objects.get(uuid=uuid)

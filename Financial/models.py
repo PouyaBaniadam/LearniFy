@@ -126,9 +126,9 @@ class DepositSlip(models.Model):
         ('WAL', 'شارژ کیف پول')
     )
 
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.PROTECT, verbose_name="کاربر", related_name="+")
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر", related_name="+")
 
-    cart = models.ForeignKey(to=Cart, on_delete=models.PROTECT, blank=True, null=True, verbose_name="سبد خرید",
+    cart = models.ForeignKey(to=Cart, on_delete=models.CASCADE, blank=True, null=True, verbose_name="سبد خرید",
                              editable=False)
 
     admin = models.ForeignKey(to="Account.CustomUser", on_delete=models.PROTECT, blank=True, null=True,
