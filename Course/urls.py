@@ -28,8 +28,4 @@ urlpatterns = [
     path('pdf/add/comment/<slug>', views.AddPDFCourseComment.as_view(), name='add_pdf_course_comment'),
     path('pdf/comment/delete/<id>', views.DeletePDFCourseComment.as_view(), name='delete_pdf_course_comment'),
     path('pdf/like_comment/', views.LikePDFCourseComment.as_view(), name='like_pdf_course_comment'),
-    path('exam/<slug>/enter', views.EnterExam.as_view(), name='enter_exam'),
-    path('exam/<slug>', views.ExamDetail.as_view(), name='exam_detail'),
-    path('exam/<slug>/submit/final', views.FinalExamSubmit.as_view(), name='final_exam_submit'),
-    path('exam/<slug>/calculate/result', views.CalculateExamResult.as_view(), name='calculate_exam_result'),
 ]

@@ -43,7 +43,7 @@ class CartItem(models.Model):
     pdf_course = models.ForeignKey(to="Course.PDFCourse", on_delete=models.CASCADE, blank=True, null=True,
                                    verbose_name="دوره پی‌دی‌افی")
 
-    course_type = models.CharField(max_length=3, choices=COURSE_CHOICES, verbose_name='نوع')
+    course_type = models.CharField(max_length=3, choices=COURSE_CHOICES, verbose_name='نوع دوره')
 
     def __str__(self):
         return f"{self.video_course or self.pdf_course}"
@@ -85,7 +85,7 @@ class Discount(models.Model):
 
     type = models.CharField(max_length=2, choices=DISCOUNT_CHOICES, verbose_name="نوع تخفیف")
 
-    individual_user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
                                         verbose_name="کاربر")
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
@@ -105,7 +105,7 @@ class Discount(models.Model):
         if self.duration.total_seconds() < 60:
             raise ValidationError("مدت تخفیف نمی‌تواند کمتر از 60 ثانیه باشد.")
 
-        if self.type == "PV" and self.individual_user is None:
+        if self.type == "PV" and self.user is None:
             raise ValidationError(message="در صورت شخصی بودن کد تخفیف، یک کاربر باید انتخاب شده باشد.")
 
         if self.type == "PV" and self.usage_limits > 1:

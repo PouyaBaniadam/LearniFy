@@ -10,7 +10,7 @@ from django_jalali.db.models import jDateTimeField
 from star_ratings.models import Rating
 
 from Account.validators import validate_email
-from Course.models import VideoCourse, Exam, PDFCourse
+from Course.models import VideoCourse, PDFCourse
 
 
 class CustomUserManager(BaseUserManager):

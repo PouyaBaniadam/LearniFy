@@ -3,7 +3,6 @@ from datetime import datetime
 
 import pytz
 from django.contrib import messages
-from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
 from django.urls import reverse
@@ -16,13 +15,10 @@ from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification, FavoritePDFCourse
 from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
-from Course.mixins import CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
-    NonFinishedExamsOnlyMixin, ParticipatedUsersPDFCoursesOnlyMixin, \
-    RedirectToPDFCourseEpisodesForParticipatedUsersMixin, ParticipatedUsersVideoCoursesOnlyMixin, \
-    RedirectToVideoCourseEpisodesForParticipatedUsersMixin
-from Course.models import VideoCourse, Exam, ExamAnswer, EnteredExamUser, UserFinalAnswer, VideoCourseComment, \
-    PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, PDFCourseObjectDownloadedBy, VideoCourseObject, \
-    VideoCourseObjectDownloadedBy
+from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCourseEpisodesForParticipatedUsersMixin, \
+    ParticipatedUsersVideoCoursesOnlyMixin, RedirectToVideoCourseEpisodesForParticipatedUsersMixin
+from Course.models import VideoCourse, VideoCourseComment, PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, \
+    PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
 
@@ -131,78 +127,6 @@ class AllBookCourses(URLStorageMixin, ListView):
     pass
 
 
-class ExamDetail(URLStorageMixin, DetailView):
-    model = Exam
-    context_object_name = 'exam'
-    template_name = 'Course/exam_detail.html'
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.select_related('category', 'designer')
-
-    def get_object(self, queryset=None):
-        slug = uri_to_iri(self.kwargs.get(self.slug_url_kwarg))
-        queryset = self.get_queryset()
-        return get_object_or_404(queryset, **{self.slug_field: slug})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        user = self.request.user
-
-        sections = ExamAnswer.objects.filter(exam=self.object)
-
-        section_names = list(set(sections.values_list('section__name', flat=True)))
-
-        #  Checks if user can enter exam anymore or not. (Based on entrance time)
-        is_time_up = False
-
-        if self.request.user.is_authenticated:
-            if EnteredExamUser.objects.filter(
-                    user=user, exam=self.object
-            ).exists():
-                entered_exam_user = EnteredExamUser.objects.get(user=user, exam=self.object)
-
-                date_1 = entered_exam_user.created_at
-                date_2 = datetime.now(pytz.timezone('Iran'))
-
-                total_duration = self.object.total_duration.total_seconds()
-
-                difference = get_time_difference(date_1=date_1, date_2=date_2)
-
-                time_left = int(total_duration - difference)
-
-                if time_left < 0:
-                    is_time_up = True
-
-            can_be_continued = False
-            if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
-                can_be_continued = True
-
-            has_finished_exam = False
-            if UserFinalAnswer.objects.filter(user=user, exam=self.object).exists():
-                has_finished_exam = True
-
-            try:
-                is_user_registered = Exam.objects.filter(participated_users=user, slug=self.object.slug).exists()
-
-            except TypeError:
-                is_user_registered = False
-
-        else:
-            is_user_registered = False
-            can_be_continued = False
-            has_finished_exam = False
-
-        context['is_time_up'] = is_time_up  # Returns a boolean
-        context['is_user_registered'] = is_user_registered  # Returns a boolean
-        context['can_be_continued'] = can_be_continued  # Returns a boolean
-        context['has_finished_exam'] = has_finished_exam  # Returns a boolean
-        context['sections_names'] = section_names  # Returns a list
-
-        return context
-
-
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterInVideoCourse(AuthenticatedUsersOnlyMixin, View):
     def post(self, request, *args, **kwargs):
@@ -223,107 +147,6 @@ class RegisterInVideoCourse(AuthenticatedUsersOnlyMixin, View):
             else:
                 return JsonResponse(data={"message": f"شما قبلا در دوره {video_course.name} ثبت نام کردید."},
                                     status=400)
-
-
-class EnterExam(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin, CheckForExamTimeMixin, NonFinishedExamsOnlyMixin,
-                URLStorageMixin, View):
-    template_name = "Course/multiple_choice_exam.html"
-
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        slug = kwargs.get('slug')
-
-        exam = Exam.objects.get(slug=slug)
-
-        if not EnteredExamUser.objects.filter(exam=exam, user=user).exists():
-            EnteredExamUser.objects.create(exam=exam, user=user)
-
-        entered_exam_user = EnteredExamUser.objects.get(exam=exam, user=user)
-
-        date_1 = entered_exam_user.created_at
-        date_2 = datetime.now(pytz.timezone('Iran'))
-
-        total_duration = exam.total_duration.total_seconds()
-
-        difference = get_time_difference(date_1=date_1, date_2=date_2)
-
-        time_left = int(total_duration - difference)
-
-        answers = ExamAnswer.objects.values(
-            "choice_1", "choice_2",
-            "choice_3", "choice_4"
-        )
-
-        context = {
-            'time_left': time_left,
-            'answers': answers,
-            'slug': exam.slug
-        }
-
-        return render(request=request, template_name=self.template_name, context=context)
-
-
-class FinalExamSubmit(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin,
-                      CheckForExamTimeMixin, NonFinishedExamsOnlyMixin, View):
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        exam_slug = self.kwargs['slug']
-        exam = get_object_or_404(Exam, slug=exam_slug)
-
-        for key, value in request.POST.items():
-            if key.startswith('question_'):
-                question_number = int(key.replace('question_', ''))
-                selected_answer = value
-
-                exam_answer = ExamAnswer.objects.get(exam=exam, question_number=question_number)
-                if exam_answer.choice_1 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=1
-                    )
-
-                if exam_answer.choice_2 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=2
-                    )
-
-                if exam_answer.choice_3 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=3
-                    )
-
-                if exam_answer.choice_4 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=4
-                    )
-
-        messages.success(request, f"پاسخنامه آزمون {exam.name} با موقیت ثبت شد.")
-
-        return redirect(reverse("course:exam_detail", kwargs={"slug": exam_slug}))
-
-
-class CalculateExamResult(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin, View):
-    def get(self, request, *args, **kwargs):
-        slug = kwargs.get('slug')
-        user = request.user
-        exam = get_object_or_404(Exam, slug=slug)
-
-        context = {
-
-        }
-
-        return render(request, "Course/answer_results.html", context=context)
 
 
 class VideoCourseFilterView(View):

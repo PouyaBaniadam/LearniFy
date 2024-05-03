@@ -60,8 +60,8 @@ class VideoCourse(models.Model):
 
     what_we_will_learn = models.TextField(max_length=250, verbose_name='چی یاد میگیریم؟')
 
-    teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='مدرس',
-                                related_name='teacher_video_courses')
+    teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.SET_DEFAULT, default=1,
+                                verbose_name='مدرس', related_name='teacher_video_courses')
 
     cover_image = models.ImageField(upload_to='Course/VideoCourse/cover_images', verbose_name='عکس کاور')
 
@@ -168,7 +168,7 @@ class VideoCourseObjectDownloadedBy(models.Model):
     user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
 
     video_course_object = models.ForeignKey(to="VideoCourseObject", on_delete=models.CASCADE,
-                                          verbose_name="جزئیات ویدئو")
+                                            verbose_name="جزئیات ویدئو")
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ ایحاد')
 
@@ -182,7 +182,7 @@ class VideoCourseObjectDownloadedBy(models.Model):
 
 
 class VideoCourseObject(models.Model):
-    video_course = models.ForeignKey(VideoCourse, on_delete=models.CASCADE, verbose_name="دوره", blank=True,
+    video_course = models.ForeignKey(VideoCourse, on_delete=models.PROTECT, verbose_name="دوره", blank=True,
                                      null=True)
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
@@ -372,7 +372,7 @@ class PDFCourseObjectDownloadedBy(models.Model):
 
 
 class PDFCourseObject(models.Model):
-    pdf_course = models.ForeignKey(PDFCourse, on_delete=models.CASCADE, verbose_name="دوره", blank=True,
+    pdf_course = models.ForeignKey(PDFCourse, on_delete=models.PROTECT, verbose_name="دوره", blank=True,
                                    null=True)
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
@@ -427,130 +427,9 @@ class PDFCourseObject(models.Model):
         verbose_name_plural = 'جزئیات پی‌دی‌اف'
 
 
-class ExamAnswer(models.Model):
-    answer_choices = (
-        ("1", "گزینه 1"),
-        ("2", "گزینه 2"),
-        ("3", "گزینه 3"),
-        ("4", "گزینه 4"),
-    )
-
-    question_number = models.PositiveSmallIntegerField(verbose_name="شماره سوال")
-
-    exam = models.ForeignKey(to="Exam", on_delete=models.CASCADE, verbose_name="آزمون")
-
-    choice_1 = models.CharField(max_length=100, verbose_name="گزینه 1")
-
-    choice_2 = models.CharField(max_length=100, verbose_name="گزینه 2")
-
-    choice_3 = models.CharField(max_length=100, verbose_name="گزینه 3")
-
-    choice_4 = models.CharField(max_length=100, verbose_name="گزینه 4")
-
-    true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح")
-
-    true_answer_explanation = CKEditor5Field(config_name="extends", blank=True, null=True,
-                                             verbose_name="توضیحات اضافه پاسخ صحیح")
-
-    def __str__(self):
-        return f"{self.true_answer}"
-
-    class Meta:
-        db_table = 'course__exam_answer'
-        verbose_name = 'پاسخ آزمون'
-        verbose_name_plural = 'پاسخ‌های آزمون'
-
-
-class Exam(models.Model):
-    level_choices_types = (
-        ("E", "ساده"),
-        ("N", "متوسط"),
-        ("H", "پیچیده"),
-    )
-
-    video_course_season = models.ForeignKey(to=VideoCourseSeason, on_delete=models.CASCADE, verbose_name="دوره ویدئویی",
-                                            blank=True, null=True)
-
-    name = models.CharField(max_length=100, unique=True, verbose_name='نام آزمون')
-
-    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
-
-    category = models.ForeignKey(to=Category, on_delete=models.PROTECT, verbose_name='دسته بندی')
-
-    description = CKEditor5Field(config_name="extends", verbose_name='درباره آزمون')
-
-    cover_image = models.ImageField(upload_to='Course/Exam/cover_images', verbose_name='عکس کاور')
-
-    level = models.CharField(max_length=1, choices=level_choices_types, verbose_name='میزان سختی', default="N")
-
-    total_duration = models.DurationField(default=0, verbose_name='مدت آزمون')
-
-    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
-
-    updated_at = jDateTimeField(auto_now=True, verbose_name='تاریخ آخرین به‌روز‌رسانی')
-
-    def __str__(self):
-        return f"{self.name}"
-
-    def clean(self):
-        if self.total_duration.total_seconds() < 900:
-            raise ValidationError(
-                message=".زمان آزمون نمی‌تواند کمتر از 15 دقیقه باشد",
-                code="invalid_total_duration"
-            )
-
-    class Meta:
-        db_table = 'course__exam'
-        verbose_name = 'آزمون'
-        verbose_name_plural = 'آزمون‌ها'
-
-
-class EnteredExamUser(models.Model):
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
-                             verbose_name="کاربر")
-
-    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
-
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
-
-    def __str__(self):
-        return f"{self.user} - {self.exam.name}"
-
-    class Meta:
-        db_table = 'course__entered_exam_user'
-        verbose_name = "کاربر شرکت کرده در آزمون"
-        verbose_name_plural = "کاربران شرکت کرده در آزمون"
-
-
-class UserFinalAnswer(models.Model):
-    selected_answer_choices = (
-        ("1", "گزینه 1"),
-        ("2", "گزینه 2"),
-        ("3", "گزینه 3"),
-        ("4", "گزینه 4"),
-    )
-
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
-                             verbose_name="کاربر")
-
-    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
-
-    question_number = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="شماره سوال")
-
-    selected_answer = models.CharField(max_length=10, blank=True, choices=selected_answer_choices, null=True,
-                                       verbose_name="گزینه انتخاب شده")
-
-    def __str__(self):
-        return f"{self.user.username} - {self.exam.name}"
-
-    class Meta:
-        db_table = 'course__user_final_answer'
-        verbose_name = "پاسخ نهایی کاربر"
-        verbose_name_plural = "پاسخ‌های نهایی کابران"
-
-
 class BoughtCourse(models.Model):
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.SET_NULL, blank=True, null=True,
+                             verbose_name="کاربر")
 
     pdf_course = models.ForeignKey(to=PDFCourse, on_delete=models.PROTECT, blank=True, null=True,
                                    verbose_name="دوره پی‌دی‌افی", editable=False)

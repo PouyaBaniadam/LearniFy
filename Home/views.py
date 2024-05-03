@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from Course.models import VideoCourse, Exam, PDFCourse
+from Course.models import VideoCourse, PDFCourse
 from Home.mixins import URLStorageMixin
 from Home.models import IntroBanner
 from News.models import News
@@ -114,14 +114,9 @@ class SearchView(TemplateView):
             Q(name__icontains=q) |
             Q(description__icontains=q))
 
-        exams_result = Exam.objects.filter(
-            Q(name__icontains=q) |
-            Q(description__icontains=q))
-
         context = {
             'weblog_result': weblog_result,
             'news_result': news_result,
-            'exams_result': exams_result,
             'video_course_result': video_course_result,
         }
 

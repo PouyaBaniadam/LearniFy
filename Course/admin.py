@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, Exam, ExamAnswer, \
-    EnteredExamUser, UserFinalAnswer, PDFCourseObject, PDFCourse, PDFCourseSeason, BoughtCourse, \
+from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, PDFCourseObject, PDFCourse, \
+    PDFCourseSeason, BoughtCourse, \
     PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy
 from Home.templatetags.filters import j_date_formatter
 
@@ -134,29 +134,3 @@ class PDFCourseSeasonAdmin(admin.ModelAdmin):
     autocomplete_fields = ('course',)
 
     search_fields = ('course__name',)
-
-
-class UserFinalAnswerInline(admin.StackedInline):
-    model = UserFinalAnswer
-    extra = 1
-
-
-class EnteredExamUserInline(admin.StackedInline):
-    model = EnteredExamUser
-    extra = 1
-
-
-class ExamAnswerInline(admin.StackedInline):
-    model = ExamAnswer
-    extra = 1
-
-
-@admin.register(Exam)
-class ExamAdmin(admin.ModelAdmin):
-    list_display = (
-        'name', 'total_duration', 'category', 'level'
-    )
-
-    prepopulated_fields = {'slug': ('name',)}
-
-    inlines = [ExamAnswerInline, UserFinalAnswerInline, EnteredExamUserInline]

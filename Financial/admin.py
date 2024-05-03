@@ -40,7 +40,7 @@ class DiscountUsageTabularInline(admin.TabularInline):
 @admin.register(Discount)
 class DiscountAdmin(admin.ModelAdmin):
     list_display = ("code", "type", "percent", "duration", "created_at", "ends_at")
-    autocomplete_fields = ("individual_user",)
+    autocomplete_fields = ("user",)
     list_filter = ("type",)
     inlines = [DiscountUsageTabularInline]
 
