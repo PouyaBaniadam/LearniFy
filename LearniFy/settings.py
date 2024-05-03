@@ -53,12 +53,12 @@ INSTALLED_APPS = [
     "Financial.apps.FinancialConfig",
     "MediaHandling",
 
-
     # Third party packages
     "widget_tweaks",
     "hitcount",
     "star_ratings",
     "mptt",
+    "django_cleanup.apps.CleanupConfig"
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"

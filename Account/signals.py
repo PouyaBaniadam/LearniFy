@@ -44,7 +44,7 @@ def create_follow_notification(sender, instance, created, **kwargs):
 
         notification = Notification.objects.create(
             title="فالو",
-            message=f'<p>شما <a href="/account/profile/{following.username}"><span style="color:hsl(210,75%,60%);">{following.username}</span></a> را فالو کردید.</p>',
+            message=f'<p>شما <a href="/account/profile/{following.username}"><span style="color:hsl(240,75%,60%);">{following.username}</span></a> را فالو کردید.</p>',
             visibility="PV",
             following=following,
             follower=follower,
@@ -57,7 +57,7 @@ def create_follow_notification(sender, instance, created, **kwargs):
 
         if Notification.objects.filter(
                 title="فالو",
-                message=f'<p>شما <a href="/account/profile/{following.username}"><span style="color:hsl(210,75%,60%);">{following.username}</span></a> را فالو کردید.</p>',
+                message=f'<p>شما <a href="/account/profile/{following.username}"><span style="color:hsl(240,75%,60%);">{following.username}</span></a> را فالو کردید.</p>',
                 visibility="PV",
                 following=following,
                 follower=follower,
@@ -66,7 +66,7 @@ def create_follow_notification(sender, instance, created, **kwargs):
         ).count() > 1:
             first_follow_notification = Notification.objects.filter(
                 title="فالو",
-                message=f'<p>شما <a href="/account/profile/{following.username}"><span style="color:hsl(210,75%,60%);">{following.username}</span></a> را فالو کردید.</p>',
+                message=f'<p>شما <a href="/account/profile/{following.username}"><span style="color:hsl(240,75%,60%);">{following.username}</span></a> را فالو کردید.</p>',
                 visibility="PV",
                 following=following,
                 follower=follower,
