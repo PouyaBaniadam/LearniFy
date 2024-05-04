@@ -33,7 +33,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "admin_interface",
     "colorfield",
-    "nested_inline",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,8 +45,6 @@ INSTALLED_APPS = [
     "Account.apps.AccountConfig",
     "Weblog.apps.WeblogConfig",
     "Course.apps.CourseConfig",
-    "django_ckeditor_5",
-    "debug_toolbar",
     "News.apps.NewsConfig",
     "Us.apps.UsConfig",
     "Financial.apps.FinancialConfig",
@@ -58,7 +55,9 @@ INSTALLED_APPS = [
     "hitcount",
     "star_ratings",
     "mptt",
-    "django_cleanup.apps.CleanupConfig"
+    "django_ckeditor_5",
+    "debug_toolbar",
+    "django_cleanup.apps.CleanupConfig",
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"

@@ -93,7 +93,7 @@ class CartItemsView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
+        favorite_video_courses =  VideoCourse.favorite_video_list(self, user=user)
 
         cart_items = CartItem.objects.filter(cart__user=user)
 

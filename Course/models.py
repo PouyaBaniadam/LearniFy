@@ -117,6 +117,13 @@ class VideoCourse(models.Model):
 
         return total_duration
 
+    def favorite_video_list(self, user):
+        favorites = []
+        if user.is_authenticated:
+            favorites = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id', flat=True)
+
+        return favorites
+
     class Meta:
         db_table = 'course__video_course'
         verbose_name = 'دوره ویدئویی'
@@ -191,7 +198,7 @@ class VideoCourseObject(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
-    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="ققط انگلیسی")
+    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="فقط انگلیسی")
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
@@ -311,6 +318,13 @@ class PDFCourse(models.Model):
 
         return total_pages
 
+    def favorite_pdf_list(self, user):
+        favorites = []
+        if user.is_authenticated:
+            favorites = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id', flat=True)
+
+        return favorites
+
     class Meta:
         db_table = 'course__pdf_course'
         verbose_name = 'دوره پی‌دی‌افی'
@@ -385,7 +399,7 @@ class PDFCourseObject(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
-    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="ققط انگلیسی")
+    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="فقط انگلیسی")
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 

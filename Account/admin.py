@@ -79,7 +79,7 @@ class FollowAdmin(admin.ModelAdmin):
 
 
 @admin.register(FavoriteVideoCourse)
-class FavoriteExamAdmin(admin.ModelAdmin):
+class FavoriteVideoCourseAdmin(admin.ModelAdmin):
     list_display = ('user', 'video_course', 'created_at',)
     search_fields = ('user__username', 'video_course__name')
 

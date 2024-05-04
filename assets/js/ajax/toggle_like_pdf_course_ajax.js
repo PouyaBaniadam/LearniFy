@@ -18,7 +18,6 @@ $(document).ready(function () {
                         button.removeClass('text-muted bg-secondary hover:text-red-500')
                             .addClass('text-red-500');
                     } else if (data.action === 'removed') {
-                        // Exam was removed from favorites
                         button.removeClass('text-red-500 bg-yellow-200')
                             .addClass('text-muted bg-secondary hover:text-red-500');
                     }

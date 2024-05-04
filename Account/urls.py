@@ -10,7 +10,6 @@ urlpatterns = [
     path("profile/post/delete/", views.DeletePostView.as_view(), name="delete_post"),
     path("profile/post/caption/update/", views.UpdateCaptionView.as_view(), name="update_caption"),
     path("profile/<slug:slug>/temp/follow", views.TempFollowPrivateAccountFirst.as_view(), name="temp_follow"),
-    path("profile/videos/<slug:slug>", views.VideoCoursesView.as_view(), name="video_courses"),
     path("profile/<slug:slug>/edit", views.ProfileEditView.as_view(), name="edit_profile"),
     path("login", views.LogInView.as_view(), name="login"),
     path("register", views.RegisterView.as_view(), name="register"),

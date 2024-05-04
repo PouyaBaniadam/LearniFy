@@ -58,24 +58,15 @@ class HomeView(URLStorageMixin, TemplateView):
         ).order_by('-created_at').filter(
             Q(holding_status="F") | Q(holding_status="IP"))[:6]
 
-        latest_news = News.objects.all().order_by('-created_at')
-
-        latest_weblogs = Weblog.objects.all().order_by('-created_at')
-
         intro_banner = IntroBanner.objects.first()
+
+        latest_news = News.objects.all().order_by('-created_at')
+        latest_weblogs = Weblog.objects.all().order_by('-created_at')
 
         attitudes = Message.objects.filter(can_be_shown=True).order_by('-created_at')
 
-        if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                            flat=True)
-
-            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
-                                                                                                      flat=True)
-
-        else:
-            favorite_video_courses = []
-            favorite_pdf_courses = []
+        favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
+        favorite_pdf_courses =  PDFCourse.favorite_pdf_list(self, user=user)
 
         why_us_part_1 = WhyUs.objects.values_list("id", "title", "icon")
         why_us_part_2 = WhyUs.objects.values_list("id", "image", "description")
@@ -104,6 +95,10 @@ class SearchView(TemplateView):
     template_name = "Home/search_result.html"
 
     def get(self, request, *args, **kwargs):
+        user = self.request.user
+        favorite_video_courses = []
+        favorite_pdf_courses = []
+
         q = request.GET.get('q')
         selected_category = request.GET.get('category')
 
@@ -111,39 +106,54 @@ class SearchView(TemplateView):
             result_type = "weblog"
             result = Weblog.objects.filter(
                 Q(title__icontains=q) |
-                Q(content__icontains=q))
+                Q(content__icontains=q) |
+                Q(category__name__icontains=q)
+            )
 
         elif selected_category == "news":
             result_type = "news"
             result = News.objects.filter(
                 Q(title__icontains=q) |
-                Q(content__icontains=q))
+                Q(content__icontains=q) |
+                Q(category__name__icontains=q)
+            )
 
         elif selected_category == "video_course":
+            favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
+
             result_type = "video_course"
             result = VideoCourse.objects.filter(
                 Q(name__icontains=q) |
                 Q(description__icontains=q) |
-                Q(what_we_will_learn__icontains=q)
+                Q(what_we_will_learn__icontains=q) |
+                Q(category__name__icontains=q)
             )
 
         elif selected_category == "pdf_course":
+            favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
+
             result_type = "pdf_course"
             result = PDFCourse.objects.filter(
                 Q(name__icontains=q) |
                 Q(description__icontains=q) |
-                Q(what_we_will_learn__icontains=q)
+                Q(what_we_will_learn__icontains=q) |
+                Q(category__name__icontains=q)
             )
 
         else:  # Default search category is pdf courses
+            favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
+
             result_type = "pdf_course"
             result = PDFCourse.objects.filter(
                 Q(name__icontains=q) |
                 Q(description__icontains=q) |
-                Q(what_we_will_learn__icontains=q)
+                Q(what_we_will_learn__icontains=q) |
+                Q(category__name__icontains=q)
             )
 
         context = {
+            "favorite_video_courses": favorite_video_courses,
+            "favorite_pdf_courses": favorite_pdf_courses,
             "result_type": result_type,
             "result": result
         }

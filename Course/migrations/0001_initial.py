@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(blank=True, max_length=200, null=True, verbose_name='تیتر')),
-                ('download_file_name', models.CharField(help_text='ققط انگلیسی', max_length=50, verbose_name='نام فایل دانلودی')),
+                ('download_file_name', models.CharField(help_text='فقط انگلیسی', max_length=50, verbose_name='نام فایل دانلودی')),
                 ('note', django_ckeditor_5.fields.CKEditor5Field(blank=True, null=True, verbose_name='یادداشت')),
                 ('session', models.PositiveSmallIntegerField(default=1, verbose_name='قسمت')),
                 ('can_be_sample', models.BooleanField(default=False, verbose_name='به عنوان نمونه تدریس انتخاب شود؟')),
@@ -209,7 +209,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(blank=True, max_length=200, null=True, verbose_name='تیتر')),
-                ('download_file_name', models.CharField(help_text='ققط انگلیسی', max_length=50, verbose_name='نام فایل دانلودی')),
+                ('download_file_name', models.CharField(help_text='فقط انگلیسی', max_length=50, verbose_name='نام فایل دانلودی')),
                 ('note', django_ckeditor_5.fields.CKEditor5Field(blank=True, null=True, verbose_name='یادداشت')),
                 ('session', models.PositiveSmallIntegerField(default=1, verbose_name='قسمت')),
                 ('can_be_sample', models.BooleanField(default=False, verbose_name='به عنوان نمونه تدریس انتخاب شود؟')),

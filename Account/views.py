@@ -314,7 +314,8 @@ class CheckOTPView(FormView):
                 return redirect("home:home")
 
             except ProtectedError:
-                messages.error(request, f"متاسفانه شما مجوز حدف حساب کاربری خود را ندارید. (به دلیل وجود related objects)")
+                messages.error(request,
+                               f"متاسفانه شما مجوز حدف حساب کاربری خود را ندارید. (به دلیل وجود related objects)")
 
                 return redirect(reverse("account:profile", kwargs={"slug": request.user.username}))
 
@@ -472,81 +473,6 @@ class TempFollowPrivateAccountFirst(NonFollowersOnlyMixin, URLStorageMixin, View
             }
 
             return render(request=request, template_name="account/visitor_posts_blur.html", context=context)
-
-
-class VideoCoursesView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
-    def get(self, request, slug):
-        user = self.request.user
-
-        if user.is_authenticated:
-            user = CustomUser.objects.get(username=user.username)
-            owner = CustomUser.objects.get(slug=slug)
-
-            is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
-            video_courses = VideoCourse.objects.filter(participated_users=owner)
-
-            if is_visitor_the_owner:
-                if owner.is_staff:
-                    video_courses = VideoCourse.objects.filter(teacher=owner)
-
-                favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=owner).values_list('id',
-                                                                                                                 flat=True)
-
-                context = {
-                    "user": owner,
-                    "video_courses": video_courses,
-                    "favorite_video_courses": favorite_video_courses,
-                    "account_status": owner.account_status
-                }
-
-                return render(
-                    request=request, template_name="Account/owner_videos_profile.html", context=context)
-
-            else:
-                favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                                flat=True)
-
-                if owner.is_staff:
-                    video_courses = VideoCourse.objects.filter(teacher=owner)
-
-                is_following = user.is_following(owner)
-                account_status = owner.account_status
-
-                is_follow_request_pending = Notification.objects.filter(
-                    users=owner,
-                    title="درخواست فالو",
-                    visibility="PV",
-                    following=owner,
-                    follower=user,
-                    mode="S",
-                    type="FO",
-                ).exists()
-
-                context = {
-                    "user": owner,
-                    "video_courses": video_courses,
-                    "favorite_video_courses": favorite_video_courses,
-                    "is_following": is_following,
-                    "account_status": account_status,
-                    "is_follow_request_pending": is_follow_request_pending,
-                }
-
-                return render(
-                    request=request, template_name="Account/visitor_video_profile.html", context=context)
-
-        else:
-            is_following = False
-            owner = CustomUser.objects.get(slug=slug)
-            video_courses = VideoCourse.objects.filter(participated_users=owner)
-
-            context = {
-                "user": owner,
-                "video_courses": video_courses,
-                "is_following": is_following
-            }
-
-            return render(
-                request=request, template_name="Account/visitor_video_profile.html", context=context)
 
 
 @method_decorator(csrf_exempt, name='dispatch')

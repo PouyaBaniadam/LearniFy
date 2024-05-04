@@ -32,11 +32,7 @@ class AllVideoCourses(URLStorageMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                            flat=True)
-        else:
-            favorite_video_courses = []
+        favorite_video_courses =  VideoCourse.favorite_video_list(self, user=user)
 
         context['favorite_video_courses'] = favorite_video_courses
 
@@ -68,8 +64,7 @@ class VideoCourseDetail(RedirectToVideoCourseEpisodesForParticipatedUsersMixin, 
             does_course_exists_in_cart = CartItem.objects.filter(
                 cart__user=user, video_course=self.object, course_type="VID").exists()
 
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                            flat=True)
+            favorite_video_courses =  VideoCourse.favorite_video_list(self, user=user)
 
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
@@ -123,10 +118,6 @@ class VideoCourseByCategory(URLStorageMixin, ListView):
         return video_courses
 
 
-class AllBookCourses(URLStorageMixin, ListView):
-    pass
-
-
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterInVideoCourse(AuthenticatedUsersOnlyMixin, View):
     def post(self, request, *args, **kwargs):
@@ -157,11 +148,8 @@ class VideoCourseFilterView(View):
         video_course_filter = VideoCourseFilter(request.GET, queryset=video_courses)
 
         user = self.request.user
-        if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                            flat=True)
-        else:
-            favorite_video_courses = []
+
+        favorite_video_courses =  VideoCourse.favorite_video_list(self, user=user)
 
         context = {
             'video_courses': video_course_filter.qs,
@@ -186,7 +174,7 @@ class ToggleVideoCourseFavorite(View):
             else:
                 FavoriteVideoCourse.objects.create(video_course=video_course, user=user)
                 return JsonResponse({'success': True, 'action': 'added'})
-        except Exam.DoesNotExist:
+        except VideoCourse.DoesNotExist:
             pass
 
         return JsonResponse({'success': False}, status=400)
@@ -209,9 +197,9 @@ class VideoCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoCou
 
         is_follow_request_pending = False
 
+        favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
+
         if user.is_authenticated:
-            favorite_video_courses = VideoCourse.objects.filter(favoritevideocourse__user=user).values_list('id',
-                                                                                                            flat=True)
 
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
@@ -222,9 +210,6 @@ class VideoCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoCou
                 mode="S",
                 type="FO",
             ).exists()
-
-        else:
-            favorite_video_courses = []
 
         comments = self.object.video_course_comments.all()
 
@@ -311,11 +296,7 @@ class AllPDFCourses(URLStorageMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        if user.is_authenticated:
-            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
-                                                                                                      flat=True)
-        else:
-            favorite_pdf_courses = []
+        favorite_pdf_courses =  PDFCourse.favorite_pdf_list(self, user=user)
 
         context['favorite_pdf_courses'] = favorite_pdf_courses
 
@@ -357,11 +338,7 @@ class PDFCourseFilterView(View):
         pdf_course_filter = PDFCourseFilter(request.GET, queryset=pdf_courses)
 
         user = self.request.user
-        if user.is_authenticated:
-            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
-                                                                                                      flat=True)
-        else:
-            favorite_pdf_courses = []
+        favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
 
         context = {
             'pdf_courses': pdf_course_filter.qs,
@@ -387,12 +364,11 @@ class PDFCourseDetail(RedirectToPDFCourseEpisodesForParticipatedUsersMixin, URLS
 
         is_follow_request_pending = False
 
+        favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
+
         if user.is_authenticated:
             does_course_exists_in_cart = CartItem.objects.filter(
                 cart__user=user, pdf_course=self.object, course_type="PDF").exists()
-
-            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
-                                                                                                      flat=True)
 
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
@@ -406,7 +382,6 @@ class PDFCourseDetail(RedirectToPDFCourseEpisodesForParticipatedUsersMixin, URLS
 
         else:
             does_course_exists_in_cart = False
-            favorite_pdf_courses = []
 
         comments = self.object.pdf_course_comments.all()
 
@@ -513,7 +488,7 @@ class TogglePDFCourseFavorite(View):
             else:
                 FavoritePDFCourse.objects.create(pdf_course=pdf_course, user=user)
                 return JsonResponse({'success': True, 'action': 'added'})
-        except Exam.DoesNotExist:
+        except PDFCourse.DoesNotExist:
             pass
 
         return JsonResponse({'success': False}, status=400)
@@ -535,10 +510,9 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
 
         is_follow_request_pending = False
 
-        if user.is_authenticated:
-            favorite_pdf_courses = PDFCourse.objects.filter(favoritepdfcourse__user=user).values_list('id',
-                                                                                                      flat=True)
+        favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
 
+        if user.is_authenticated:
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
                 title="درخواست فالو",
@@ -548,9 +522,6 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
                 mode="S",
                 type="FO",
             ).exists()
-
-        else:
-            favorite_pdf_courses = []
 
         comments = self.object.pdf_course_comments.all()
 
