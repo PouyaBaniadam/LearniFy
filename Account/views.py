@@ -18,12 +18,12 @@ from django.views.generic import FormView, UpdateView, ListView, View
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm, \
     ChargeWalletForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
-    NonFollowersOnlyMixin, OwnerOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin
+    NonFollowersOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
     FavoritePDFCourse, Follow
 from Account.validator_utilities import validate_mobile_phone_handler
+from Course.models import PDFCourse, VideoCourse
 from Financial.models import Cart, DepositSlip
-from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import summarize_entry
 
@@ -366,7 +366,6 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
 
                 is_follow_request_pending = Notification.objects.filter(
                     users=owner,
-                    title="درخواست فالو",
                     visibility="PV",
                     following=owner,
                     follower=user,
@@ -392,7 +391,6 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
 
                 is_follow_request_pending = Notification.objects.filter(
                     users=owner,
-                    title="درخواست فالو",
                     visibility="PV",
                     following=owner,
                     follower=user,
@@ -442,7 +440,6 @@ class TempFollowPrivateAccountFirst(NonFollowersOnlyMixin, URLStorageMixin, View
 
             is_follow_request_pending = Notification.objects.filter(
                 users=owner,
-                title="درخواست فالو",
                 visibility="PV",
                 following=owner,
                 follower=user,
@@ -933,3 +930,123 @@ class FollowingList(AuthenticatedUsersOnlyMixin, CheckFollowingMixin, View):
             },
             status=200
         )
+
+
+class UserPDFCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
+    model = PDFCourse
+    context_object_name = 'pdf_courses'
+
+    def get_queryset(self):
+        slug = self.kwargs.get("slug")
+
+        pdf_courses = PDFCourse.objects.filter(teacher__slug=slug)
+
+        return pdf_courses
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        slug = self.kwargs.get("slug")
+        owner = CustomUser.objects.get(slug=slug)
+
+        if user.is_authenticated:
+            user = CustomUser.objects.get(username=user.username)
+            is_following = user.is_following(owner)
+            account_status = owner.account_status
+
+            is_follow_request_pending = Notification.objects.filter(
+                users=owner,
+                visibility="PV",
+                following=owner,
+                follower=user,
+                mode="S",
+                type="FO",
+            ).exists()
+
+        else:
+            is_following = False
+            account_status = owner.account_status
+
+            is_follow_request_pending = False
+
+        favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
+
+        context['favorite_pdf_courses'] = favorite_pdf_courses
+        context['user'] = user
+        context['is_following'] = is_following
+        context['account_status'] = account_status
+        context['is_follow_request_pending'] = is_follow_request_pending
+
+        return context
+
+    def get_template_names(self):
+        user = self.request.user
+        slug = self.kwargs.get("slug")
+
+        owner = CustomUser.objects.get(slug=slug)
+
+        if owner == user:
+            return ['Account/owner_pdf_courses.html']
+
+        else:
+            return ['Account/visitor_pdf_courses.html']
+
+
+class UserVideoCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
+    model = VideoCourse
+    context_object_name = 'video_courses'
+
+    def get_queryset(self):
+        slug = self.kwargs.get("slug")
+
+        video_courses = VideoCourse.objects.filter(teacher__slug=slug)
+
+        return video_courses
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        slug = self.kwargs.get("slug")
+        owner = CustomUser.objects.get(slug=slug)
+
+        if user.is_authenticated:
+            user = CustomUser.objects.get(username=user.username)
+            is_following = user.is_following(owner)
+            account_status = owner.account_status
+
+            is_follow_request_pending = Notification.objects.filter(
+                users=owner,
+                visibility="PV",
+                following=owner,
+                follower=user,
+                mode="S",
+                type="FO",
+            ).exists()
+
+        else:
+            is_following = False
+            account_status = owner.account_status
+
+            is_follow_request_pending = False
+
+        favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
+
+        context['favorite_video_courses'] = favorite_video_courses
+        context['user'] = user
+        context['is_following'] = is_following
+        context['account_status'] = account_status
+        context['is_follow_request_pending'] = is_follow_request_pending
+
+        return context
+
+    def get_template_names(self):
+        user = self.request.user
+        slug = self.kwargs.get("slug")
+
+        owner = CustomUser.objects.get(slug=slug)
+
+        if owner == user:
+            return ['Account/owner_video_courses.html']
+
+        else:
+            return ['Account/visitor_video_courses.html']

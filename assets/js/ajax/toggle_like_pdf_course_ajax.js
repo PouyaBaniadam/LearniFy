@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             Swal.fire({
                 icon: 'warning',
                 title: 'اهراز هویت',
-                text: 'جهت افزودن این آزمون به لیست علاقه‌مندی‌های خود، ابتدا وارد حساب کاربری خود شوید.',
+                text: 'جهت افزودن این دوره پی‌‌دی‌‌افی به لیست علاقه‌مندی‌های خود، ابتدا وارد حساب کاربری خود شوید.',
                 confirmButtonText: 'باشه',
                 // TODO: Change the host name for footer
                 footer: '<a href="http://127.0.0.1:8000/account/login">ورود به حساب کاربری</a>'

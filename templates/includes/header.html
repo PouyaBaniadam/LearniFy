@@ -137,7 +137,9 @@
             </div>
 
             <div class="flex items-center md:gap-5 gap-3 mr-auto">
-                <!-- darkMode:button -->
+
+                {% comment %}
+            <!-- darkMode:button -->
                 <button type="button"
                         class="hidden lg:inline-flex items-center justify-center w-10 h-10 bg-secondary rounded-full text-foreground"
                         x-on:click="darkMode = !darkMode">
@@ -157,6 +159,7 @@
                             </span>
                 </button>
                 <!-- end darkMode:button -->
+            {% endcomment %}
 
                 <!-- openSearchBox:button -->
                 <button type="button"
@@ -407,6 +410,7 @@
                     </div>
                 </form>
 
+                {% comment %}
                 <div class="h-px bg-border"></div>
                 <div class="relative w-full flex items-center justify-between cursor-pointer"
                      x-on:click="darkMode = !darkMode">
@@ -416,6 +420,8 @@
                             class="w-11 h-5 relative bg-background border-2 border-border peer-focus:outline-none rounded-full peer peer-checked:after:left-[26px] peer-checked:after:bg-background after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:bg-border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary peer-checked:border-primary">
                     </div>
                 </div>
+                {% endcomment %}
+
                 <div class="h-px bg-border"></div>
                 <ul class="flex flex-col space-y-1">
                     <li>

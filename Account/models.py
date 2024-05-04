@@ -295,7 +295,7 @@ class FavoriteVideoCourse(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, blank=True, null=True, verbose_name="کاربر")
 
     video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, blank=True, null=True,
-                                     verbose_name="آزمون")
+                                     verbose_name="دوره ویدئویی")
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 

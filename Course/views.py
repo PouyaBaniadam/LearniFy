@@ -68,7 +68,6 @@ class VideoCourseDetail(RedirectToVideoCourseEpisodesForParticipatedUsersMixin, 
 
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
-                title="درخواست فالو",
                 visibility="PV",
                 following=self.object.teacher,
                 follower=user,
@@ -203,7 +202,6 @@ class VideoCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoCou
 
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
-                title="درخواست فالو",
                 visibility="PV",
                 following=self.object.teacher,
                 follower=user,
@@ -372,7 +370,6 @@ class PDFCourseDetail(RedirectToPDFCourseEpisodesForParticipatedUsersMixin, URLS
 
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
-                title="درخواست فالو",
                 visibility="PV",
                 following=self.object.teacher,
                 follower=user,
@@ -515,7 +512,6 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
         if user.is_authenticated:
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
-                title="درخواست فالو",
                 visibility="PV",
                 following=self.object.teacher,
                 follower=user,
