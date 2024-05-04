@@ -217,10 +217,10 @@
                                                                     {% if course.has_discount %}
                                                                         <span class="line-through text-muted">{{ course.price|price_splitter }}</span>
                                                                         <span class="text-muted">{{ course.price_after_discount|price_splitter }} <span
-                                                                                style="color: #1D4ED8;">تومان</span></span>
+                                                                                class="text-primary">تومان</span></span>
                                                                     {% else %}
                                                                         <span class="text-muted">{{ course.price|price_splitter }} <span
-                                                                                style="color: #1D4ED8;">تومان</span></span>
+                                                                                class="text-primary">تومان</span></span>
                                                                     {% endif %}
                                                                 {% else %}
                                                                     <span class="font-black text-xl text-success">رایگان!</span>
@@ -230,7 +230,7 @@
                                                                     <div class="flex items-center gap-1">
                                                                         <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
                                                                         <span class="text-xs text-muted"><span
-                                                                                style="color: #1D4ED8;">تومان</span></span>
+                                                                                class="text-primary">تومان</span></span>
                                                                     </div>
                                                                 {% endif %}
 
@@ -570,10 +570,10 @@
                                                             {% if course.has_discount %}
                                                                 <span class="line-through text-muted">{{ course.price|price_splitter }}</span>
                                                                 <span class="text-muted">{{ course.price_after_discount|price_splitter }} <span
-                                                                        style="color: #1D4ED8;">تومان</span></span>
+                                                                        class="text-primary">تومان</span></span>
                                                             {% else %}
                                                                 <span class="text-muted">{{ course.price|price_splitter }} <span
-                                                                        style="color: #1D4ED8;">تومان</span></span>
+                                                                        class="text-primary">تومان</span></span>
                                                             {% endif %}
                                                         {% else %}
                                                             <span class="font-black text-xl text-success">رایگان!</span>
@@ -583,7 +583,7 @@
                                                             <div class="flex items-center gap-1">
                                                                 <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
                                                                 <span class="text-xs text-muted"><span
-                                                                        style="color: #1D4ED8;">تومان</span></span>
+                                                                        class="text-primary">تومان</span></span>
                                                             </div>
                                                         {% endif %}
 

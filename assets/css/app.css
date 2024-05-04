@@ -3002,11 +3002,14 @@ body, html {
     right: .75rem
 }
 
-
-.correct {
-    background-color: #ccffcc; /* Light green background for correct sections */
+.search-profile-results-container {
+    max-height: 90px;
+    overflow-y: auto;
+    border: 2px dotted #ccc;
+    border-radius: 10px;
+    padding: 5px;
 }
 
-.incorrect {
-    background-color: #ffcccc; /* Light red background for incorrect sections */
+.result-item {
+    margin-bottom: 5px;
 }

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.core.files.uploadedfile import UploadedFile
+from django.core import serializers
 from django.db.models import ProtectedError
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -375,7 +376,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
 
                 context = {
                     "posts": posts,
-                    "user": owner,
+                    "owner": owner,
                     "is_following": is_following,
                     "account_status": account_status,
                     "is_follow_request_pending": is_follow_request_pending,
@@ -400,7 +401,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
 
                 context = {
                     "posts": posts,
-                    "user": owner,
+                    "owner": owner,
                     "is_following": is_following,
                     "account_status": account_status,
                     "is_follow_request_pending": is_follow_request_pending,
@@ -418,7 +419,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
 
             context = {
                 "posts": posts,
-                "user": owner,
+                "owner": owner,
                 "is_following": is_following,
                 "account_status": account_status,
                 "is_follow_request_pending": is_follow_request_pending,
@@ -973,6 +974,7 @@ class UserPDFCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
 
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['user'] = user
+        context['owner'] = owner
         context['is_following'] = is_following
         context['account_status'] = account_status
         context['is_follow_request_pending'] = is_follow_request_pending
@@ -1033,6 +1035,7 @@ class UserVideoCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
 
         context['favorite_video_courses'] = favorite_video_courses
         context['user'] = user
+        context['owner'] = owner
         context['is_following'] = is_following
         context['account_status'] = account_status
         context['is_follow_request_pending'] = is_follow_request_pending
@@ -1050,3 +1053,21 @@ class UserVideoCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
 
         else:
             return ['Account/visitor_video_courses.html']
+
+
+def search_view(request):
+    query = request.GET.get('query', '')
+
+    # Filter users based on the query
+    results = CustomUser.objects.filter(username__icontains=query)
+
+    # Serialize only the 'slug' and 'username' fields
+    serialized_results = []
+    for user in results:
+        serialized_user = {
+            'slug': user.slug,
+            'username': user.username
+        }
+        serialized_results.append(serialized_user)
+
+    return JsonResponse({'results': serialized_results})

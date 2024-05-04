@@ -33,4 +33,5 @@ urlpatterns = [
     path('wallet/charge/', views.ChargeWallet.as_view(), name='charge_wallet'),
     path('followers/list/', views.FollowersList.as_view(), name='followers_list'),
     path('followings/list/', views.FollowingList.as_view(), name='followings_list'),
+    path('search/', views.search_view, name='search'),
 ]

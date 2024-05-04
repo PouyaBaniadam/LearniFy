@@ -1,6 +1,25 @@
 {% load static %}
 {% load filters %}
 <!-- statistics:items:wrapper -->
+
+<form>
+    <div class="flex items-center relative mt-3">
+        <input type="text"
+               id="search-profile-input"
+               class="form-input w-full h-10 !ring-0 !ring-offset-0 bg-secondary border border-border focus:border-border rounded-xl text-sm text-foreground pr-10"
+               placeholder="دنبال کی هستی؟"/>
+        <span class="absolute right-3 text-muted">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                 class="w-5 h-5">
+                <path fill-rule="evenodd"
+                      d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
+                      clip-rule="evenodd"></path>
+            </svg>
+        </span>
+    </div>
+</form>
+<div class="mb-8" id="search-profile-results"></div>
+
 <div class="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5 mb-8">
 
     <!-- statistics:item -->
@@ -59,10 +78,11 @@
         </div>
         <!-- end statistics:item -->
     </button>
-    
+
 </div>
 <!-- end statistics:wrapper -->
 
 <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
 <script src="{% static 'js/ajax/showFollowers_ajax.js' %}"></script>
 <script src="{% static 'js/ajax/showFollowings_ajax.js' %}"></script>
+<script src="{% static 'js/ajax/search_profiles_ajax.js' %}"></script>

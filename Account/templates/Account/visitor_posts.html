@@ -64,8 +64,8 @@
                                                             <div class="flex items-center justify-between gap-5">
                                                                 <div class="flex items-center gap-3">
                                                                     <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                                        {% if post.user.image %}
-                                                                            <img src="{{ post.user.image.url }}"
+                                                                        {% if post.owner.image %}
+                                                                            <img src="{{ post.owner.image.url }}"
                                                                                  class="w-full h-full object-cover"
                                                                                  alt="تصویر پروفایل"/>
                                                                         {% else %}
@@ -75,8 +75,8 @@
                                                                         {% endif %}
                                                                     </div>
                                                                     <div class="flex flex-col items-start space-y-1">
-                                                                        <a href="{% url 'account:profile' user.slug %}"
-                                                                           class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ post.user.username }}</a>
+                                                                        <a href="{% url 'account:profile' owner.slug %}"
+                                                                           class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ post.owner.username }}</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
