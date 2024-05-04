@@ -106,9 +106,7 @@ class NonFollowersOnlyMixin(View):
         if owner != request.user:
             if user.is_authenticated:
                 user = CustomUser.objects.get(username=user.username)
-                if owner.account_status == "PV" and user.id in owner.followers.all().values_list(
-                        "follower_id", flat=True
-                ):
+                if owner.account_status == "PU" or user.is_following(owner):
                     messages.error(request, f"شما مجوز ورود به این صفحه را ندارید!")
 
                     redirect_url = request.session.get('current_url')

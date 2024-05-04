@@ -17,7 +17,7 @@
                               d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
                     </svg>
                 </button>
-                <!-- end offcanvas:button -->
+                <!-- end off-canvas:button -->
                 <a href="{% url 'home:home' %}" class="inline-flex items-center gap-2 text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                          class="w-6 h-6">
@@ -379,8 +379,8 @@
                          stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                </button><!-- end offcanvas:close-button -->
-            </div><!-- end offcanvas header -->
+                </button><!-- end off-canvas:close-button -->
+            </div><!-- end off-canvas header -->
 
             <!-- off-canvas:content -->
             <div class="space-y-5 p-4">
@@ -505,13 +505,13 @@
             </div>
             <!-- end off-canvas:content -->
 
-        </div><!-- end offcanvas:box -->
+        </div><!-- end off-canvas:box -->
 
         <!-- off-canvas:overlay -->
         <div class="fixed inset-0 h-screen bg-secondary/80 cursor-pointer transition-all duration-1000 z-40"
              x-bind:class="offcanvasOpen ? 'opacity-100 visible' : 'opacity-0 invisible'"
              x-on:click="offcanvasOpen = false">
-        </div><!-- end offcanvas:overlay -->
-    </div><!-- end offcanvas -->
+        </div><!-- end off-canvas:overlay -->
+    </div><!-- end off-canvas -->
 </header>
 <!-- end header -->

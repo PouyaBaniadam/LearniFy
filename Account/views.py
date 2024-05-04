@@ -18,7 +18,7 @@ from django.views.generic import FormView, UpdateView, ListView, View
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm, \
     ChargeWalletForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
-    NonFollowersOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin
+    NonFollowersOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin, OwnerOnlyMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
     FavoritePDFCourse, Follow
 from Account.validator_utilities import validate_mobile_phone_handler
@@ -186,7 +186,7 @@ class ForgetPasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
         return redirect(reverse(viewname="account:check_otp") + f"?uuid={uuid}")
 
 
-class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
+class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerOnlyMixin, URLStorageMixin, UpdateView):
     model = CustomUser
     template_name = 'Account/edit_profile.html'
     fields = ("full_name", "email", "about_me")
