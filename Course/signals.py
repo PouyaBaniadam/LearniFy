@@ -48,7 +48,7 @@ def add_to_user_stars_for_downloading_pdf_course_object(instance, created, **kwa
 
         notification = Notification.objects.create(
             title="کسب امتیاز",
-            message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">شما </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{stars}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> به امتیازات خود اضافه کردید.</span></p>',
+            message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">شما </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{stars} امتیاز</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> به امتیازات خود اضافه کردید.</span></p>',
             visibility="PV",
             mode="S",
             type="AN",
@@ -71,8 +71,7 @@ def add_to_user_stars_for_downloading_video_course_object(instance, created, **k
 
         notification = Notification.objects.create(
             title="کسب امتیاز",
-            message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">شما </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{stars}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> به امتیازات خود اضافه کردید.</span></p>',
-            visibility="PV",
+            message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">شما </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{stars} امتیاز</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> به امتیازات خود اضافه کردید.</span></p>',            visibility="PV",
             mode="S",
             type="AN",
         )

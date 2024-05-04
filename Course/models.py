@@ -2,7 +2,7 @@ import string
 
 import fitz
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.db import models
 from django.db.models import Sum
 from django_ckeditor_5.fields import CKEditor5Field
@@ -65,7 +65,9 @@ class VideoCourse(models.Model):
 
     cover_image = models.ImageField(upload_to='Course/VideoCourse/cover_images', verbose_name='عکس کاور')
 
-    introduction_video = models.FileField(upload_to='Course/VideoCourse/introduction_video', verbose_name='فیلم مقدمه')
+    introduction_video = models.FileField(upload_to='Course/VideoCourse/introduction_video',
+                                          validators=[FileExtensionValidator(['mp4', 'mkv'])],
+                                          verbose_name='فیلم مقدمه', help_text="فرمت‌‌های mp4 و mkv")
 
     holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره',
                                       default='NS')
@@ -77,7 +79,7 @@ class VideoCourse(models.Model):
                                                           help_text="یک عدد صحیح بین 1 تا 4")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
-                                                related_name='user_video_courses')
+                                                related_name='user_video_courses', editable=False)
 
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE_CHOICES, default='F', verbose_name='نوع دوره')
 
@@ -198,7 +200,8 @@ class VideoCourseObject(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
-    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="فقط انگلیسی")
+    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی",
+                                          help_text="فقط حروف انگلیسی و ارقام لاتین")
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
@@ -207,17 +210,26 @@ class VideoCourseObject(models.Model):
 
     session = models.PositiveSmallIntegerField(default=1, verbose_name="قسمت")
 
-    can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
-
-    video_file = models.FileField(upload_to="Course/VideoCourse/tutorials", verbose_name="فایل ویدئو")
+    video_file = models.FileField(upload_to="Course/VideoCourse/tutorials",
+                                  validators=[FileExtensionValidator(['mp4', 'mkv'])],
+                                  verbose_name="فایل ویدئو", help_text="فرمت‌‌های mp4 و mkv")
 
     attachment = models.FileField(upload_to="Course/VideoCourse/attachments", verbose_name="فایل ضمیمه", blank=True,
                                   null=True)
+
+    can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
 
     duration = models.PositiveIntegerField(default=0, verbose_name="زمان فیلم")
 
     def __str__(self):
         return f"{self.title}"
+
+    def clean(self, *args, **kwargs):
+        allowed_characters = string.ascii_letters + string.digits + "-_"
+
+        for letter in self.download_file_name:
+            if letter not in allowed_characters:
+                raise ValidationError(message="نام فایل دانلودی فقط می‌‌تواند شامل حروف انگلیسی و ارقام باشد.")
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -236,8 +248,8 @@ class VideoCourseObject(models.Model):
 
     class Meta:
         db_table = 'course__video_course_object'
-        verbose_name = 'جزئیات فیلم'
-        verbose_name_plural = 'جزئیات فیلم'
+        verbose_name = 'قسمت  دوره ویدئویی'
+        verbose_name_plural = 'قسمت‌‌های دوره ویدئویی'
 
 
 class PDFCourse(models.Model):
@@ -267,7 +279,9 @@ class PDFCourse(models.Model):
 
     cover_image = models.ImageField(upload_to='Course/PDFCourse/cover_images', verbose_name='عکس کاور')
 
-    introduction_pdf = models.FileField(upload_to='Course/PDFCourse/introduction_pdf', verbose_name='پی‌دی‌اف مقدمه')
+    introduction_pdf = models.FileField(upload_to='Course/PDFCourse/introduction_pdf',
+                                        validators=[FileExtensionValidator(['pdf'])],
+                                        verbose_name='پی‌دی‌اف مقدمه', help_text="فقط PDF")
 
     holding_status = models.CharField(max_length=2, choices=HOLDING_STATUS_CHOICES, verbose_name='وضعیت دوره',
                                       default='NS')
@@ -279,7 +293,7 @@ class PDFCourse(models.Model):
                                                           help_text="یک عدد صحیح بین 1 تا 4")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
-                                                related_name='user_pdf_courses')
+                                                related_name='user_pdf_courses', editable=False)
 
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE_CHOICES, default='F', verbose_name='نوع دوره')
 
@@ -399,7 +413,8 @@ class PDFCourseObject(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
-    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی", help_text="فقط انگلیسی")
+    download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی",
+                                          help_text="فقط حروف انگلیسی و ارقام لاتین")
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
@@ -408,12 +423,13 @@ class PDFCourseObject(models.Model):
 
     session = models.PositiveSmallIntegerField(default=1, verbose_name="قسمت")
 
-    can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
-
-    pdf_file = models.FileField(upload_to="Course/PDFCourse/tutorials", verbose_name="فایل پی‌دی‌اف")
+    pdf_file = models.FileField(upload_to="Course/PDFCourse/tutorials", validators=[FileExtensionValidator(['pdf'])],
+                                verbose_name="فایل پی‌دی‌اف", help_text="فقط PDF")
 
     attachment = models.FileField(upload_to="Course/PDFCourse/attachments", verbose_name="فایل ضمیمه", blank=True,
                                   null=True)
+
+    can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
 
     pages = models.PositiveIntegerField(default=0, verbose_name="تعداد صفحات پی‌دی‌اف")
 
@@ -421,11 +437,11 @@ class PDFCourseObject(models.Model):
         return f"{self.title}"
 
     def clean(self, *args, **kwargs):
-        allowed_characters = string.ascii_letters + string.digits
+        allowed_characters = string.ascii_letters + string.digits + "-_"
 
         for letter in self.download_file_name:
             if letter not in allowed_characters:
-                raise ValidationError(message="نام فایل دانلودی فقط می‌‌تواند شامل حروف انگلیسی یا ارقام باشد.")
+                raise ValidationError(message="نام فایل دانلودی فقط می‌‌تواند شامل حروف انگلیسی و ارقام باشد.")
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -445,8 +461,8 @@ class PDFCourseObject(models.Model):
 
     class Meta:
         db_table = 'course__pdf_course_object'
-        verbose_name = 'جزئیات پی‌دی‌اف'
-        verbose_name_plural = 'جزئیات پی‌دی‌اف'
+        verbose_name = 'قسمت  دوره پی‌دی‌افی'
+        verbose_name_plural = 'قسمت‌‌های دوره پی‌دی‌افی'
 
 
 class BoughtCourse(models.Model):

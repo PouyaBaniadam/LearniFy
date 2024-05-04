@@ -37,6 +37,9 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
 
     autocomplete_fields = ('video_course', 'season')
 
+    readonly_fields = ('duration',)
+
+    inlines = (VideoCourseObjectDownloadedByInline,)
 
 class BoughtCourseTabularInline(admin.TabularInline):
     model = BoughtCourse
@@ -105,6 +108,8 @@ class PDFCourseObjectAdmin(admin.ModelAdmin):
     list_display = ("title",)
 
     autocomplete_fields = ('pdf_course', 'season')
+
+    readonly_fields = ('pages',)
 
     inlines = (PDFCourseObjectDownloadedByInline,)
 
