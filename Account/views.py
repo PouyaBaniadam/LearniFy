@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.core.files.uploadedfile import UploadedFile
 from django.core import serializers
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.templatetags.static import static
@@ -1058,10 +1058,8 @@ class UserVideoCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
 def search_view(request):
     query = request.GET.get('query', '')
 
-    # Filter users based on the query
-    results = CustomUser.objects.filter(username__icontains=query)
+    results = CustomUser.objects.filter(Q(username__icontains=query) | Q(full_name__icontains=query))
 
-    # Serialize only the 'slug' and 'username' fields
     serialized_results = []
     for user in results:
         serialized_user = {
@@ -1070,4 +1068,9 @@ def search_view(request):
         }
         serialized_results.append(serialized_user)
 
-    return JsonResponse({'results': serialized_results})
+    return JsonResponse(
+        data={
+            'results': serialized_results
+        },
+        status=200
+    )

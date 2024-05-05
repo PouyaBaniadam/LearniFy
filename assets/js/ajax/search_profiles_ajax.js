@@ -11,11 +11,15 @@ $(document).ready(function () {
                     searchResults.empty();
 
                     var resultsContainer = $('<div>').addClass('search-profile-results-container');
-                    response.results.forEach(function (result) {
-                        var profileLink = $('<a>').attr('href', '/account/profile/' + result.slug).text(result.username);
-                        var listItem = $('<div>').addClass('result-item').append(profileLink);
-                        resultsContainer.append(listItem);
-                    });
+                    if (response.results.length > 0) {
+                        response.results.forEach(function (result) {
+                            var profileLink = $('<a>').attr('href', '/account/profile/' + result.slug).text(result.username);
+                            var listItem = $('<div>').addClass('result-item').append(profileLink);
+                            resultsContainer.append(listItem);
+                        });
+                    } else {
+                        resultsContainer.append('<p class="font-bold text-red-500">هیچ نتیجه‌‌ای برای جست‌‌جوی شما یافت نشد!</p>');
+                    }
 
                     searchResults.append(resultsContainer);
                 },
