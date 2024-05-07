@@ -41,3 +41,13 @@ def format_seconds_to_time(total_seconds):
     minutes = (total_seconds % 3600) // 60
     seconds = total_seconds % 60
     return "{:02d}:{:02d}:{:02d}".format(int(hours), int(minutes), int(seconds))
+
+
+@register.filter(name='select_list_index')
+def select_list_index(value1, value2):
+    return value1[value2]
+
+
+@register.filter(name='select_dictionary_item')
+def select_dictionary_item(value1, value2):
+    return value1[value2]

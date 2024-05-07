@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.encoding import uri_to_iri
 from django.views.decorators.csrf import csrf_exempt
@@ -16,9 +17,11 @@ from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification
 from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCourseEpisodesForParticipatedUsersMixin, \
-    ParticipatedUsersVideoCoursesOnlyMixin, RedirectToVideoCourseEpisodesForParticipatedUsersMixin
+    ParticipatedUsersVideoCoursesOnlyMixin, RedirectToVideoCourseEpisodesForParticipatedUsersMixin, \
+    ParticipatedUsersPDFExamsOnlyMixin, OnlyOneExamAtATimeMixin, InTimeExamsOnlyMixin
 from Course.models import VideoCourse, VideoCourseComment, PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, \
-    PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy
+    PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy, PDFExam, PDFExamTempAnswer, \
+    PDFExamDetail, PDFExamTimer
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
 
@@ -32,7 +35,7 @@ class AllVideoCourses(URLStorageMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        favorite_video_courses =  VideoCourse.favorite_video_list(self, user=user)
+        favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
 
         context['favorite_video_courses'] = favorite_video_courses
 
@@ -64,7 +67,7 @@ class VideoCourseDetail(RedirectToVideoCourseEpisodesForParticipatedUsersMixin, 
             does_course_exists_in_cart = CartItem.objects.filter(
                 cart__user=user, video_course=self.object, course_type="VID").exists()
 
-            favorite_video_courses =  VideoCourse.favorite_video_list(self, user=user)
+            favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
 
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
@@ -148,7 +151,7 @@ class VideoCourseFilterView(View):
 
         user = self.request.user
 
-        favorite_video_courses =  VideoCourse.favorite_video_list(self, user=user)
+        favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
 
         context = {
             'video_courses': video_course_filter.qs,
@@ -199,7 +202,6 @@ class VideoCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoCou
         favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
 
         if user.is_authenticated:
-
             is_follow_request_pending = Notification.objects.filter(
                 users=self.object.teacher,
                 visibility="PV",
@@ -294,7 +296,7 @@ class AllPDFCourses(URLStorageMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        favorite_pdf_courses =  PDFCourse.favorite_pdf_list(self, user=user)
+        favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
 
         context['favorite_pdf_courses'] = favorite_pdf_courses
 
@@ -505,35 +507,30 @@ class PDFCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFCourses
 
         user = self.request.user
 
-        is_follow_request_pending = False
-
         favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
 
-        if user.is_authenticated:
-            is_follow_request_pending = Notification.objects.filter(
-                users=self.object.teacher,
-                visibility="PV",
-                following=self.object.teacher,
-                follower=user,
-                mode="S",
-                type="FO",
-            ).exists()
+        is_follow_request_pending = Notification.objects.filter(
+            users=self.object.teacher,
+            visibility="PV",
+            following=self.object.teacher,
+            follower=user,
+            mode="S",
+            type="FO",
+        ).exists()
 
         comments = self.object.pdf_course_comments.all()
 
-        if self.request.user.is_authenticated:
-            user_likes = PDFCourseComment.objects.filter(likes=user).values_list('id', flat=True)
-            is_following = Follow.objects.filter(follower=user, following=self.object.teacher).exists()
+        user_likes = PDFCourseComment.objects.filter(likes=user).values_list('id', flat=True)
+        is_following = Follow.objects.filter(follower=user, following=self.object.teacher).exists()
 
-        else:
-            user_likes = []
-            is_following = False
+        exams = PDFExam.objects.filter(pdf_course_season__course=self.object)
 
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['comments'] = comments
         context['user_likes'] = user_likes
         context['is_following'] = is_following
         context['is_follow_request_pending'] = is_follow_request_pending
+        context['exams'] = exams
 
         return context
 
@@ -591,3 +588,122 @@ class VideoCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersV
                 )
 
             return response
+
+
+class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, OnlyOneExamAtATimeMixin,
+                        InTimeExamsOnlyMixin, URLStorageMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        pdf_exam = PDFExam.objects.get(slug=slug)
+
+        try:
+            pdf_exam_timer = PDFExamTimer.objects.get(user=user, pdf_exam=pdf_exam)
+            date_1 = pdf_exam_timer.started_at
+            date_2 = datetime.now(pytz.timezone('Iran'))
+
+            total_duration = pdf_exam.duration.total_seconds()
+
+            difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+            time_left = int(total_duration - difference)
+
+        except PDFExamTimer.DoesNotExist:
+            ends_at = pdf_exam.duration + timezone.now()
+            pdf_exam_timer = PDFExamTimer.objects.create(user=user, pdf_exam=pdf_exam, ends_at=ends_at)
+
+            date_1 = pdf_exam_timer.started_at
+            date_2 = datetime.now(pytz.timezone('Iran'))
+
+            total_duration = pdf_exam.duration.total_seconds()
+
+            difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+            time_left = int(total_duration - difference)
+
+        questions_and_answers = []
+
+        pdf_exam_details = PDFExamDetail.objects.filter(pdf_exam__slug=slug)
+
+        for pdf_exam_detail in pdf_exam_details:
+            if PDFExamTempAnswer.objects.filter(
+                    user=user,
+                    question=pdf_exam_detail.question).exists():
+
+                pdf_exam_temp_answer = PDFExamTempAnswer.objects.get(user=user,
+                                                                     question=pdf_exam_detail.question
+                                                                     )
+
+                questions_and_answers.append(
+                    {
+                        "id": pdf_exam_detail.id,
+                        "slug": pdf_exam_detail.pdf_exam.slug,
+                        "question": pdf_exam_detail.question,
+                        "answer_1": pdf_exam_detail.answer_1,
+                        "answer_2": pdf_exam_detail.answer_2,
+                        "answer_3": pdf_exam_detail.answer_3,
+                        "answer_4": pdf_exam_detail.answer_4,
+                        "selected_answer": pdf_exam_temp_answer.selected_answer
+                    }
+                )
+
+            else:
+                questions_and_answers.append(
+                    {
+                        "id": pdf_exam_detail.id,
+                        "slug": pdf_exam_detail.pdf_exam.slug,
+                        "question": pdf_exam_detail.question,
+                        "answer_1": pdf_exam_detail.answer_1,
+                        "answer_2": pdf_exam_detail.answer_2,
+                        "answer_3": pdf_exam_detail.answer_3,
+                        "answer_4": pdf_exam_detail.answer_4,
+                        "selected_answer": None
+                    }
+                )
+
+        context = {
+            "pdf_exam_details": pdf_exam_details,
+            "questions_and_answers": questions_and_answers,
+            "time_left": time_left,
+        }
+
+        return render(request=request, template_name="Course/exam_detail.html", context=context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SubmitPDFExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        question = request.POST.get("question")
+        selected_answer = request.POST.get("selected_answer")
+
+        pdf_exam_detail = PDFExamDetail.objects.filter(pdf_exam__slug=slug).last()
+
+        try:
+            pdf_exam_temp_answer = PDFExamTempAnswer.objects.get(user=user, question=question)
+            pdf_exam_temp_answer.selected_answer = selected_answer
+            pdf_exam_temp_answer.question = question
+            pdf_exam_temp_answer.save()
+
+        except PDFExamTempAnswer.DoesNotExist:
+            PDFExamTempAnswer.objects.create(
+                user=user,
+                pdf_exam_detail=pdf_exam_detail,
+                question=question,
+                selected_answer=selected_answer
+            )
+
+        return JsonResponse(
+            data={
+                "message": "saved!"
+            },
+            status=200
+        )
+
+
+class ExamResultView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user

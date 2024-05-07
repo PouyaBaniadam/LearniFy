@@ -6,7 +6,7 @@ function confirmToggleFollow(following_id) {
         showCancelButton: true,
         cancelButtonColor: '#d33',
         confirmButtonText: 'بله',
-        cancelButtonText: 'نه'
+        cancelButtonText: 'خیر'
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({

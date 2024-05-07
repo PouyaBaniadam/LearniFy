@@ -8,7 +8,7 @@ function submit_deletion(id, app) {
         showCancelButton: true,
         cancelButtonColor: '#d33',
         confirmButtonText: 'بله',
-        cancelButtonText: 'نه'
+        cancelButtonText: 'خیر'
     }).then((result) => {
         if (result.isConfirmed) {
             window.location.href = deleteUrl;

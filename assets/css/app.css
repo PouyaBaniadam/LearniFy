@@ -958,6 +958,10 @@ body, html {
     margin-top: 2rem
 }
 
+.mr-8 {
+    margin-right: 2rem
+}
+
 .line-clamp-1 {
     overflow: hidden;
     display: -webkit-box;

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% load static %}
+
+{% block content %}
+    {% include 'includes/header.html' %}
+
+    <div class="flex flex-col min-h-screen bg-background">
+
+        {% for questions_and_answer in questions_and_answers %}
+
+            <div class="mr-8">
+
+                <p class="mb-3 mt-3">{{ questions_and_answer.question_number }}) {{ questions_and_answer.question }}</p>
+
+                {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_1 %}
+                    <label>
+                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_1 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_1 }}
+                    </label>
+                {% else %}
+                    <label>
+                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_1 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_1 }}
+                    </label>
+                {% endif %}
+
+
+                <br>
+
+                {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_2 %}
+                    <label>
+                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_2 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_2 }}
+                    </label>
+                {% else %}
+                    <label>
+                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_2 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_2 }}
+                    </label>                {% endif %}
+
+                <br>
+
+                {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_3 %}
+                    <label>
+                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_3 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_3 }}
+                    </label>
+                {% else %}
+                    <label>
+                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_3 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_3 }}
+                    </label>
+                {% endif %}
+
+                <br>
+
+                {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_4 %}
+                    <label>
+                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_4 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_4 }}
+                    </label>
+                {% else %}
+                    <label>
+                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                               value="{{ questions_and_answer.answer_4 }}"
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}')">
+                        {{ questions_and_answer.answer_4 }}
+                    </label>
+                {% endif %}
+
+                <br>
+                <hr>
+
+            </div>
+        {% endfor %}
+
+        <script>
+            function sendData(question, selectedAnswer, slug) {
+                $.ajax({
+                    url: `/course/pdf/exam/${slug}/submit/temp/`,
+                    method: 'POST',
+                    data: {
+                        'question': question,
+                        'selected_answer': selectedAnswer
+                    },
+                    success: function (response) {
+                        console.log("Success");
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error response if needed
+                    }
+                });
+            }
+        </script>
+
+
+        {#        {% for pdf_exam_temp_answer in pdf_exam_temp_answers %}#}
+        {#            {{ pdf_exam_temp_answer.selected_answer }}#}
+        {#        {% endfor %}#}
+
+        {% include 'includes/footer.html' %}
+    </div>
+
+{% endblock %}

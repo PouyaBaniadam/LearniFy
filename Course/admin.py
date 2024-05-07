@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, PDFCourseObject, PDFCourse, \
     PDFCourseSeason, BoughtCourse, \
-    PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy
+    PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy, PDFExam, PDFExamDetail, VideoExamDetail, VideoExam, \
+    PDFExamTempAnswer, PDFExamTimer
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -40,6 +41,7 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
     readonly_fields = ('duration',)
 
     inlines = (VideoCourseObjectDownloadedByInline,)
+
 
 class BoughtCourseTabularInline(admin.TabularInline):
     model = BoughtCourse
@@ -139,3 +141,37 @@ class PDFCourseSeasonAdmin(admin.ModelAdmin):
     autocomplete_fields = ('course',)
 
     search_fields = ('course__name',)
+
+
+class PDFExamDetailInline(admin.StackedInline):
+    model = PDFExamDetail
+    extra = 1
+
+
+@admin.register(PDFExam)
+class PDFExamAdmin(admin.ModelAdmin):
+    autocomplete_fields = ("pdf_course_season",)
+    inlines = (PDFExamDetailInline,)
+    prepopulated_fields = {'slug': ('name',)}
+
+
+class VideoExamDetailInline(admin.StackedInline):
+    model = VideoExamDetail
+    extra = 1
+
+
+@admin.register(VideoExam)
+class VideoExamAdmin(admin.ModelAdmin):
+    autocomplete_fields = ("video_course_season",)
+    inlines = (VideoExamDetailInline,)
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(PDFExamTempAnswer)
+class PDFExamTempAnswerAdmin(admin.ModelAdmin):
+    list_display = ("user",)
+
+
+@admin.register(PDFExamTimer)
+class PDFExamTimerAdmin(admin.ModelAdmin):
+    list_display = ("user", "pdf_exam")
