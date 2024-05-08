@@ -129,7 +129,7 @@ class RedirectToVideoCourseEpisodesForParticipatedUsersMixin(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class OnlyOneExamAtATimeMixin(View):
+class OnlyOnePDFExamAtATimeMixin(View):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get("slug")
@@ -150,7 +150,7 @@ class OnlyOneExamAtATimeMixin(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class InTimeExamsOnlyMixin(View):
+class InTimePDFExamsOnlyMixin(View):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get("slug")
@@ -179,5 +179,30 @@ class InTimeExamsOnlyMixin(View):
 
         except PDFExamTimer.DoesNotExist:
             pass
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class NoTimingPenaltyAllowedForPDFExamMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+        pdf_exam = PDFExam.objects.get(slug=slug)
+
+        pdf_exam_timer = PDFExamTimer.objects.get(user=user, pdf_exam=pdf_exam)
+        ends_at = pdf_exam_timer.ends_at
+        time_left = ends_at - timezone.now()
+
+        if time_left.total_seconds() < -60:
+            messages.error(request=request,
+                           message=f"""
+این آزمون مورد قبول نیست!
+زمان این آژمون بیش از 1 دقیقه پیش به اتمام رسیده و احتمالا خطایی توسط شما رخ داده!
+"""
+                           )
+
+            course = pdf_exam.pdf_course_season.course
+
+            return redirect(reverse("course:pdf_course_episodes", kwargs={"slug": course.slug}))
 
         return super().dispatch(request, *args, **kwargs)

@@ -540,25 +540,6 @@ class PDFExamDetail(models.Model):
         verbose_name_plural = 'جواب‌‌های آزمون پی‌‌دی‌‌افی'
 
 
-class PDFExamFinalAnswer(models.Model):
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
-
-    pdf_exam_detail = models.ForeignKey(to=PDFExamDetail, on_delete=models.CASCADE, verbose_name="آزمون پی‌‌دی‌‌افی",
-                                        related_name="final_answers")
-
-    question = models.CharField(max_length=200, verbose_name="صورت سوال")
-
-    selected_answer = models.CharField(max_length=200, verbose_name="گزینه انتخاب شده")
-
-    def __str__(self):
-        return f"{self.user} - {self.pdf_exam_detail.pdf_exam.name}"
-
-    class Meta:
-        db_table = 'course__pdf_final_answer'
-        verbose_name = "پاسخ نهایی آزمون"
-        verbose_name_plural = "پاسخ‌‌های نهایی آزمون"
-
-
 class PDFExamTempAnswer(models.Model):
     user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
 
@@ -576,60 +557,6 @@ class PDFExamTempAnswer(models.Model):
         db_table = 'course__pdf_temp_answer'
         verbose_name = "پاسخ موقت آزمون پی‌‌دی‌‌افی"
         verbose_name_plural = "پاسخ‌‌های موقت آزمون پی‌‌دی‌‌افی"
-
-
-class VideoExam(models.Model):
-    video_course_season = models.OneToOneField(to=VideoCourseSeason, on_delete=models.CASCADE, unique=True,
-                                               verbose_name="فصل آزمون ویدئویی")
-
-    name = models.CharField(max_length=75, verbose_name="نام آزمون")
-
-    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
-
-    duration = models.DurationField(verbose_name="مدت زمان آزمون", default=900,
-                                    help_text="به ثانیه (پیش‌‌فرض: 15 دقیقه)")
-
-    def __str__(self):
-        return f"{self.video_course_season.name}"
-
-    class Meta:
-        db_table = 'course__video_exam'
-        verbose_name = 'آزمون ویدئویی'
-        verbose_name_plural = 'آزمون‌‌های ویدئویی'
-
-
-class VideoExamDetail(models.Model):
-    ANSWER_CHOICES = (
-        ("1", "1"),
-        ("2", "2"),
-        ("3", "3"),
-        ("4", "4"),
-    )
-
-    video_exam = models.ForeignKey(to=VideoExam, on_delete=models.CASCADE, blank=True, null=True,
-                                   verbose_name="آزمون ویدئویی")
-
-    question_number = models.PositiveSmallIntegerField(default=1, verbose_name="شماره سوال")
-
-    question = models.CharField(max_length=200, verbose_name="صورت سوال")
-
-    answer_1 = models.CharField(max_length=200, verbose_name="گزینه 1")
-
-    answer_2 = models.CharField(max_length=200, verbose_name="گزینه 2")
-
-    answer_3 = models.CharField(max_length=200, verbose_name="گزینه 3")
-
-    answer_4 = models.CharField(max_length=200, verbose_name="گزینه 4")
-
-    correct_answer = models.CharField(max_length=1, choices=ANSWER_CHOICES, default=1, verbose_name="گزینه صحیح")
-
-    def __str__(self):
-        return f"{self.question}"
-
-    class Meta:
-        db_table = 'course__video_exam_detail'
-        verbose_name = 'جواب آزمون ویدئویی'
-        verbose_name_plural = 'جواب‌‌های آزمون ویدئویی'
 
 
 class PDFExamTimer(models.Model):

@@ -19,7 +19,8 @@ from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCourseEpisodesForParticipatedUsersMixin, \
     ParticipatedUsersVideoCoursesOnlyMixin, RedirectToVideoCourseEpisodesForParticipatedUsersMixin, \
-    ParticipatedUsersPDFExamsOnlyMixin, OnlyOneExamAtATimeMixin, InTimeExamsOnlyMixin
+    ParticipatedUsersPDFExamsOnlyMixin, OnlyOnePDFExamAtATimeMixin, InTimePDFExamsOnlyMixin, \
+    NoTimingPenaltyAllowedForPDFExamMixin
 from Course.models import VideoCourse, VideoCourseComment, PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, \
     PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy, PDFExam, PDFExamTempAnswer, \
     PDFExamDetail, PDFExamTimer, PDFExamResult
@@ -591,8 +592,8 @@ class VideoCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersV
             return response
 
 
-class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, OnlyOneExamAtATimeMixin,
-                        InTimeExamsOnlyMixin, URLStorageMixin, View):
+class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, OnlyOnePDFExamAtATimeMixin,
+                        InTimePDFExamsOnlyMixin, URLStorageMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get("slug")
@@ -694,7 +695,8 @@ class SubmitPDFExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFE
         )
 
 
-class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, View):
+class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin,
+                               NoTimingPenaltyAllowedForPDFExamMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get("slug")
@@ -761,15 +763,15 @@ class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDF
 
         if pdf_exam_result.result_status == "E" or pdf_exam_result.result_status == "G":
             messages.success(request=request,
-                             message=f"شما در آزمون {pdf_exam.name}، {int(percentage)}% را با موفقیت کسب کردید!")
+                             message=f"شما در آزمون {pdf_exam.name}، مقدار {int(percentage)}% را کسب کردید!")
 
         if pdf_exam_result.result_status == "N":
             messages.warning(request=request,
-                             message=f"شما در آزمون {pdf_exam.name}، {int(percentage)}% را کسب کردید!")
+                             message=f"شما در آزمون {pdf_exam.name}، مقدار {int(percentage)}% را کسب کردید!")
 
         if pdf_exam_result.result_status == "B":
             messages.error(request=request,
-                           message=f"متاسفانه شما در آزمون {pdf_exam.name}، {int(percentage)}% را کسب کردید! به امید موفقیت در آزمون بعدی.")
+                           message=f"شما در آزمون {pdf_exam.name}، مقدار {int(percentage)}% را کسب کردید!")
 
         course = pdf_exam.pdf_course_season.course
 

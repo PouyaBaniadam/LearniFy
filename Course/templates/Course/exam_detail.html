@@ -105,10 +105,10 @@
 
     </div>
 
-    <script>startCountdown('{{ time_left }}', '{{ slug }}');</script>
     <script src="{% static 'js/ajax/submit_temp_answers.js' %}"></script>
-    <script src="{% static 'js/exam_countdown.js' %}"></script>
     <script src="{% static 'js/ending_exam_confirmation.js' %}"></script>
+    <script src="{% static 'js/exam_countdown.js' %}"></script>
+    <script>startCountdown('{{ time_left }}', '{{ slug }}');</script>
 
 
 {% endblock %}

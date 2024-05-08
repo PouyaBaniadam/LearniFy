@@ -13,7 +13,7 @@ function startCountdown(durationInSeconds, slug) {
 
         if (remainingTime <= 0) {
             clearInterval(intervalId);
-            window.location.href = `/course/pdf/exam/${slug}/submit/final/`;
+            window.location.href = `/course/pdf/exam/${slug}/submit/final`;
         }
     }, 1000);
 }
