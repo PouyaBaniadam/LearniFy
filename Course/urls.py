@@ -31,5 +31,6 @@ urlpatterns = [
     path('pdf/exam/<slug>', views.PDFExamDetailView.as_view(), name='pdf_exam_detail'),
     path('pdf/exam/<slug>/submit/temp/', views.SubmitPDFExamTempAnswer.as_view(),
          name='submit_pdf_exam_temp_answer'),
-    # path('video/exam/<slug:slug>/enter', views.EnterVideoExam.as_view(), name='enter_video_exam'),
+    path('pdf/exam/<slug>/submit/final', views.SubmitPDFExamFinalAnswer.as_view(),
+         name="submit_pdf_exam_final_answer")
 ]

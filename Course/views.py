@@ -14,6 +14,7 @@ from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import FavoriteVideoCourse, Follow, CustomUser, Notification, FavoritePDFCourse
+from Course.evaluations import exam_evaluations
 from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCourseEpisodesForParticipatedUsersMixin, \
@@ -21,7 +22,7 @@ from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCou
     ParticipatedUsersPDFExamsOnlyMixin, OnlyOneExamAtATimeMixin, InTimeExamsOnlyMixin
 from Course.models import VideoCourse, VideoCourseComment, PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, \
     PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy, PDFExam, PDFExamTempAnswer, \
-    PDFExamDetail, PDFExamTimer
+    PDFExamDetail, PDFExamTimer, PDFExamResult
 from Home.mixins import URLStorageMixin
 from utils.useful_functions import get_time_difference
 
@@ -600,27 +601,15 @@ class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOn
 
         try:
             pdf_exam_timer = PDFExamTimer.objects.get(user=user, pdf_exam=pdf_exam)
-            date_1 = pdf_exam_timer.started_at
-            date_2 = datetime.now(pytz.timezone('Iran'))
-
-            total_duration = pdf_exam.duration.total_seconds()
-
-            difference = get_time_difference(date_1=date_1, date_2=date_2)
-
-            time_left = int(total_duration - difference)
+            ends_at = pdf_exam_timer.ends_at
+            time_left = ends_at - timezone.now()
 
         except PDFExamTimer.DoesNotExist:
             ends_at = pdf_exam.duration + timezone.now()
             pdf_exam_timer = PDFExamTimer.objects.create(user=user, pdf_exam=pdf_exam, ends_at=ends_at)
 
-            date_1 = pdf_exam_timer.started_at
-            date_2 = datetime.now(pytz.timezone('Iran'))
-
-            total_duration = pdf_exam.duration.total_seconds()
-
-            difference = get_time_difference(date_1=date_1, date_2=date_2)
-
-            time_left = int(total_duration - difference)
+            ends_at = pdf_exam_timer.ends_at
+            time_left = ends_at - timezone.now()
 
         questions_and_answers = []
 
@@ -665,7 +654,8 @@ class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOn
         context = {
             "pdf_exam_details": pdf_exam_details,
             "questions_and_answers": questions_and_answers,
-            "time_left": time_left,
+            "time_left": int(time_left.total_seconds()),
+            "slug": slug
         }
 
         return render(request=request, template_name="Course/exam_detail.html", context=context)
@@ -702,6 +692,88 @@ class SubmitPDFExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFE
             },
             status=200
         )
+
+
+class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        questions_and_answers = []
+
+        pdf_exam_details = PDFExamDetail.objects.filter(pdf_exam__slug=slug)
+        pdf_exam = PDFExam.objects.get(slug=slug)
+        coefficient_number = pdf_exam.pdf_course_season.course.coefficient_number
+
+        for pdf_exam_detail in pdf_exam_details:
+            if PDFExamTempAnswer.objects.filter(
+                    user=user,
+                    question=pdf_exam_detail.question).exists():
+
+                pdf_exam_temp_answer = PDFExamTempAnswer.objects.get(user=user,
+                                                                     question=pdf_exam_detail.question
+                                                                     )
+
+                questions_and_answers.append(
+                    {
+                        "correct_answer": pdf_exam_detail.correct_answer,
+                        "selected_answer": pdf_exam_temp_answer.selected_answer
+                    }
+                )
+
+            else:
+                questions_and_answers.append(
+                    {
+                        "correct_answer": pdf_exam_detail.correct_answer,
+                        "selected_answer": None
+                    }
+                )
+        exam_result = []
+
+        for item in questions_and_answers:
+            if item["selected_answer"] is None:
+                exam_result.append(None)
+
+            elif item["correct_answer"] == item["selected_answer"]:
+                exam_result.append(True)
+
+            else:
+                exam_result.append(False)
+
+        percentage, true_answers_count, false_answers_count, none_answers_count = exam_evaluations(
+            answers=exam_result,
+            coefficient_number=coefficient_number
+        )
+
+        pdf_exam_result = PDFExamResult.objects.create(
+            user=user,
+            pdf_exam=pdf_exam,
+            percentage=percentage,
+            true_answers_count=true_answers_count,
+            false_answers_count=false_answers_count,
+            none_answers_count=none_answers_count,
+        )
+
+        temp_answers = PDFExamTempAnswer.objects.filter(user=user)
+
+        for temp_answer in temp_answers:
+            temp_answer.delete()
+
+        if pdf_exam_result.result_status == "E" or pdf_exam_result.result_status == "G":
+            messages.success(request=request,
+                             message=f"شما در آزمون {pdf_exam.name}، {int(percentage)}% را با موفقیت کسب کردید!")
+
+        if pdf_exam_result.result_status == "N":
+            messages.warning(request=request,
+                             message=f"شما در آزمون {pdf_exam.name}، {int(percentage)}% را کسب کردید!")
+
+        if pdf_exam_result.result_status == "B":
+            messages.error(request=request,
+                           message=f"متاسفانه شما در آزمون {pdf_exam.name}، {int(percentage)}% را کسب کردید! به امید موفقیت در آزمون بعدی.")
+
+        course = pdf_exam.pdf_course_season.course
+
+        return redirect(reverse("course:pdf_course_episodes", kwargs={'slug': course.slug}))
 
 
 class ExamResultView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, View):

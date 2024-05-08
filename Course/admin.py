@@ -3,7 +3,7 @@ from django.contrib import admin
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, PDFCourseObject, PDFCourse, \
     PDFCourseSeason, BoughtCourse, \
     PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy, PDFExam, PDFExamDetail, VideoExamDetail, VideoExam, \
-    PDFExamTempAnswer, PDFExamTimer
+    PDFExamTempAnswer, PDFExamTimer, PDFExamResult
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -175,3 +175,8 @@ class PDFExamTempAnswerAdmin(admin.ModelAdmin):
 @admin.register(PDFExamTimer)
 class PDFExamTimerAdmin(admin.ModelAdmin):
     list_display = ("user", "pdf_exam")
+
+
+@admin.register(PDFExamResult)
+class PDFExamResultAdmin(admin.ModelAdmin):
+    list_display = ("user", "pdf_exam", "percentage")

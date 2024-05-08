@@ -76,7 +76,7 @@ class VideoCourse(models.Model):
 
     coefficient_number = models.PositiveSmallIntegerField(default=1, verbose_name="ضریب",
                                                           validators=[MinValueValidator(1), MaxValueValidator(4)],
-                                                          help_text="یک عدد صحیح بین 1 تا 4")
+                                                          help_text="یک عدد صحیح بین 1 تا 4 (با توجه به میزان سختی)")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
                                                 related_name='user_video_courses', editable=False)
@@ -529,7 +529,7 @@ class PDFExamDetail(models.Model):
 
     answer_4 = models.CharField(max_length=200, verbose_name="گزینه 4")
 
-    correct_answer = models.CharField(max_length=1, choices=ANSWER_CHOICES, default=1, verbose_name="گزینه صحیح")
+    correct_answer = models.CharField(max_length=200, verbose_name="گزینه صحیح", help_text="متن یکی از فیلد‌‌های بالا")
 
     def __str__(self):
         return f"{self.question}"
@@ -649,3 +649,52 @@ class PDFExamTimer(models.Model):
         db_table = 'course__pdf_exam_timer'
         verbose_name = 'زمان بندی آزمون پی‌‌دی‌‌افی'
         verbose_name_plural = 'زمان بندی‌‌های آزمون پی‌‌دی‌‌افی'
+
+
+class PDFExamResult(models.Model):
+    RESULT_STATUS = (
+        ("E", "عالی"),  # Excellent
+        ("G", "عالی"),  # Good
+        ("N", "معمولی"),  # Normal
+        ("B", "بد"),  # Bad
+    )
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    pdf_exam = models.ForeignKey(to=PDFExam, on_delete=models.CASCADE, verbose_name="آزمون پی‌‌دی‌‌افی")
+
+    percentage = models.FloatField(verbose_name="درصد")
+
+    true_answers_count = models.SmallIntegerField(default=0, verbose_name="تعداد پاسخ‌‌های صحیح")
+
+    false_answers_count = models.SmallIntegerField(default=0, verbose_name="تعداد پاسخ‌‌های غلط")
+
+    none_answers_count = models.SmallIntegerField(default=0, verbose_name="تعداد پاسخ‌‌های جواب")
+
+    result_status = models.CharField(max_length=1, choices=RESULT_STATUS, verbose_name="وضعیت نتیجه")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user} - {self.pdf_exam.name}"
+
+    def save(self, *args, **kwargs):
+        print(self.percentage)
+        if self.percentage == 100.0:
+            self.result_status = "E"
+
+        if 80.0 < self.percentage < 100.0:
+            self.result_status = "G"
+
+        if 60.0 < self.percentage < 80.0:
+            self.result_status = "N"
+
+        if self.percentage < 60.0:
+            self.result_status = "B"
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'course__pdf_exam_result'
+        verbose_name = 'نتیجه آزمون پی‌‌دی‌‌افی'
+        verbose_name_plural = 'نتایج آزمون پی‌‌دی‌‌افی'

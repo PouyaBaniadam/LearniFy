@@ -170,38 +170,31 @@
                                                                                 </path>
                                                                                 </svg>
                                                                         </span>
-                                                    <button id="pdf_exam_link"
-                                                            data-url="{% url 'course:pdf_exam_detail' exam.slug %}"
-                                                            class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
-                                                        <span class="text-xs">ورود به آزمون</span>
+
+                                                    <button class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
+                                                        <span class="text-xs">نتایج</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                              viewBox="0 0 24 24" stroke-width="1.5"
                                                              stroke="currentColor" class="w-4 h-4">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path>
+                                                                  d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z">
+                                                            </path>
                                                         </svg>
                                                     </button>
 
-                                                    <script>
-                                                        document.addEventListener('DOMContentLoaded', function () {
-                                                            document.getElementById('pdf_exam_link').addEventListener('click', function (e) {
-                                                                e.preventDefault();
-                                                                Swal.fire({
-                                                                    title: 'ورود به آزمون',
-                                                                    text: "آیا از ورود به آزمون اطمینان دارید؟ بعد از ورود، امکان ورود تا 24 ساعت آینده وجود نخواهد داشت.",
-                                                                    icon: 'warning',
-                                                                    showCancelButton: true,
-                                                                    cancelButtonColor: '#d33',
-                                                                    confirmButtonText: 'بله',
-                                                                    cancelButtonText: 'خیر'
-                                                                }).then((result) => {
-                                                                    if (result.isConfirmed) {
-                                                                        window.location.href = this.getAttribute('data-url');
-                                                                    }
-                                                                });
-                                                            });
-                                                        });
-                                                    </script>
+                                                    <button id="pdf_exam_link"
+                                                            data-url="{% url 'course:pdf_exam_detail' exam.slug %}"
+                                                            class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
+                                                        <span class="text-xs">شروع</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                             viewBox="0 0 24 24" stroke-width="1.5"
+                                                             stroke="currentColor" class="w-4 h-4">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+
                                                 </div>
                                             </div>
                                             <!-- end episode -->
@@ -632,6 +625,7 @@
     </div>
 
     <script src="{% static 'js/ajax/download_course_object.js' %}"></script>
+    <script src="{% static 'js/enter_exam_confirmation.js' %}"></script>
     <script>
         document.getElementById('openAdminPanel').addEventListener('click', function () {
             window.open('http://{{ request.get_host }}/admin/Course/pdfcourseobject/add/');
