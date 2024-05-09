@@ -7,7 +7,12 @@ function sendData(question, selectedAnswer, slug, appName) {
             'selected_answer': selectedAnswer
         },
         success: function (response) {
-            console.log("Success");
+            let question_id;
+            if (response.message === "removed") {
+                let question_id = response.id;
+                input = document.getElementById(question_id);
+                input.checked = false;
+            }
         },
         error: function (xhr, status, error) {
             console.log("Error");

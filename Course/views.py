@@ -678,25 +678,47 @@ class SubmitPDFExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFE
 
         try:
             pdf_exam_temp_answer = PDFExamTempAnswer.objects.get(user=user, question=question)
-            pdf_exam_temp_answer.selected_answer = selected_answer
-            pdf_exam_temp_answer.question = question
-            pdf_exam_temp_answer.save()
+
+            if pdf_exam_temp_answer.selected_answer != selected_answer:
+                pdf_exam_temp_answer.selected_answer = selected_answer
+                pdf_exam_temp_answer.question = question
+                pdf_exam_temp_answer.save()
+
+                return JsonResponse(
+                    data={
+                        "message": "changed",
+                        "id": pdf_exam_temp_answer.pdf_exam_detail.id
+                    },
+                    status=200
+                )
+
+            else:
+                id = pdf_exam_temp_answer.pdf_exam_detail.id
+                pdf_exam_temp_answer.delete()
+
+                return JsonResponse(
+                    data={
+                        "message": "removed",
+                        "id": id
+                    },
+                    status=200
+                )
 
         except PDFExamTempAnswer.DoesNotExist:
-            PDFExamTempAnswer.objects.create(
+            temp_answer = PDFExamTempAnswer.objects.create(
                 user=user,
                 pdf_exam_detail=pdf_exam_detail,
                 question=question,
                 selected_answer=selected_answer
             )
 
-        return JsonResponse(
-            data={
-                "message": "saved!"
-            },
-            status=200
-        )
-
+            return JsonResponse(
+                data={
+                    "message": "added",
+                    "id": temp_answer.pdf_exam_detail.id
+                },
+                status=200
+            )
 
 class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin,
                                NoTimingPenaltyAllowedForPDFExamMixin, View):
@@ -894,9 +916,28 @@ class SubmitVideoExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersVi
 
         try:
             video_exam_temp_answer = VideoExamTempAnswer.objects.get(user=user, question=question)
-            video_exam_temp_answer.selected_answer = selected_answer
-            video_exam_temp_answer.question = question
-            video_exam_temp_answer.save()
+
+            if video_exam_temp_answer.selected_answer != selected_answer:
+                video_exam_temp_answer.selected_answer = selected_answer
+                video_exam_temp_answer.question = question
+                video_exam_temp_answer.save()
+
+                return JsonResponse(
+                    data={
+                        "message": "changed"
+                    },
+                    status=200
+                )
+
+            else:
+                video_exam_temp_answer.delete()
+
+                return JsonResponse(
+                    data={
+                        "message": "removed"
+                    },
+                    status=200
+                )
 
         except VideoExamTempAnswer.DoesNotExist:
             VideoExamTempAnswer.objects.create(
@@ -906,12 +947,12 @@ class SubmitVideoExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersVi
                 selected_answer=selected_answer
             )
 
-        return JsonResponse(
-            data={
-                "message": "saved!"
-            },
-            status=200
-        )
+            return JsonResponse(
+                data={
+                    "message": "added"
+                },
+                status=200
+            )
 
 
 class SubmitVideoExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoExamsOnlyMixin,

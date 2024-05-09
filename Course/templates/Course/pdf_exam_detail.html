@@ -3,65 +3,70 @@
 {% load static %}
 
 {% block content %}
-    <div class="flex justify-center align-center mt-5 font-bold fixed top-0 w-full">
+    <div class="flex justify-center align-center mt-3 font-bold fixed top-0 w-full">
         <p>زمان باقی مانده: </p>
         <p id="countdown">{{ time_left|format_seconds_to_time }}</p>
     </div>
 
-    <div class="flex flex-col min-h-screen bg-background">
+    <div class="flex mt-8 flex-col min-h-screen bg-background">
 
         {% for questions_and_answer in questions_and_answers %}
-
             <div class="mr-8">
 
                 <p class="mb-3 mt-3">{{ forloop.counter }}) {{ questions_and_answer.question }}</p>
 
                 {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_1 %}
                     <label>
-                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" checked type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_1 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_1 }}
                     </label>
                 {% else %}
                     <label>
-                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_1 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_1 }}
                     </label>
                 {% endif %}
 
-
                 <br>
 
                 {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_2 %}
                     <label>
-                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" checked type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_2 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_2 }}
                     </label>
                 {% else %}
                     <label>
-                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_2 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_2 }}
-                    </label>                {% endif %}
+                    </label>
+                {% endif %}
 
                 <br>
 
                 {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_3 %}
                     <label>
-                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" checked type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_3 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_3 }}
                     </label>
                 {% else %}
                     <label>
-                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_3 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_3 }}
@@ -72,14 +77,16 @@
 
                 {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_4 %}
                     <label>
-                        <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" checked type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_4 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_4 }}
                     </label>
                 {% else %}
                     <label>
-                        <input type="radio" name="answer_{{ questions_and_answer.id }}"
+                        <input id="{{ questions_and_answer.id }}" type="radio"
+                               name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_4 }}"
                                onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}', 'pdf')">
                         {{ questions_and_answer.answer_4 }}

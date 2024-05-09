@@ -509,13 +509,6 @@ class PDFExam(models.Model):
 
 
 class PDFExamDetail(models.Model):
-    ANSWER_CHOICES = (
-        ("1", "1"),
-        ("2", "2"),
-        ("3", "3"),
-        ("4", "4"),
-    )
-
     pdf_exam = models.ForeignKey(to=PDFExam, on_delete=models.CASCADE, blank=True, null=True,
                                  verbose_name="آزمون پی‌‌دی‌‌افی")
 
@@ -529,7 +522,7 @@ class PDFExamDetail(models.Model):
 
     answer_4 = models.CharField(max_length=200, verbose_name="گزینه 4")
 
-    correct_answer = models.CharField(max_length=200, verbose_name="گزینه صحیح", help_text="متن یکی از فیلد‌‌های بالا")
+    correct_answer = models.CharField(max_length=200, verbose_name="گزینه صحیح", help_text="دقیقا متن یکی از فیلد‌‌های بالا")
 
     def __str__(self):
         return f"{self.question}"
@@ -606,7 +599,6 @@ class PDFExamResult(models.Model):
         return f"{self.user} - {self.pdf_exam.name}"
 
     def save(self, *args, **kwargs):
-        print(self.percentage)
         if self.percentage == 100.0:
             self.result_status = "E"
 
@@ -648,13 +640,6 @@ class VideoExam(models.Model):
 
 
 class VideoExamDetail(models.Model):
-    ANSWER_CHOICES = (
-        ("1", "1"),
-        ("2", "2"),
-        ("3", "3"),
-        ("4", "4"),
-    )
-
     video_exam = models.ForeignKey(to=VideoExam, on_delete=models.CASCADE, blank=True, null=True,
                                  verbose_name="آزمون ویدئویی")
 
@@ -745,7 +730,6 @@ class VideoExamResult(models.Model):
         return f"{self.user} - {self.video_exam.name}"
 
     def save(self, *args, **kwargs):
-        print(self.percentage)
         if self.percentage == 100.0:
             self.result_status = "E"
 

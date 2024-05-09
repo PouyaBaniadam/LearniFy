@@ -2,8 +2,7 @@ from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, PDFCourseObject, PDFCourse, \
     PDFCourseSeason, BoughtCourse, PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy, PDFExam, PDFExamDetail, \
-    PDFExamTempAnswer, PDFExamTimer, PDFExamResult, VideoExamTempAnswer, VideoExamTimer, VideoExam, VideoExamResult, \
-    VideoExamDetail
+    PDFExamTimer, PDFExamResult, VideoExamTimer, VideoExam, VideoExamResult, VideoExamDetail
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -155,11 +154,6 @@ class PDFExamAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 
-@admin.register(PDFExamTempAnswer)
-class PDFExamTempAnswerAdmin(admin.ModelAdmin):
-    list_display = ("user",)
-
-
 @admin.register(PDFExamTimer)
 class PDFExamTimerAdmin(admin.ModelAdmin):
     list_display = ("user", "pdf_exam")
@@ -180,11 +174,6 @@ class VideoExamAdmin(admin.ModelAdmin):
     autocomplete_fields = ("video_course_season",)
     inlines = (VideoExamDetailInline,)
     prepopulated_fields = {'slug': ('name',)}
-
-
-@admin.register(VideoExamTempAnswer)
-class VideoExamTempAnswerAdmin(admin.ModelAdmin):
-    list_display = ("user",)
 
 
 @admin.register(VideoExamTimer)

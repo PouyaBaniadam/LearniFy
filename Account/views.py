@@ -111,8 +111,6 @@ class DeleteAccountView(AuthenticatedUsersOnlyMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
 
-        print(user)
-
         sms_code = random.randint(a=1000, b=9999)
         uuid = str(uuid4())
 
