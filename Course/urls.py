@@ -29,6 +29,7 @@ urlpatterns = [
     path('pdf/comment/delete/<id>', views.DeletePDFCourseComment.as_view(), name='delete_pdf_course_comment'),
     path('pdf/like_comment/', views.LikePDFCourseComment.as_view(), name='like_pdf_course_comment'),
     path('pdf/exam/<slug>', views.PDFExamDetailView.as_view(), name='pdf_exam_detail'),
+    path('pdf/exam/<slug>/result', views.PDFExamResultView.as_view(), name='pdf_exam_result'),
     path('pdf/exam/<slug>/submit/temp/', views.SubmitPDFExamTempAnswer.as_view(),
          name='submit_pdf_exam_temp_answer'),
     path('pdf/exam/<slug>/submit/final', views.SubmitPDFExamFinalAnswer.as_view(),

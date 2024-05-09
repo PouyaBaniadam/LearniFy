@@ -34,6 +34,17 @@ def j_date_formatter(value):
 
     return formatted_date
 
+@register.filter(name='j_date_formatter_short')
+def j_date_formatter_short(value):
+    day_name = jdate.j_weekdays_fa[value.weekday()]
+    day = value.day
+    month_name = jdate.j_months_fa[value.month - 1]
+    year = value.year
+
+    formatted_date = f'{day_name}، {day} {month_name} {year}'
+
+    return formatted_date
+
 
 @register.filter(name='format_seconds_to_time')
 def format_seconds_to_time(total_seconds):

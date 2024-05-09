@@ -962,6 +962,10 @@ body, html {
     margin-right: 2rem
 }
 
+.mr-24 {
+    margin-right: 6rem
+}
+
 .ml-8 {
     margin-left: 2rem
 }

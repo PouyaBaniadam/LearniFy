@@ -1,6 +1,7 @@
 import json
 
 from django.contrib import messages
+from django.core.serializers import serialize
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
 from django.urls import reverse
@@ -20,8 +21,9 @@ from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCou
     ParticipatedUsersPDFExamsOnlyMixin, InTimePDFExamsOnlyMixin, NoTimingPenaltyAllowedForPDFExamMixin
 from Course.models import VideoCourse, VideoCourseComment, PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, \
     PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy, PDFExam, PDFExamTempAnswer, \
-    PDFExamDetail, PDFExamTimer, PDFExamResult, CurrentPDFExamParticipation
+    PDFExamDetail, PDFExamTimer, PDFExamResult
 from Home.mixins import URLStorageMixin
+from Home.templatetags.filters import j_date_formatter, j_date_formatter_short
 
 
 class AllVideoCourses(URLStorageMixin, ListView):
@@ -655,11 +657,6 @@ class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOn
             "slug": slug
         }
 
-        try:
-            CurrentPDFExamParticipation.objects.get(user=user, pdf_exam=pdf_exam)
-        except CurrentPDFExamParticipation.DoesNotExist:
-            CurrentPDFExamParticipation.objects.create(user=user, pdf_exam=pdf_exam)
-
         return render(request=request, template_name="Course/exam_detail.html", context=context)
 
 
@@ -783,6 +780,27 @@ class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDF
         return redirect(reverse("course:pdf_course_episodes", kwargs={'slug': course.slug}))
 
 
-class ExamResultView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, View):
+class PDFExamResultView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
+        slug = kwargs.get("slug")
+
+        pdf_exam_results = PDFExamResult.objects.filter(user=user, pdf_exam__slug=slug)
+
+        exam_result = []
+
+        for result in pdf_exam_results:
+            exam_result.append(
+                {
+                    "percentage": f"{int(result.percentage)}%",
+                    "result_status": result.result_status,
+                    "created_at": j_date_formatter_short(result.created_at)
+                }
+            )
+
+        return JsonResponse(
+            data={
+                "exam_result": exam_result,
+            },
+            status=200
+        )

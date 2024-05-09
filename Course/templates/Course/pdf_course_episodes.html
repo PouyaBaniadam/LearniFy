@@ -171,7 +171,8 @@
                                                                                 </svg>
                                                                         </span>
 
-                                                    <button class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
+                                                    <button onclick="showExamResult('{{ exam.slug }}')"
+                                                            class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
                                                         <span class="text-xs">نتایج</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                              viewBox="0 0 24 24" stroke-width="1.5"
@@ -625,6 +626,7 @@
         {% include 'includes/footer.html' %}
     </div>
 
+    <script src="{% static 'js/ajax/show_exam_results.js' %}"></script>
     <script src="{% static 'js/ajax/download_course_object.js' %}"></script>
     <script src="{% static 'js/enter_exam_confirmation.js' %}"></script>
     <script>

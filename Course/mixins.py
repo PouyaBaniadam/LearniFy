@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.views.generic import View
 
 from Account.models import CustomUser
-from Course.models import PDFCourse, VideoCourse, PDFExam, PDFExamTimer, CurrentPDFExamParticipation
+from Course.models import PDFCourse, VideoCourse, PDFExam, PDFExamTimer
 from utils.useful_functions import get_time_difference
 
 
