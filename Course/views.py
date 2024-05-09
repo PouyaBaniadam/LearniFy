@@ -1,7 +1,5 @@
 import json
-from datetime import datetime
 
-import pytz
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
@@ -19,13 +17,11 @@ from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCourseEpisodesForParticipatedUsersMixin, \
     ParticipatedUsersVideoCoursesOnlyMixin, RedirectToVideoCourseEpisodesForParticipatedUsersMixin, \
-    ParticipatedUsersPDFExamsOnlyMixin, OnlyOnePDFExamAtATimeMixin, InTimePDFExamsOnlyMixin, \
-    NoTimingPenaltyAllowedForPDFExamMixin
+    ParticipatedUsersPDFExamsOnlyMixin, InTimePDFExamsOnlyMixin, NoTimingPenaltyAllowedForPDFExamMixin
 from Course.models import VideoCourse, VideoCourseComment, PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, \
     PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy, PDFExam, PDFExamTempAnswer, \
-    PDFExamDetail, PDFExamTimer, PDFExamResult
+    PDFExamDetail, PDFExamTimer, PDFExamResult, CurrentPDFExamParticipation
 from Home.mixins import URLStorageMixin
-from utils.useful_functions import get_time_difference
 
 
 class AllVideoCourses(URLStorageMixin, ListView):
@@ -592,7 +588,7 @@ class VideoCourseDownloadSession(AuthenticatedUsersOnlyMixin, ParticipatedUsersV
             return response
 
 
-class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin, OnlyOnePDFExamAtATimeMixin,
+class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin,
                         InTimePDFExamsOnlyMixin, URLStorageMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -658,6 +654,11 @@ class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOn
             "time_left": int(time_left.total_seconds()),
             "slug": slug
         }
+
+        try:
+            CurrentPDFExamParticipation.objects.get(user=user, pdf_exam=pdf_exam)
+        except CurrentPDFExamParticipation.DoesNotExist:
+            CurrentPDFExamParticipation.objects.create(user=user, pdf_exam=pdf_exam)
 
         return render(request=request, template_name="Course/exam_detail.html", context=context)
 
@@ -774,6 +775,10 @@ class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDF
                            message=f"شما در آزمون {pdf_exam.name}، مقدار {int(percentage)}% را کسب کردید!")
 
         course = pdf_exam.pdf_course_season.course
+
+        pdf_exam_timer = PDFExamTimer.objects.get(user=user, pdf_exam=pdf_exam)
+        pdf_exam_timer.ends_at = timezone.now()
+        pdf_exam_timer.save()
 
         return redirect(reverse("course:pdf_course_episodes", kwargs={'slug': course.slug}))
 

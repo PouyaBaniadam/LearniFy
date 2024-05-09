@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.views.generic import View
 
 from Account.models import CustomUser
-from Course.models import PDFCourse, VideoCourse, PDFExam, PDFExamTimer
+from Course.models import PDFCourse, VideoCourse, PDFExam, PDFExamTimer, CurrentPDFExamParticipation
 from utils.useful_functions import get_time_difference
 
 
@@ -125,27 +125,6 @@ class RedirectToVideoCourseEpisodesForParticipatedUsersMixin(View):
 
         if is_user_participated:
             return redirect(reverse("course:video_course_episodes", kwargs={"slug": slug}))
-
-        return super().dispatch(request, *args, **kwargs)
-
-
-class OnlyOnePDFExamAtATimeMixin(View):
-    def dispatch(self, request, *args, **kwargs):
-        user = request.user
-        slug = kwargs.get("slug")
-
-        if PDFExamTimer.objects.filter(
-                Q(user=user) &
-                ~Q(pdf_exam__slug=slug)
-        ).exists():
-            redirect_url = request.session.get('current_url')
-
-            messages.error(request, f"شما مجوز دسترسی به این بخش را ندارید!")
-
-            if redirect_url is not None:
-                return redirect(redirect_url)
-
-            return redirect("home:home")
 
         return super().dispatch(request, *args, **kwargs)
 

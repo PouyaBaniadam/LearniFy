@@ -625,3 +625,17 @@ class PDFExamResult(models.Model):
         db_table = 'course__pdf_exam_result'
         verbose_name = 'نتیجه آزمون پی‌‌دی‌‌افی'
         verbose_name_plural = 'نتایج آزمون پی‌‌دی‌‌افی'
+
+
+class CurrentPDFExamParticipation(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    pdf_exam = models.ForeignKey(to=PDFExam, on_delete=models.CASCADE, verbose_name="آزمون پی‌‌دی‌‌افی")
+
+    def __str__(self):
+        return f"{self.user}"
+
+    class Meta:
+        db_table = 'course__pdf_exam_participation'
+        verbose_name = "شرکت کننده فعلی آزمون پی‌‌دی‌‌افی"
+        verbose_name_plural = "شرکت کنندگان فعلی آزمون پی‌‌دی‌‌افی"
