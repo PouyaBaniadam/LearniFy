@@ -10,7 +10,7 @@ function sendData(question, selectedAnswer, slug, appName) {
             console.log("Success");
         },
         error: function (xhr, status, error) {
-            // Handle error response if needed
+            console.log("Error");
         }
     });
 }

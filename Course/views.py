@@ -18,10 +18,12 @@ from Financial.models import CartItem
 from Course.filters import VideoCourseFilter, PDFCourseFilter
 from Course.mixins import ParticipatedUsersPDFCoursesOnlyMixin, RedirectToPDFCourseEpisodesForParticipatedUsersMixin, \
     ParticipatedUsersVideoCoursesOnlyMixin, RedirectToVideoCourseEpisodesForParticipatedUsersMixin, \
-    ParticipatedUsersPDFExamsOnlyMixin, InTimePDFExamsOnlyMixin, NoTimingPenaltyAllowedForPDFExamMixin
+    ParticipatedUsersPDFExamsOnlyMixin, InTimePDFExamsOnlyMixin, NoTimingPenaltyAllowedForPDFExamMixin, \
+    ParticipatedUsersVideoExamsOnlyMixin, InTimeVideoExamsOnlyMixin, NoTimingPenaltyAllowedForVideoExamMixin
 from Course.models import VideoCourse, VideoCourseComment, PDFCourse, PDFCourseComment, BoughtCourse, PDFCourseObject, \
     PDFCourseObjectDownloadedBy, VideoCourseObject, VideoCourseObjectDownloadedBy, PDFExam, PDFExamTempAnswer, \
-    PDFExamDetail, PDFExamTimer, PDFExamResult
+    PDFExamDetail, PDFExamTimer, PDFExamResult, VideoExamResult, VideoExamTimer, VideoExam, VideoExamDetail, \
+    VideoExamTempAnswer
 from Home.mixins import URLStorageMixin
 from Home.templatetags.filters import j_date_formatter, j_date_formatter_short
 
@@ -221,11 +223,14 @@ class VideoCourseEpisodes(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoCou
             user_likes = []
             is_following = False
 
+        exams = VideoExam.objects.filter(video_course_season__course=self.object)
+
         context['favorite_video_courses'] = favorite_video_courses
         context['comments'] = comments
         context['user_likes'] = user_likes
         context['is_following'] = is_following
         context['is_follow_request_pending'] = is_follow_request_pending
+        context['exams'] = exams
 
         return context
 
@@ -657,7 +662,7 @@ class PDFExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOn
             "slug": slug
         }
 
-        return render(request=request, template_name="Course/exam_detail.html", context=context)
+        return render(request=request, template_name="Course/pdf_exam_detail.html", context=context)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -790,6 +795,222 @@ class PDFExamResultView(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOn
         exam_result = []
 
         for result in pdf_exam_results:
+            exam_result.append(
+                {
+                    "percentage": f"{int(result.percentage)}%",
+                    "result_status": result.result_status,
+                    "created_at": j_date_formatter_short(result.created_at)
+                }
+            )
+
+        return JsonResponse(
+            data={
+                "exam_result": exam_result,
+            },
+            status=200
+        )
+
+
+class VideoExamDetailView(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoExamsOnlyMixin,
+                          InTimeVideoExamsOnlyMixin, URLStorageMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        video_exam = VideoExam.objects.get(slug=slug)
+
+        try:
+            video_exam_timer = VideoExamTimer.objects.get(user=user, video_exam=video_exam)
+            ends_at = video_exam_timer.ends_at
+            time_left = ends_at - timezone.now()
+
+        except VideoExamTimer.DoesNotExist:
+            ends_at = video_exam.duration + timezone.now()
+            video_exam_timer = VideoExamTimer.objects.create(user=user, video_exam=video_exam, ends_at=ends_at)
+
+            ends_at = video_exam_timer.ends_at
+            time_left = ends_at - timezone.now()
+
+        questions_and_answers = []
+
+        video_exam_details = VideoExamDetail.objects.filter(video_exam__slug=slug)
+
+        for video_exam_detail in video_exam_details:
+            if VideoExamTempAnswer.objects.filter(
+                    user=user,
+                    question=video_exam_detail.question).exists():
+
+                video_exam_temp_answer = VideoExamTempAnswer.objects.get(user=user,
+                                                                         question=video_exam_detail.question
+                                                                         )
+
+                questions_and_answers.append(
+                    {
+                        "id": video_exam_detail.id,
+                        "slug": video_exam_detail.video_exam.slug,
+                        "question": video_exam_detail.question,
+                        "answer_1": video_exam_detail.answer_1,
+                        "answer_2": video_exam_detail.answer_2,
+                        "answer_3": video_exam_detail.answer_3,
+                        "answer_4": video_exam_detail.answer_4,
+                        "selected_answer": video_exam_temp_answer.selected_answer
+                    }
+                )
+
+            else:
+                questions_and_answers.append(
+                    {
+                        "id": video_exam_detail.id,
+                        "slug": video_exam_detail.video_exam.slug,
+                        "question": video_exam_detail.question,
+                        "answer_1": video_exam_detail.answer_1,
+                        "answer_2": video_exam_detail.answer_2,
+                        "answer_3": video_exam_detail.answer_3,
+                        "answer_4": video_exam_detail.answer_4,
+                        "selected_answer": None
+                    }
+                )
+
+        context = {
+            "video_exam_details": video_exam_details,
+            "questions_and_answers": questions_and_answers,
+            "time_left": int(time_left.total_seconds()),
+            "slug": slug
+        }
+
+        return render(request=request, template_name="Course/video_exam_detail.html", context=context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SubmitVideoExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoExamsOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        question = request.POST.get("question")
+        selected_answer = request.POST.get("selected_answer")
+
+        video_exam_detail = VideoExamDetail.objects.filter(video_exam__slug=slug).last()
+
+        try:
+            video_exam_temp_answer = VideoExamTempAnswer.objects.get(user=user, question=question)
+            video_exam_temp_answer.selected_answer = selected_answer
+            video_exam_temp_answer.question = question
+            video_exam_temp_answer.save()
+
+        except VideoExamTempAnswer.DoesNotExist:
+            VideoExamTempAnswer.objects.create(
+                user=user,
+                video_exam_detail=video_exam_detail,
+                question=question,
+                selected_answer=selected_answer
+            )
+
+        return JsonResponse(
+            data={
+                "message": "saved!"
+            },
+            status=200
+        )
+
+
+class SubmitVideoExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoExamsOnlyMixin,
+                                 NoTimingPenaltyAllowedForVideoExamMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        questions_and_answers = []
+
+        video_exam_details = VideoExamDetail.objects.filter(video_exam__slug=slug)
+        video_exam = VideoExam.objects.get(slug=slug)
+        coefficient_number = video_exam.video_course_season.course.coefficient_number
+
+        for video_exam_detail in video_exam_details:
+            if VideoExamTempAnswer.objects.filter(
+                    user=user,
+                    question=video_exam_detail.question).exists():
+
+                video_exam_temp_answer = VideoExamTempAnswer.objects.get(user=user,
+                                                                         question=video_exam_detail.question
+                                                                         )
+
+                questions_and_answers.append(
+                    {
+                        "correct_answer": video_exam_detail.correct_answer,
+                        "selected_answer": video_exam_temp_answer.selected_answer
+                    }
+                )
+
+            else:
+                questions_and_answers.append(
+                    {
+                        "correct_answer": video_exam_detail.correct_answer,
+                        "selected_answer": None
+                    }
+                )
+        exam_result = []
+
+        for item in questions_and_answers:
+            if item["selected_answer"] is None:
+                exam_result.append(None)
+
+            elif item["correct_answer"] == item["selected_answer"]:
+                exam_result.append(True)
+
+            else:
+                exam_result.append(False)
+
+        percentage, true_answers_count, false_answers_count, none_answers_count = exam_evaluations(
+            answers=exam_result,
+            coefficient_number=coefficient_number
+        )
+
+        video_exam_result = VideoExamResult.objects.create(
+            user=user,
+            video_exam=video_exam,
+            percentage=percentage,
+            true_answers_count=true_answers_count,
+            false_answers_count=false_answers_count,
+            none_answers_count=none_answers_count,
+        )
+
+        temp_answers = VideoExamTempAnswer.objects.filter(user=user)
+
+        for temp_answer in temp_answers:
+            temp_answer.delete()
+
+        if video_exam_result.result_status == "E" or video_exam_result.result_status == "G":
+            messages.success(request=request,
+                             message=f"شما در آزمون {video_exam.name}، مقدار {int(percentage)}% را کسب کردید!")
+
+        if video_exam_result.result_status == "N":
+            messages.warning(request=request,
+                             message=f"شما در آزمون {video_exam.name}، مقدار {int(percentage)}% را کسب کردید!")
+
+        if video_exam_result.result_status == "B":
+            messages.error(request=request,
+                           message=f"شما در آزمون {video_exam.name}، مقدار {int(percentage)}% را کسب کردید!")
+
+        course = video_exam.video_course_season.course
+
+        video_exam_timer = VideoExamTimer.objects.get(user=user, video_exam=video_exam)
+        video_exam_timer.ends_at = timezone.now()
+        video_exam_timer.save()
+
+        return redirect(reverse("course:video_course_episodes", kwargs={'slug': course.slug}))
+
+
+class VideoExamResultView(AuthenticatedUsersOnlyMixin, ParticipatedUsersVideoExamsOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        video_exam_results = VideoExamResult.objects.filter(user=user, video_exam__slug=slug)
+
+        exam_result = []
+
+        for result in video_exam_results:
             exam_result.append(
                 {
                     "percentage": f"{int(result.percentage)}%",

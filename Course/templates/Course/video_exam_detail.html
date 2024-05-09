@@ -14,20 +14,20 @@
 
             <div class="mr-8">
 
-                <p class="mb-3 mt-3">{{ questions_and_answer.question_number }}) {{ questions_and_answer.question }}</p>
+                <p class="mb-3 mt-3">{{ forloop.counter }}) {{ questions_and_answer.question }}</p>
 
                 {% if questions_and_answer|select_dictionary_item:"selected_answer" == questions_and_answer.answer_1 %}
                     <label>
                         <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_1 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_1 }}
                     </label>
                 {% else %}
                     <label>
                         <input type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_1 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_1 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_1 }}
                     </label>
                 {% endif %}
@@ -39,14 +39,14 @@
                     <label>
                         <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_2 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_2 }}
                     </label>
                 {% else %}
                     <label>
                         <input type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_2 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_2 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_2 }}
                     </label>                {% endif %}
 
@@ -56,14 +56,14 @@
                     <label>
                         <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_3 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_3 }}
                     </label>
                 {% else %}
                     <label>
                         <input type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_3 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_3 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_3 }}
                     </label>
                 {% endif %}
@@ -74,14 +74,14 @@
                     <label>
                         <input checked type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_4 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_4 }}
                     </label>
                 {% else %}
                     <label>
                         <input type="radio" name="answer_{{ questions_and_answer.id }}"
                                value="{{ questions_and_answer.answer_4 }}"
-                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}', 'pdf')">
+                               onclick="sendData('{{ questions_and_answer.question }}', '{{ questions_and_answer.answer_4 }}', '{{ questions_and_answer.slug }}', 'video')">
                         {{ questions_and_answer.answer_4 }}
                     </label>
                 {% endif %}
@@ -92,7 +92,7 @@
             </div>
         {% endfor %}
 
-        <button onclick="confirmSubmission('{{ slug }}', 'pdf')"
+        <button onclick="confirmSubmission('{{ slug }}', 'video')"
                 class="mr-8 ml-8 mt-8 mb-8 h-10 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
             <span class="line-clamp-1 font-semibold text-sm">ثبت نهایی آزمون</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -105,10 +105,10 @@
 
     </div>
 
-    <script src="{% static 'js/ajax/submit_temp_answers.js' %}"></script>
+    <script src="{% static 'js/ajax/submit_exam_temp_answers.js' %}"></script>
     <script src="{% static 'js/ending_exam_confirmation.js' %}"></script>
     <script src="{% static 'js/exam_countdown.js' %}"></script>
-    <script>startCountdown('{{ time_left }}', '{{ slug }}');</script>
+    <script>startCountdown('{{ time_left }}', '{{ slug }}', 'video');</script>
 
 
 {% endblock %}

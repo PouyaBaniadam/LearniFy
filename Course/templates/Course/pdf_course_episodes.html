@@ -171,7 +171,7 @@
                                                                                 </svg>
                                                                         </span>
 
-                                                    <button onclick="showExamResult('{{ exam.slug }}')"
+                                                    <button onclick="showPDFExamResult('{{ exam.slug }}')"
                                                             class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
                                                         <span class="text-xs">نتایج</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -626,9 +626,9 @@
         {% include 'includes/footer.html' %}
     </div>
 
-    <script src="{% static 'js/ajax/show_exam_results.js' %}"></script>
+    <script src="{% static 'js/ajax/show_pdf_exam_results.js' %}"></script>
     <script src="{% static 'js/ajax/download_course_object.js' %}"></script>
-    <script src="{% static 'js/enter_exam_confirmation.js' %}"></script>
+    <script src="{% static 'js/enter_pdf_exam_confirmation.js' %}"></script>
     <script>
         document.getElementById('openAdminPanel').addEventListener('click', function () {
             window.open('http://{{ request.get_host }}/admin/Course/pdfcourseobject/add/');

@@ -1,7 +1,7 @@
-function showExamResult(slug) {
+function showVideoExamResult(slug) {
     $.ajax({
         type: 'GET',
-        url: `/course/pdf/exam/${slug}/result`,
+        url: `/course/video/exam/${slug}/result`,
         dataType: 'json',
         success: function (response) {
             let examResults = response.exam_result;

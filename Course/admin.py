@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, PDFCourseObject, PDFCourse, \
     PDFCourseSeason, BoughtCourse, PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy, PDFExam, PDFExamDetail, \
-    PDFExamTempAnswer, PDFExamTimer, PDFExamResult
+    PDFExamTempAnswer, PDFExamTimer, PDFExamResult, VideoExamTempAnswer, VideoExamTimer, VideoExam, VideoExamResult, \
+    VideoExamDetail
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -167,3 +168,30 @@ class PDFExamTimerAdmin(admin.ModelAdmin):
 @admin.register(PDFExamResult)
 class PDFExamResultAdmin(admin.ModelAdmin):
     list_display = ("user", "pdf_exam", "percentage")
+
+
+class VideoExamDetailInline(admin.StackedInline):
+    model = VideoExamDetail
+    extra = 1
+
+
+@admin.register(VideoExam)
+class VideoExamAdmin(admin.ModelAdmin):
+    autocomplete_fields = ("video_course_season",)
+    inlines = (VideoExamDetailInline,)
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(VideoExamTempAnswer)
+class VideoExamTempAnswerAdmin(admin.ModelAdmin):
+    list_display = ("user",)
+
+
+@admin.register(VideoExamTimer)
+class VideoExamTimerAdmin(admin.ModelAdmin):
+    list_display = ("user", "video_exam")
+
+
+@admin.register(VideoExamResult)
+class VideoExamResultAdmin(admin.ModelAdmin):
+    list_display = ("user", "video_exam", "percentage")

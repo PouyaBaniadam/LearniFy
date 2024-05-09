@@ -625,3 +625,142 @@ class PDFExamResult(models.Model):
         db_table = 'course__pdf_exam_result'
         verbose_name = 'نتیجه آزمون پی‌‌دی‌‌افی'
         verbose_name_plural = 'نتایج آزمون پی‌‌دی‌‌افی'
+
+
+class VideoExam(models.Model):
+    video_course_season = models.OneToOneField(to=VideoCourseSeason, on_delete=models.CASCADE,
+                                             verbose_name="فصل آزمون ویدئویی")
+
+    name = models.CharField(max_length=75, verbose_name="نام آزمون")
+
+    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
+
+    duration = models.DurationField(verbose_name="مدت زمان آزمون", default=900,
+                                    help_text="به ثانیه (پیش‌‌فرض: 15 دقیقه)")
+
+    def __str__(self):
+        return f"{self.video_course_season.name}"
+
+    class Meta:
+        db_table = 'course__video_exam'
+        verbose_name = 'آزمون ویدئویی'
+        verbose_name_plural = 'آزمون‌‌های ویدئویی'
+
+
+class VideoExamDetail(models.Model):
+    ANSWER_CHOICES = (
+        ("1", "1"),
+        ("2", "2"),
+        ("3", "3"),
+        ("4", "4"),
+    )
+
+    video_exam = models.ForeignKey(to=VideoExam, on_delete=models.CASCADE, blank=True, null=True,
+                                 verbose_name="آزمون ویدئویی")
+
+    question = models.CharField(max_length=200, verbose_name="صورت سوال")
+
+    answer_1 = models.CharField(max_length=200, verbose_name="گزینه 1")
+
+    answer_2 = models.CharField(max_length=200, verbose_name="گزینه 2")
+
+    answer_3 = models.CharField(max_length=200, verbose_name="گزینه 3")
+
+    answer_4 = models.CharField(max_length=200, verbose_name="گزینه 4")
+
+    correct_answer = models.CharField(max_length=200, verbose_name="گزینه صحیح", help_text="متن یکی از فیلد‌‌های بالا")
+
+    def __str__(self):
+        return f"{self.question}"
+
+    class Meta:
+        db_table = 'course__video_exam_detail'
+        verbose_name = 'جواب آزمون ویدئویی'
+        verbose_name_plural = 'جواب‌‌های آزمون ویدئویی'
+
+
+class VideoExamTempAnswer(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    video_exam_detail = models.ForeignKey(to=VideoExamDetail, on_delete=models.CASCADE, verbose_name="آزمون ویدئویی",
+                                        related_name="temp_answers", editable=False)
+
+    question = models.CharField(max_length=200, verbose_name="صورت سوال")
+
+    selected_answer = models.CharField(max_length=200, verbose_name="گزینه انتخاب شده")
+
+    def __str__(self):
+        return f"{self.user} - {self.video_exam_detail.video_exam.name}"
+
+    class Meta:
+        db_table = 'course__video_temp_answer'
+        verbose_name = "پاسخ موقت آزمون ویدئویی"
+        verbose_name_plural = "پاسخ‌‌های موقت آزمون ویدئویی"
+
+
+class VideoExamTimer(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    video_exam = models.ForeignKey(to=VideoExam, on_delete=models.CASCADE, blank=True, null=True,
+                                 verbose_name="آزمون ویدئویی")
+
+    started_at = models.DateTimeField(auto_now_add=True, verbose_name="شروع شده در تاریخ")
+
+    ends_at = models.DateTimeField(verbose_name="پایان در تاریخ")
+
+    def __str__(self):
+        return f"{self.user} - {self.video_exam.name}"
+
+    class Meta:
+        db_table = 'course__video_exam_timer'
+        verbose_name = 'زمان بندی آزمون ویدئویی'
+        verbose_name_plural = 'زمان بندی‌‌های آزمون ویدئویی'
+
+
+class VideoExamResult(models.Model):
+    RESULT_STATUS = (
+        ("E", "عالی"),  # Excellent
+        ("G", "عالی"),  # Good
+        ("N", "معمولی"),  # Normal
+        ("B", "بد"),  # Bad
+    )
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    video_exam = models.ForeignKey(to=VideoExam, on_delete=models.CASCADE, verbose_name="آزمون ویدئویی")
+
+    percentage = models.FloatField(verbose_name="درصد")
+
+    true_answers_count = models.SmallIntegerField(default=0, verbose_name="تعداد پاسخ‌‌های صحیح")
+
+    false_answers_count = models.SmallIntegerField(default=0, verbose_name="تعداد پاسخ‌‌های غلط")
+
+    none_answers_count = models.SmallIntegerField(default=0, verbose_name="تعداد پاسخ‌‌های جواب")
+
+    result_status = models.CharField(max_length=1, choices=RESULT_STATUS, verbose_name="وضعیت نتیجه")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user} - {self.video_exam.name}"
+
+    def save(self, *args, **kwargs):
+        print(self.percentage)
+        if self.percentage == 100.0:
+            self.result_status = "E"
+
+        if 80.0 < self.percentage < 100.0:
+            self.result_status = "G"
+
+        if 60.0 < self.percentage < 80.0:
+            self.result_status = "N"
+
+        if self.percentage < 60.0:
+            self.result_status = "B"
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'course__video_exam_result'
+        verbose_name = 'نتیجه آزمون ویدئویی'
+        verbose_name_plural = 'نتایج آزمون ویدئویی'
