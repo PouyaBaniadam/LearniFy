@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Financial.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
+from Financial.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip, TempDiscountUsage
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -26,6 +26,7 @@ class CartAdmin(admin.ModelAdmin):
 class DiscountUsageTabularInline(admin.TabularInline):
     model = DiscountUsage
     readonly_fields = ('user', 'discount', 'formatted_usage_date')
+
     # can_delete = False
     #
     def has_add_permission(self, request, obj=None):
@@ -73,3 +74,8 @@ class DepositSlipAdmin(admin.ModelAdmin):
         return j_date_formatter(obj.created_at)
 
     formatted_created_at.short_description = "تاریخ ایجاد"
+
+
+@admin.register(TempDiscountUsage)
+class TempDiscountUsageAdmin(admin.ModelAdmin):
+    list_display = ("user", "discount")

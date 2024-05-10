@@ -265,3 +265,18 @@ CKEDITOR_5_CONFIGS = {
         }
     }
 }
+
+MERCHANT = "00000000-0000-0000-0000-000000000000"
+SANDBOX = True
+
+if SANDBOX:
+    sandbox = 'sandbox'
+else:
+    sandbox = 'www'
+
+ZP_API_REQUEST = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
+ZP_API_VERIFY = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
+ZP_API_STARTPAY = f"https://{sandbox}.zarinpal.com/pg/StartPay/"
+description = 'خرید از آکادمی LearniFy'
+CartCallbackURL = 'http://127.0.0.1:8000/financial/verify'
+WalletCallbackURL = 'http://127.0.0.1:8000/account/wallet/charge/verify'

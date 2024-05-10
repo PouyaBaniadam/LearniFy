@@ -14,8 +14,10 @@ $(document).ready(function () {
             success: function (response) {
                 const submittedDiscount = document.getElementById("submittedDiscount")
                 const discountInput = document.getElementById("discountInput")
+                const paypalDiscount = document.getElementById("paypal_discount")
 
-                submittedDiscount.value = discountInput.value
+                submittedDiscount.value = discountInput.value;
+                paypalDiscount.value = discountInput.value;
 
                 var span = document.getElementById("total_price_with_discount");
                 span.innerText = response.final_price;

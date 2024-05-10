@@ -86,3 +86,15 @@ class DisallowedCarActionsMixin(View):
             )
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class DeleteTempDiscountUsagesMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+
+        temp_discount_usages = TempDiscountUsage.objects.filter(user=user)
+        if temp_discount_usages.count() != 0:
+            for temp_discount_usage in temp_discount_usages:
+                temp_discount_usage.delete()
+
+        return super().dispatch(request, *args, **kwargs)

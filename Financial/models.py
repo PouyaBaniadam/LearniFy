@@ -248,3 +248,19 @@ class DepositSlip(models.Model):
         db_table = "financial__deposit_slip"
         verbose_name = "فیش واریزی"
         verbose_name_plural = "رسیدهای خرید"
+
+
+class TempDiscountUsage(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    total_price_with_discount = models.PositiveBigIntegerField(default=0, verbose_name="قیمت نهایی")
+
+    discount = models.ForeignKey(to=Discount, on_delete=models.CASCADE, verbose_name="تخفیف")
+
+    def __str__(self):
+        return f"{self.user.username}"
+
+    class Meta:
+        db_table = "financial__temp_discount_usage"
+        verbose_name = 'مورد استفاده موقت از کد تخفیف'
+        verbose_name_plural = 'موارد استفاده موقت از کد تخفیف'

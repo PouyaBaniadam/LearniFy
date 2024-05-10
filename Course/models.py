@@ -79,7 +79,7 @@ class VideoCourse(models.Model):
                                                           help_text="یک عدد صحیح بین 1 تا 4 (با توجه به میزان سختی)")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
-                                                related_name='user_video_courses', editable=False)
+                                                related_name='user_video_courses')
 
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE_CHOICES, default='F', verbose_name='نوع دوره')
 
@@ -293,7 +293,7 @@ class PDFCourse(models.Model):
                                                           help_text="یک عدد صحیح بین 1 تا 4")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
-                                                related_name='user_pdf_courses', editable=False)
+                                                related_name='user_pdf_courses')
 
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPE_CHOICES, default='F', verbose_name='نوع دوره')
 

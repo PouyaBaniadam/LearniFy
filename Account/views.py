@@ -2,6 +2,7 @@ import json
 import random
 from uuid import uuid4
 
+import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
@@ -19,13 +20,14 @@ from django.views.generic import FormView, UpdateView, ListView, View
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm, \
     ChargeWalletForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, FollowersForPVAccountsOnlyMixin, \
-    NonFollowersOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin, OwnerOnlyMixin
+    NonFollowersOnlyMixin, CantChargeWalletYetMixin, CheckFollowingMixin, OwnerOnlyMixin, DeleteTempChargeWalletMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, FavoriteVideoCourse, Post, \
-    FavoritePDFCourse, Follow
+    FavoritePDFCourse, Follow, TempChargeWallet
 from Account.validator_utilities import validate_mobile_phone_handler
 from Course.models import PDFCourse, VideoCourse
 from Financial.models import Cart, DepositSlip
 from Home.mixins import URLStorageMixin
+from LearniFy.settings import ZP_API_VERIFY, ZP_API_REQUEST, ZP_API_STARTPAY, WalletCallbackURL, description
 from utils.useful_functions import summarize_entry
 
 
@@ -849,7 +851,7 @@ class UpdateCaptionView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ChargeWallet(AuthenticatedUsersOnlyMixin, CantChargeWalletYetMixin, FormView):
+class ChargeWalletWithCTC(AuthenticatedUsersOnlyMixin, CantChargeWalletYetMixin, FormView):
     form_class = ChargeWalletForm
     template_name = "Account/charge_wallet.html"
 
@@ -1053,22 +1055,107 @@ class UserVideoCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
             return ['Account/visitor_video_courses.html']
 
 
-def search_view(request):
-    query = request.GET.get('query', '')
+class SearchProfileView(View):
+    def get(self, request):
+        query = request.GET.get('query', '')
 
-    results = CustomUser.objects.filter(Q(username__icontains=query) | Q(full_name__icontains=query))
+        results = CustomUser.objects.filter(Q(username__icontains=query) | Q(full_name__icontains=query))
 
-    serialized_results = []
-    for user in results:
-        serialized_user = {
-            'slug': user.slug,
-            'username': user.username
+        serialized_results = []
+        for user in results:
+            serialized_user = {
+                'slug': user.slug,
+                'username': user.username
+            }
+            serialized_results.append(serialized_user)
+
+        return JsonResponse(
+            data={
+                'results': serialized_results
+            },
+            status=200
+        )
+
+
+class SendRequestView(AuthenticatedUsersOnlyMixin, DeleteTempChargeWalletMixin, View):
+    def post(self, request):
+        amount = int(request.POST.get("amount").replace(",", ""))
+
+        username = request.user.username
+        user = CustomUser.objects.get(username=username)
+
+        TempChargeWallet.objects.create(user=user, amount=amount)
+
+        data = {
+            'MerchantID': settings.MERCHANT,
+            'Amount': amount,
+            'CallbackURL': WalletCallbackURL,
+            'Description': description,
+            'Phone': user.mobile_phone,
+            'currency': 'IRT'
         }
-        serialized_results.append(serialized_user)
 
-    return JsonResponse(
-        data={
-            'results': serialized_results
-        },
-        status=200
-    )
+        data = json.dumps(data)
+        headers = {'content-type': 'application/json', 'content-length': str(len(data))}
+
+        try:
+            response = requests.post(ZP_API_REQUEST, data=data, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                response = response.json()
+
+                if response['Status'] == 100:
+                    return redirect(ZP_API_STARTPAY + str(response['Authority']),
+                                    context={'status': True, 'authority': response['Authority']})
+                else:
+                    return {'status': False, 'code': str(response['Status'])}
+            return response
+
+        except requests.exceptions.Timeout:
+            return {'status': False, 'code': 'timeout'}
+
+        except requests.exceptions.ConnectionError:
+            return {'status': False, 'code': 'connection error'}
+
+
+class VerifyView(AuthenticatedUsersOnlyMixin, View):
+    def get(self, authority):
+        auth = authority.GET.get('Authority')
+        username = self.request.user.username
+        user = CustomUser.objects.get(username=username)
+
+        temp_charge_wallet = TempChargeWallet.objects.get(user=user)
+
+        data = {
+            "MerchantID": settings.MERCHANT,
+            "Amount": temp_charge_wallet.amount,
+            "Authority": auth,
+            "Phone": user.mobile_phone
+        }
+
+        data = json.dumps(data)
+        headers = {'content-type': 'application/json', 'content-length': str(len(data))}
+        response = requests.post(ZP_API_VERIFY, data=data, headers=headers)
+
+        if response.status_code == 200:
+            response = response.json()
+
+            if response['Status'] == 100:
+                wallet = Wallet.objects.get(user=user)
+                wallet.charge_wallet(amount=temp_charge_wallet.amount)
+                wallet.save()
+
+                temp_charge_wallet.delete()
+
+                messages.success(self.request, f"شارژ کیف پول با موفقیت انجام شد.")
+
+                return redirect(reverse('account:profile', kwargs={'slug': user.username}))
+
+            else:
+                temp_charge_wallet.delete()
+
+                messages.error(self.request, f"تراکنش ناموفق بود!")
+
+                return redirect("account:charge_wallet")
+
+        return response

@@ -12,4 +12,6 @@ urlpatterns = [
          name='delete_from_cart_page'),
     path('deposit/slip/add/', views.AddDepositSlipView.as_view(), name='add_deposit_slip'),
     path('wallet/pay/', views.BuyCourseWithWalletFundView.as_view(), name='buy_with_wallet'),
+    path('sendrequest', views.SendRequestView.as_view(), name='send_request'),
+    path('verify', views.VerifyView.as_view(), name='verify_request'),
 ]

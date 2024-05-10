@@ -48,7 +48,7 @@
                                                    class="block">
                                                     <img src="{{ course.video_course.cover_image.url }}"
                                                          class="max-w-full rounded-3xl"
-                                                         alt="..."/>
+                                                         alt="تصویر دوره {{ course.video_course.name }}"/>
                                                 </a>
 
                                                 <button type="button"
@@ -183,7 +183,7 @@
                                                    class="block">
                                                     <img src="{{ course.pdf_course.cover_image.url }}"
                                                          class="max-w-full rounded-3xl"
-                                                         alt="..."/>
+                                                        alt="تصویر دوره {{ course.pdf_course.name }}"/>
                                                 </a>
                                                 <button type="button"
                                                         class="delete-button flex-shrink-0 absolute right-1/2 translate-x-1/2 -translate-y-6 w-11 h-11 inline-flex items-center justify-center bg-error rounded-full text-error-foreground shadow-2xl"
@@ -421,8 +421,10 @@
                                     </div>
                                 </div>
 
-
-                                <button type="submit"
+                                <form method="post" action="{% url 'financial:send_request' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="paypal_discount" name="discount_code">
+                                    <button type="submit"
                                         class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                     <span class="font-semibold text-sm">پرداخت با درگاه</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -432,6 +434,7 @@
                                         </path>
                                     </svg>
                                 </button>
+                                </form>
 
                                 <button type="button"
                                         onclick="showAddDepositSlipReceiptForm('{{ bank_card_number }}', '{{ bank_card_owner_name }}', 'BUY', '')"

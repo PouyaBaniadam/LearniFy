@@ -347,3 +347,17 @@ class Post(models.Model):
         db_table = 'account__post'
         verbose_name = "پست"
         verbose_name_plural = "پست‌ها"
+
+
+class TempChargeWallet(models.Model):
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, verbose_name="کاربر")
+
+    amount = models.PositiveSmallIntegerField(verbose_name="مقدار شارژ")
+
+    def __str__(self):
+        return f"{self.user} - {self.amount}"
+
+    class Meta:
+        db_table = 'account__temp_charge_wallet'
+        verbose_name = 'شارژ موقت کیف پول'
+        verbose_name_plural = 'شارژ‌‌های موقت کیف پول'

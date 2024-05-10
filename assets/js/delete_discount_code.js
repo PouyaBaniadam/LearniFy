@@ -11,4 +11,7 @@ function deleteDiscountCode(formatted_total_price_with_discount) {
     let submittedDiscount = document.getElementById("submittedDiscount")
     submittedDiscount.value = ""
 
+    const paypalDiscount = document.getElementById("paypal_discount")
+    paypalDiscount.value = ""
+
 }

@@ -30,8 +30,10 @@ urlpatterns = [
     path('profile/<slug:slug>/pdfs', views.UserPDFCourseListView.as_view(), name='pdfs'),
     path('profile/<slug:slug>/videos', views.UserVideoCourseListView.as_view(), name='videos'),
     path('favorite/pdfs/', views.FavoritePDFCourses.as_view(), name='favorite_pdfs'),
-    path('wallet/charge/', views.ChargeWallet.as_view(), name='charge_wallet'),
+    path('wallet/charge/', views.ChargeWalletWithCTC.as_view(), name='charge_wallet'),
     path('followers/list/', views.FollowersList.as_view(), name='followers_list'),
     path('followings/list/', views.FollowingList.as_view(), name='followings_list'),
-    path('search/', views.search_view, name='search'),
+    path('search/', views.SearchProfileView.as_view(), name='search_for_profile'),
+    path('sendrequest', views.SendRequestView.as_view(), name='send_request'),
+    path('wallet/charge/verify', views.VerifyView.as_view(), name='verify_request'),
 ]

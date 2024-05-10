@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import View
 
-from Account.models import CustomUser
+from Account.models import CustomUser, TempChargeWallet
 from Financial.models import DepositSlip
 
 
@@ -195,3 +195,15 @@ class CheckFollowingMixin(View):
             )
 
         return super(CheckFollowingMixin, self).dispatch(request, *args, **kwargs)
+
+
+class DeleteTempChargeWalletMixin(View):
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+
+        temp_charge_wallets = TempChargeWallet.objects.filter(user=user)
+        if temp_charge_wallets.count() != 0:
+            for temp_charge_wallet in temp_charge_wallets:
+                temp_charge_wallet.delete()
+
+        return super().dispatch(request, *args, **kwargs)
