@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Financial.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip, TempDiscountUsage
+from Financial.models import Cart, CartItem, Discount, DiscountUsage, DepositSlip
 from Home.templatetags.filters import j_date_formatter
 
 
