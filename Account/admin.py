@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow, FavoriteVideoCourse, Post, \
-    TempChargeWallet
+from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow, FavoriteVideoCourse, Post
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -89,8 +88,3 @@ class FavoriteVideoCourseAdmin(admin.ModelAdmin):
 class PostAdmin(admin.ModelAdmin):
     list_display = ('user', 'title', 'created_at')
     autocomplete_fields = ('user',)
-
-
-@admin.register(TempChargeWallet)
-class TempChargeWalletAdmin(admin.ModelAdmin):
-    list_display = ("user", "amount")

@@ -74,8 +74,3 @@ class DepositSlipAdmin(admin.ModelAdmin):
         return j_date_formatter(obj.created_at)
 
     formatted_created_at.short_description = "تاریخ ایجاد"
-
-
-@admin.register(TempDiscountUsage)
-class TempDiscountUsageAdmin(admin.ModelAdmin):
-    list_display = ("user", "discount")
