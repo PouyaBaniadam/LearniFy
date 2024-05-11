@@ -720,6 +720,7 @@ class SubmitPDFExamTempAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFE
                 status=200
             )
 
+
 class SubmitPDFExamFinalAnswer(AuthenticatedUsersOnlyMixin, ParticipatedUsersPDFExamsOnlyMixin,
                                NoTimingPenaltyAllowedForPDFExamMixin, View):
     def get(self, request, *args, **kwargs):

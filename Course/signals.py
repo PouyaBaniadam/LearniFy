@@ -1,8 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from Account.models import Notification, Wallet
-from Course.models import PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy
+from Account.models import Notification, Wallet, CustomUser
+from Course.models import PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy, PDFExamResult, VideoExamResult
 from Financial.models import BoughtCourse
 
 
@@ -120,3 +120,59 @@ def charge_teacher_wallet(instance, created, **kwargs):
         wallet = Wallet.objects.get(user=teacher)
         wallet.charge_wallet(how_much_to_pay_to_teacher)
         wallet.save()
+
+
+@receiver(post_save, sender=PDFExamResult)
+def add_to_user_stars_after_pdf_exam(instance, created, **kwargs):
+    if created:
+        has_already_taken_part_in_exam = PDFExamResult.objects.filter(
+            user=instance.user,
+            pdf_exam=instance.pdf_exam
+        ).exists()
+
+        if not has_already_taken_part_in_exam:
+            coefficient_number = instance.pdf_exam.pdf_course_season.course.coefficient_number
+
+            if instance.result_status == "E":
+                stars = coefficient_number * 30
+
+            if instance.result_status == "G":
+                stars = coefficient_number * 20
+
+            if instance.result_status == "N":
+                stars = coefficient_number * 10
+
+            if instance.result_status == "B":
+                stars = coefficient_number
+
+            user = CustomUser.objects.get(user=instance.user)
+            user.stars += stars
+            user.save()
+
+
+@receiver(post_save, sender=VideoExamResult)
+def add_to_user_stars_after_video_exam(instance, created, **kwargs):
+    if created:
+        has_already_taken_part_in_exam = VideoExamResult.objects.filter(
+            user=instance.user,
+            video_exam=instance.video_exam
+        ).exists()
+
+        if not has_already_taken_part_in_exam:
+            coefficient_number = instance.video_exam.video_course_season.course.coefficient_number
+
+            if instance.result_status == "E":
+                stars = coefficient_number * 30
+
+            if instance.result_status == "G":
+                stars = coefficient_number * 20
+
+            if instance.result_status == "N":
+                stars = coefficient_number * 10
+
+            if instance.result_status == "B":
+                stars = coefficient_number
+
+            user = CustomUser.objects.get(user=instance.user)
+            user.stars += stars
+            user.save()
