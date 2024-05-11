@@ -439,7 +439,7 @@ class TempFollowPrivateAccountFirst(NonFollowersOnlyMixin, URLStorageMixin, View
             ).exists()
 
             context = {
-                "user": owner,
+                "owner": owner,
                 "is_following": is_following,
                 "account_status": account_status,
                 "is_follow_request_pending": is_follow_request_pending,
@@ -454,7 +454,7 @@ class TempFollowPrivateAccountFirst(NonFollowersOnlyMixin, URLStorageMixin, View
             is_follow_request_pending = False
 
             context = {
-                "user": owner,
+                "owner": owner,
                 "is_following": is_following,
                 "account_status": account_status,
                 "is_follow_request_pending": is_follow_request_pending,
@@ -498,7 +498,9 @@ class ToggleFollow(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class UnfollowPrivateAccounts(AuthenticatedUsersOnlyMixin, View):
     def post(self, request):
-        follower = CustomUser.objects.get(username=request.user.username)
+        username = request.user.username
+
+        follower = CustomUser.objects.get(username=username)
 
         following_id = request.POST.get("following_id")
 
