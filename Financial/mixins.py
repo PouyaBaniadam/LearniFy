@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.generic import View
 
 from Account.models import CustomUser
-from Financial.models import Discount, DiscountUsage, DepositSlip
+from Financial.models import Discount, DiscountUsage, DepositSlip, TempDiscountUsage
 from utils.useful_functions import get_time_difference
 
 

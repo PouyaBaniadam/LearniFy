@@ -49,7 +49,7 @@ class WalletAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'title', 'admin', 'mode', 'visibility', 'has_been_read', 'formatted_created_at')
+    list_display = ('uuid', 'title', 'admin', "message", 'mode', 'visibility', 'has_been_read', 'formatted_created_at')
 
     readonly_fields = ('admin',)
 
