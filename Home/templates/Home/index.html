@@ -226,7 +226,7 @@
                                                                     <span class="font-black text-xl text-success">رایگان!</span>
                                                                 {% endif %}
 
-                                                                {% if course.has_discount and course.type == "P" %}
+                                                                {% if course.has_discount and course.payment_type == "P" %}
                                                                     <div class="flex items-center gap-1">
                                                                         <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
                                                                         <span class="text-xs text-muted"><span
@@ -579,7 +579,7 @@
                                                             <span class="font-black text-xl text-success">رایگان!</span>
                                                         {% endif %}
 
-                                                        {% if course.has_discount and course.type == "P" %}
+                                                        {% if course.has_discount and course.payment_type == "P" %}
                                                             <div class="flex items-center gap-1">
                                                                 <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
                                                                 <span class="text-xs text-muted"><span

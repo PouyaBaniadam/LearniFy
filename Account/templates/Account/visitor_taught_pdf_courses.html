@@ -11,16 +11,16 @@
                 <div class="grid md:grid-cols-12 grid-cols-1 items-start gap-5">
                     <div class="lg:col-span-3 md:col-span-4 md:sticky md:top-24">
 
-                        {% include 'includes/owner_user_info.html' %}
+                        {% include 'includes/visitor_user_info.html' %}
 
-                        {% include 'includes/owner_user_menu.html' %}
+                        {% include 'includes/visitor_user_menu.html' %}
                     </div>
 
                     <div class="lg:col-span-9 md:col-span-8">
                         <div class="space-y-10">
 
                             <!-- statistics:items:wrapper -->
-                            {% include 'includes/owner_statistics.html' %}
+                            {% include 'includes/visitor_statistics.html' %}
                             <!-- end statistics:wrapper -->
 
                             <!-- section:learning-courses -->
@@ -31,7 +31,7 @@
                                         <div class="w-1 h-1 bg-foreground rounded-full"></div>
                                         <div class="w-2 h-2 bg-foreground rounded-full"></div>
                                     </div>
-                                    <div class="font-black text-foreground">دوره‌‌های پی‌‌دی‌‌افی</div>
+                                    <div class="font-black text-foreground">دوره‌‌های پی‌‌دی‌‌افی تدریس شده</div>
                                 </div>
                                 <!-- end section:title -->
 
@@ -40,7 +40,7 @@
                                     <div class="swiper-wrapper">
 
 
-                                        {% for course in pdf_courses %}
+                                        {% for course in courses %}
                                             <div class="swiper-slide">
                                                 <!-- course:card -->
                                                 <div class="relative">
@@ -110,7 +110,7 @@
                                                                         <span class="font-black text-xl text-success">رایگان!</span>
                                                                     {% endif %}
 
-                                                                    {% if course.has_discount and course.type == "P" %}
+                                                                    {% if course.has_discount and course.payment_type == "P" %}
                                                                         <div class="flex items-center gap-1">
                                                                             <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
                                                                             <span class="text-xs text-muted"><span
@@ -131,17 +131,33 @@
                                                                               clip-rule="evenodd"></path>
                                                                     </svg>
                                                                 </a>
-                                                                <button type="button"
-                                                                        class="add-pdf-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
-                                                                        data-id="{{ course.id }}"
-                                                                        data-user="{{ request.user }}">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                                         viewBox="0 0 20 20"
-                                                                         fill="currentColor" class="w-5 h-5">
-                                                                        <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
-                                                                        </path>
-                                                                    </svg>
-                                                                </button>
+
+                                                                {% if course.id in favorite_pdf_courses %}
+                                                                    <button type="button"
+                                                                            class="add-pdf-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
+                                                                            data-id="{{ course.id }}"
+                                                                            data-user="{{ request.user }}">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             viewBox="0 0 20 20"
+                                                                             fill="currentColor" class="w-5 h-5">
+                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </button>
+                                                                {% else %}
+                                                                    <button type="button"
+                                                                            class="add-pdf-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
+                                                                            data-id="{{ course.id }}"
+                                                                            data-user="{{ request.user }}">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             viewBox="0 0 20 20"
+                                                                             fill="currentColor" class="w-5 h-5">
+                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </button>
+                                                                {% endif %}
+
 
                                                             </div>
                                                         </div>

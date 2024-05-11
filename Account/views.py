@@ -933,126 +933,60 @@ class FollowingList(AuthenticatedUsersOnlyMixin, CheckFollowingMixin, View):
         )
 
 
-class UserPDFCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
+class UserRegisteredPDFCourseListView(AuthenticatedUsersOnlyMixin, ListView):
     model = PDFCourse
     context_object_name = 'pdf_courses'
+    template_name = 'Account/registered_pdf_courses.html'
 
     def get_queryset(self):
-        slug = self.kwargs.get("slug")
+        user = self.request.user
 
-        pdf_courses = PDFCourse.objects.filter(teacher__slug=slug)
+        pdf_courses = PDFCourse.objects.filter(participated_users=user)
 
         return pdf_courses
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        slug = self.kwargs.get("slug")
-        owner = CustomUser.objects.get(slug=slug)
+        username = self.request.user.username
+        user = CustomUser.objects.get(username=username)
 
-        if user.is_authenticated:
-            user = CustomUser.objects.get(username=user.username)
-            is_following = user.is_following(owner)
-            account_status = owner.account_status
-
-            is_follow_request_pending = Notification.objects.filter(
-                users=owner,
-                visibility="PV",
-                following=owner,
-                follower=user,
-                mode="S",
-                type="FO",
-            ).exists()
-
-        else:
-            is_following = False
-            account_status = owner.account_status
-
-            is_follow_request_pending = False
+        account_status = user.account_status
 
         favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
 
         context['favorite_pdf_courses'] = favorite_pdf_courses
         context['user'] = user
-        context['owner'] = owner
-        context['is_following'] = is_following
         context['account_status'] = account_status
-        context['is_follow_request_pending'] = is_follow_request_pending
 
         return context
 
-    def get_template_names(self):
-        user = self.request.user
-        slug = self.kwargs.get("slug")
 
-        owner = CustomUser.objects.get(slug=slug)
-
-        if owner == user:
-            return ['Account/owner_pdf_courses.html']
-
-        else:
-            return ['Account/visitor_pdf_courses.html']
-
-
-class UserVideoCourseListView(FollowersForPVAccountsOnlyMixin, ListView):
+class UserRegisteredVideoCourseListView(AuthenticatedUsersOnlyMixin, ListView):
     model = VideoCourse
     context_object_name = 'video_courses'
+    template_name = 'Account/registered_video_courses.html'
 
     def get_queryset(self):
-        slug = self.kwargs.get("slug")
+        user = self.request.user
 
-        video_courses = VideoCourse.objects.filter(teacher__slug=slug)
+        video_courses = VideoCourse.objects.filter(participated_users=user)
 
         return video_courses
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        slug = self.kwargs.get("slug")
-        owner = CustomUser.objects.get(slug=slug)
+        username = self.request.user.username
+        user = CustomUser.objects.get(username=username)
 
-        if user.is_authenticated:
-            user = CustomUser.objects.get(username=user.username)
-            is_following = user.is_following(owner)
-            account_status = owner.account_status
-
-            is_follow_request_pending = Notification.objects.filter(
-                users=owner,
-                visibility="PV",
-                following=owner,
-                follower=user,
-                mode="S",
-                type="FO",
-            ).exists()
-
-        else:
-            is_following = False
-            account_status = owner.account_status
-
-            is_follow_request_pending = False
+        account_status = user.account_status
 
         favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
 
         context['favorite_video_courses'] = favorite_video_courses
         context['user'] = user
-        context['owner'] = owner
-        context['is_following'] = is_following
         context['account_status'] = account_status
-        context['is_follow_request_pending'] = is_follow_request_pending
 
         return context
-
-    def get_template_names(self):
-        user = self.request.user
-        slug = self.kwargs.get("slug")
-
-        owner = CustomUser.objects.get(slug=slug)
-
-        if owner == user:
-            return ['Account/owner_video_courses.html']
-
-        else:
-            return ['Account/visitor_video_courses.html']
 
 
 class SearchProfileView(View):
@@ -1159,3 +1093,173 @@ class VerifyView(AuthenticatedUsersOnlyMixin, View):
                 return redirect("account:charge_wallet")
 
         return response
+
+
+class UserTaughtPDFCourseListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
+    def get(self, request, slug):
+        user = self.request.user
+        owner = CustomUser.objects.get(slug=slug)
+
+        if user.is_authenticated:
+            favorite_pdf_courses = PDFCourse.favorite_pdf_list(self, user=user)
+            user = CustomUser.objects.get(username=user.username)
+
+            is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
+
+            if is_visitor_the_owner:
+                courses = PDFCourse.objects.filter(teacher=user).order_by("-created_at")
+
+                is_following = user.is_following(owner)
+                account_status = owner.account_status
+
+                is_follow_request_pending = Notification.objects.filter(
+                    users=owner,
+                    visibility="PV",
+                    following=owner,
+                    follower=user,
+                    mode="S",
+                    type="FO",
+                ).exists()
+
+                context = {
+                    "courses": courses,
+                    "owner": owner,
+                    "is_following": is_following,
+                    "account_status": account_status,
+                    "is_follow_request_pending": is_follow_request_pending,
+                    "favorite_pdf_courses": favorite_pdf_courses,
+                }
+
+                return render(request=request, template_name="account/owner_taught_pdf_courses.html", context=context)
+
+            else:
+                courses = PDFCourse.objects.filter(teacher=owner).order_by("-created_at")
+
+                is_following = user.is_following(owner)
+                account_status = owner.account_status
+
+                is_follow_request_pending = Notification.objects.filter(
+                    users=owner,
+                    visibility="PV",
+                    following=owner,
+                    follower=user,
+                    mode="S",
+                    type="FO",
+                ).exists()
+
+                context = {
+                    "courses": courses,
+                    "owner": owner,
+                    "is_following": is_following,
+                    "account_status": account_status,
+                    "is_follow_request_pending": is_follow_request_pending,
+                    "favorite_pdf_courses": favorite_pdf_courses,
+                }
+
+                return render(request=request, template_name="account/visitor_taught_pdf_courses.html",
+                              context=context)
+
+        else:
+            favorite_pdf_courses = []
+            courses = PDFCourse.objects.filter(teacher=owner).order_by("-created_at")
+
+            is_following = False
+            account_status = owner.account_status
+
+            is_follow_request_pending = False
+
+            context = {
+                "courses": courses,
+                "owner": owner,
+                "is_following": is_following,
+                "account_status": account_status,
+                "is_follow_request_pending": is_follow_request_pending,
+                "favorite_pdf_courses": favorite_pdf_courses,
+            }
+
+            return render(request=request, template_name="account/visitor_taught_pdf_courses.html", context=context)
+
+
+class UserTaughtVideoCourseListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
+    def get(self, request, slug):
+        user = self.request.user
+        owner = CustomUser.objects.get(slug=slug)
+
+        if user.is_authenticated:
+            favorite_video_courses = VideoCourse.favorite_video_list(self, user=user)
+            user = CustomUser.objects.get(username=user.username)
+
+            is_visitor_the_owner = user == owner  # Checks who is visiting the profile page
+
+            if is_visitor_the_owner:
+                courses = VideoCourse.objects.filter(teacher=user).order_by("-created_at")
+
+                is_following = user.is_following(owner)
+                account_status = owner.account_status
+
+                is_follow_request_pending = Notification.objects.filter(
+                    users=owner,
+                    visibility="PV",
+                    following=owner,
+                    follower=user,
+                    mode="S",
+                    type="FO",
+                ).exists()
+
+                context = {
+                    "courses": courses,
+                    "owner": owner,
+                    "is_following": is_following,
+                    "account_status": account_status,
+                    "is_follow_request_pending": is_follow_request_pending,
+                    "favorite_video_courses": favorite_video_courses,
+                }
+
+                return render(request=request, template_name="account/owner_taught_video_courses.html", context=context)
+
+            else:
+                courses = VideoCourse.objects.filter(teacher=owner).order_by("-created_at")
+
+                is_following = user.is_following(owner)
+                account_status = owner.account_status
+
+                is_follow_request_pending = Notification.objects.filter(
+                    users=owner,
+                    visibility="PV",
+                    following=owner,
+                    follower=user,
+                    mode="S",
+                    type="FO",
+                ).exists()
+
+                context = {
+                    "courses": courses,
+                    "owner": owner,
+                    "is_following": is_following,
+                    "account_status": account_status,
+                    "is_follow_request_pending": is_follow_request_pending,
+                    "favorite_video_courses": favorite_video_courses,
+                }
+
+                return render(request=request, template_name="account/visitor_taught_video_courses.html",
+                              context=context)
+
+        else:
+            favorite_video_courses = []
+            courses = VideoCourse.objects.filter(teacher=owner).order_by("-created_at")
+
+            is_following = False
+            account_status = owner.account_status
+
+            is_follow_request_pending = False
+
+            context = {
+                "courses": courses,
+                "owner": owner,
+                "is_following": is_following,
+                "account_status": account_status,
+                "is_follow_request_pending": is_follow_request_pending,
+                "favorite_video_courses": favorite_video_courses,
+            }
+
+            return render(request=request, template_name="account/visitor_taught_video_courses.html", context=context)

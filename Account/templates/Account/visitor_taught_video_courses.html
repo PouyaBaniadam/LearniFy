@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% load static %}
+
+{% block content %}
+    <div class="flex flex-col min-h-screen bg-background">
+        {% include 'includes/header.html' %}
+
+        <main class="flex-auto py-5">
+            <div class="max-w-7xl space-y-14 px-4 mx-auto">
+                <div class="grid md:grid-cols-12 grid-cols-1 items-start gap-5">
+                    <div class="lg:col-span-3 md:col-span-4 md:sticky md:top-24">
+
+                        {% include 'includes/visitor_user_info.html' %}
+
+                        {% include 'includes/visitor_user_menu.html' %}
+                    </div>
+
+                    <div class="lg:col-span-9 md:col-span-8">
+                        <div class="space-y-10">
+
+                            <!-- statistics:items:wrapper -->
+                            {% include 'includes/visitor_statistics.html' %}
+                            <!-- end statistics:wrapper -->
+
+                            <!-- section:learning-courses -->
+                            <div class="space-y-5">
+                                <!-- section:title -->
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-1 h-1 bg-foreground rounded-full"></div>
+                                        <div class="w-2 h-2 bg-foreground rounded-full"></div>
+                                    </div>
+                                    <div class="font-black text-foreground">دوره‌‌های ویدئویی تدریس شده</div>
+                                </div>
+                                <!-- end section:title -->
+
+                                <!-- section:learning-courses:slider -->
+                                <div class="swiper col3-swiper-slider">
+                                    <div class="swiper-wrapper">
+
+
+                                        {% for course in courses %}
+                                            <div class="swiper-slide">
+                                                <!-- course:card -->
+                                                <div class="relative">
+                                                    <div class="relative z-10">
+                                                        <a href="{% url 'course:video_course_detail' course.slug %}"
+                                                           class="block">
+                                                            <img src="{{ course.cover_image.url }}"
+                                                                 class="max-w-full rounded-3xl"
+                                                                 alt="{{ course.name }}"/>
+                                                        </a>
+                                                        <a href="{% url 'course:videos_by_category' course.category.slug %}"
+                                                           class="absolute left-3 top-3 h-11 inline-flex items-center justify-center gap-1 bg-black/20 rounded-full text-white transition-all hover:opacity-80 px-4">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                 fill="currentColor" class="w-6 h-6">
+                                                                <path fill-rule="evenodd"
+                                                                      d="M3 6a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6Zm9.75 0a3 3 0 0 1 3-3H18a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3V6ZM3 15.75a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-2.25Zm9.75 0a3 3 0 0 1 3-3H18a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3v-2.25Z"
+                                                                      clip-rule="evenodd"></path>
+                                                            </svg>
+                                                            <span class="font-semibold text-sm">{{ course.category.name }}</span>
+                                                        </a>
+                                                    </div>
+                                                    <div class="bg-background rounded-b-3xl -mt-12 pt-12">
+                                                        <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
+
+                                                            <h2 class="font-bold text-sm">
+                                                                <a href="{% url 'course:video_course_detail' course.slug %}"
+                                                                   class="line-clamp-1 text-foreground transition-colors hover:text-primary">{{ course.name }}</a>
+                                                            </h2>
+                                                        </div>
+                                                        <div class="space-y-3 p-5">
+                                                            <div class="flex flex-wrap items-center gap-3">
+                                                                <div class="flex flex-wrap items-center gap-3">
+                                                                    <p class="text-foreground text-sm font-bold">{{ course.what_we_will_learn|truncatechars:50 }}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex items-center justify-between gap-5">
+                                                                <div class="flex items-center gap-3">
+                                                                    {% if course.designer.image %}
+                                                                        <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                            <img src="{{ course.designer.image.url }}"
+                                                                                 class="w-full h-full object-cover"
+                                                                                 alt="مدرس دوره {{ course.name }}"/>
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                                            <img src="{% static 'images/avatars/default_user.JPG' %}"
+                                                                                 class="w-full h-full object-cover"
+                                                                                 alt="مدرس دوره {{ course.name }}"/>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                    <div class="flex flex-col items-start space-y-1">
+                                                                        <span class="line-clamp-1 font-semibold text-xs text-muted">مدرس دوره</span>
+                                                                        <a href="{% url 'account:profile' course.teacher.slug %}"
+                                                                           class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ course.teacher.full_name }}</a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex flex-col items-end justify-center h-14">
+                                                                    {% if course.payment_type == "P" %}
+                                                                        {% if course.has_discount %}
+                                                                            <span class="line-through text-muted">{{ course.price|price_splitter }} <span
+                                                                                    class="text-primary">تومان</span></span>
+                                                                        {% else %}
+                                                                            <span class="text-muted">{{ course.price|price_splitter }} <span
+                                                                                    class="text-primary">تومان</span></span>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <span class="font-black text-xl text-success">رایگان!</span>
+                                                                    {% endif %}
+
+                                                                    {% if course.has_discount and course.payment_type == "P" %}
+                                                                        <div class="flex items-center gap-1">
+                                                                            <span class="font-black text-xl text-foreground">{{ course.price_after_discount|price_splitter }}</span>
+                                                                            <span class="text-xs text-muted"><span
+                                                                                    class="text-primary">تومان</span></span>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex gap-3 mt-3">
+                                                                <a href="{% url 'course:video_course_detail' course.slug %}"
+                                                                   class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                                    <span class="line-clamp-1 font-semibold text-sm">مشاهده دوره</span>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                         viewBox="0 0 20 20"
+                                                                         fill="currentColor" class="w-5 h-5">
+                                                                        <path fill-rule="evenodd"
+                                                                              d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                                              clip-rule="evenodd"></path>
+                                                                    </svg>
+                                                                </a>
+
+                                                                {% if course.id in favorite_video_courses %}
+                                                                    <button type="button"
+                                                                            class="add-video-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
+                                                                            data-id="{{ course.id }}"
+                                                                            data-user="{{ request.user }}">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             viewBox="0 0 20 20"
+                                                                             fill="currentColor" class="w-5 h-5">
+                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </button>
+                                                                {% else %}
+                                                                    <button type="button"
+                                                                            class="add-video-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
+                                                                            data-id="{{ course.id }}"
+                                                                            data-user="{{ request.user }}">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             viewBox="0 0 20 20"
+                                                                             fill="currentColor" class="w-5 h-5">
+                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </button>
+                                                                {% endif %}
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- end course:card -->
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
+
+                                    <div class="swiper-button-prev"></div>
+                                    <div class="swiper-button-next"></div>
+                                </div>
+                                <!-- end section:learning-courses:slider -->
+                            </div>
+                            <!-- end section:learning-courses -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        {% include 'includes/footer.html' %}
+    </div>
+
+{% endblock %}

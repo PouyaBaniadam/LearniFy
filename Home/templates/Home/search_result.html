@@ -319,7 +319,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="flex flex-col items-end justify-center h-14">
-                                                            {% if video_course.type == "P" %}
+                                                            {% if video_course.payment_type == "P" %}
                                                                 {% if video_course.has_discount %}
                                                                     <span class="line-through text-muted">{{ video_course.price|price_splitter }} <span
                                                                             class="text-primary">تومان</span></span>
@@ -331,7 +331,7 @@
                                                                 <span class="font-black text-xl text-success">رایگان!</span>
                                                             {% endif %}
 
-                                                            {% if video_course.has_discount and video_course.type == "P" %}
+                                                            {% if video_course.has_discount and video_course.payment_type == "P" %}
                                                                 <div class="flex items-center gap-1">
                                                                     <span class="font-black text-xl text-foreground">{{ video_course.price_after_discount|price_splitter }}</span>
                                                                     <span class="text-xs text-muted"><span
@@ -494,7 +494,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="flex flex-col items-end justify-center h-14">
-                                                            {% if pdf_course.type == "P" %}
+                                                            {% if pdf_course.payment_type == "P" %}
                                                                 {% if pdf_course.has_discount %}
                                                                     <span class="line-through text-muted">{{ pdf_course.price|price_splitter }} <span
                                                                             class="text-primary">تومان</span></span>
@@ -506,7 +506,7 @@
                                                                 <span class="font-black text-xl text-success">رایگان!</span>
                                                             {% endif %}
 
-                                                            {% if pdf_course.has_discount and pdf_course.type == "P" %}
+                                                            {% if pdf_course.has_discount and pdf_course.payment_type == "P" %}
                                                                 <div class="flex items-center gap-1">
                                                                     <span class="font-black text-xl text-foreground">{{ pdf_course.price_after_discount|price_splitter }}</span>
                                                                     <span class="text-xs text-muted"><span

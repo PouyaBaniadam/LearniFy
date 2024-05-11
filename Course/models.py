@@ -304,7 +304,7 @@ class PDFCourse(models.Model):
     discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
                                                            validators=[MaxValueValidator(100)])
 
-    price_after_discount = models.PositiveBigIntegerField(default=0, editable=False, verbose_name='قیمت بعد از تخفیف')
+    price_after_discount = models.PositiveBigIntegerField(default=0,  verbose_name='قیمت بعد از تخفیف')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
