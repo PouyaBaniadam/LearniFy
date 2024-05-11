@@ -44,10 +44,12 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
 
 class BoughtCourseTabularInline(admin.TabularInline):
     model = BoughtCourse
-    # readonly_fields = ("user", "formatted_cost", "formatted_created_at")
+    readonly_fields = ("user", "formatted_cost", "formatted_created_at")
 
-    # can_delete = False
+    can_delete = False
 
+    def has_add_permission(self, request, obj):
+        return False
 
     def formatted_created_at(self, obj):
         return j_date_formatter(obj.created_at)
