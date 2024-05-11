@@ -87,18 +87,20 @@ def add_to_user_stars_for_downloading_video_course_object(instance, created, **k
 def charge_teacher_wallet(instance, created, **kwargs):
     if created:
         how_much_to_pay_to_teacher = instance.cost - (5 / 100 * instance.cost)
+        humanized_how_much_to_pay_to_teacher = "{:,}".format(int(how_much_to_pay_to_teacher))
 
         if instance.pdf_course:
             teacher = instance.pdf_course.teacher
 
             notification = Notification.objects.create(
                 title="ثبت نام دوره",
-                message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">کاربر </span><span style="color:hsl(240, 75%, 60%);">{instance.user.username}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> در دوره </span><span style="background-color:rgb(255,255,255);color:hsl(240, 75%, 60%);">{instance.pdf_course.name}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> ثبت نام کرد.</span></p>',
+                message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">کاربر </span><span style="color:hsl(240,75%,60%);">{instance.user.username}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> در دوره </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{instance.pdf_course.name}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> ثبت نام کرد و مبلغ </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{humanized_how_much_to_pay_to_teacher}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> تومان به کیف پول شما واریز شد.</span></p>',
                 visibility="PV",
                 mode="S",
                 type="AN",
             )
-            notification.users.add(instance.pdf_course.teacher)
+
+            notification.users.add(teacher)
             notification.save()
 
         if instance.video_course:
@@ -106,17 +108,15 @@ def charge_teacher_wallet(instance, created, **kwargs):
 
             notification = Notification.objects.create(
                 title="ثبت نام دوره",
-                message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">کاربر </span><span style="color:hsl(240, 75%, 60%);">{instance.user.username}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> در دوره </span><span style="background-color:rgb(255,255,255);color:hsl(240, 75%, 60%);">{instance.video_course.name}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> ثبت نام کرد.</span></p>',
+                message=f'<p><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);">کاربر </span><span style="color:hsl(240,75%,60%);">{instance.user.username}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> در دوره </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{instance.video_course.name}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> ثبت نام کرد و مبلغ </span><span style="background-color:rgb(255,255,255);color:hsl(240,75%,60%);">{humanized_how_much_to_pay_to_teacher}</span><span style="background-color:rgb(255,255,255);color:rgb(75,85,99);"> تومان به کیف پول شما واریز شد.</span></p>',
                 visibility="PV",
                 mode="S",
                 type="AN",
             )
 
-            notification.users.add(instance.pdf_course.teacher)
+            notification.users.add(teacher)
             notification.save()
 
         wallet = Wallet.objects.get(user=teacher)
         wallet.charge_wallet(how_much_to_pay_to_teacher)
         wallet.save()
-
-
