@@ -33,7 +33,7 @@
             {% if is_following %}
                 {% if account_status == "PU" %}
                     <button type="button" id="follow-btn"
-                            onclick="toggle_follow('{{ user.id }}')"
+                            onclick="toggle_follow('{{ owner.id }}')"
                             class="flex items-center justify-center gap-1 w-full h-10 bg-red-500 rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                         <span class="font-semibold text-sm">آن‌فالو</span>
                         <svg id="follow-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -59,7 +59,7 @@
             {% else %}
                 {% if account_status == "PU" %}
                     <button type="button" id="follow-btn"
-                            onclick="toggle_follow('{{ user.id }}')"
+                            onclick="toggle_follow('{{ owner.id }}')"
                             class="flex items-center justify-center gap-1 w-full h-10 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                         <span class="font-semibold text-sm">فالو</span>
                         <svg id="follow-svg" xmlns="http://www.w3.org/2000/svg" fill="none"

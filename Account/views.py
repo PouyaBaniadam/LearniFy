@@ -362,24 +362,12 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
             if is_visitor_the_owner:
                 posts = Post.objects.filter(user=owner).order_by("-created_at")
 
-                is_following = user.is_following(owner)
                 account_status = owner.account_status
-
-                is_follow_request_pending = Notification.objects.filter(
-                    users=owner,
-                    visibility="PV",
-                    following=owner,
-                    follower=user,
-                    mode="S",
-                    type="FO",
-                ).exists()
 
                 context = {
                     "posts": posts,
                     "owner": owner,
-                    "is_following": is_following,
                     "account_status": account_status,
-                    "is_follow_request_pending": is_follow_request_pending,
                 }
 
                 return render(request=request, template_name="account/owner_posts.html", context=context)
@@ -398,6 +386,8 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                     mode="S",
                     type="FO",
                 ).exists()
+
+                print(is_following)
 
                 context = {
                     "posts": posts,
