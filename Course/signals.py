@@ -125,12 +125,12 @@ def charge_teacher_wallet(instance, created, **kwargs):
 @receiver(post_save, sender=PDFExamResult)
 def add_to_user_stars_after_pdf_exam(instance, created, **kwargs):
     if created:
-        has_already_taken_part_in_exam = PDFExamResult.objects.filter(
+        pdf_exam_taken_part_count = PDFExamResult.objects.filter(
             user=instance.user,
             pdf_exam=instance.pdf_exam
-        ).exists()
+        ).count()
 
-        if not has_already_taken_part_in_exam:
+        if pdf_exam_taken_part_count <= 1:
             coefficient_number = instance.pdf_exam.pdf_course_season.course.coefficient_number
 
             if instance.result_status == "E":
@@ -145,7 +145,7 @@ def add_to_user_stars_after_pdf_exam(instance, created, **kwargs):
             if instance.result_status == "B":
                 stars = coefficient_number
 
-            user = CustomUser.objects.get(user=instance.user)
+            user = CustomUser.objects.get(username=instance.user.username)
             user.stars += stars
             user.save()
 
@@ -153,12 +153,12 @@ def add_to_user_stars_after_pdf_exam(instance, created, **kwargs):
 @receiver(post_save, sender=VideoExamResult)
 def add_to_user_stars_after_video_exam(instance, created, **kwargs):
     if created:
-        has_already_taken_part_in_exam = VideoExamResult.objects.filter(
+        video_exam_taken_part_count = VideoExamResult.objects.filter(
             user=instance.user,
             video_exam=instance.video_exam
-        ).exists()
+        ).count()
 
-        if not has_already_taken_part_in_exam:
+        if video_exam_taken_part_count <= 1:
             coefficient_number = instance.video_exam.video_course_season.course.coefficient_number
 
             if instance.result_status == "E":
@@ -173,6 +173,6 @@ def add_to_user_stars_after_video_exam(instance, created, **kwargs):
             if instance.result_status == "B":
                 stars = coefficient_number
 
-            user = CustomUser.objects.get(user=instance.user)
+            user = CustomUser.objects.get(username=instance.user.username)
             user.stars += stars
             user.save()
