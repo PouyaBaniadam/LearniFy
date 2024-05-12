@@ -387,8 +387,6 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                     type="FO",
                 ).exists()
 
-                print(is_following)
-
                 context = {
                     "posts": posts,
                     "owner": owner,
