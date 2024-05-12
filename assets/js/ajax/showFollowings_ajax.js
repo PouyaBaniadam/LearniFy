@@ -47,7 +47,6 @@ function showFollowings(user, owner) {
                 text: error.responseJSON.error,
                 confirmButtonText: 'باشه',
                 confirmButtonColor: '#d33',
-                timer: 3000
             });
         }
     });

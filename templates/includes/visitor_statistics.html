@@ -34,13 +34,13 @@
                                     </span>
         <div class="flex flex-col items-start text-right space-y-1">
             <span class="font-bold text-xs text-muted line-clamp-1">امتیازات</span>
-            <span class="font-bold text-sm text-foreground line-clamp-1">{{ user.stars|price_splitter }}</span>
+            <span class="font-bold text-sm text-foreground line-clamp-1">{{ owner.stars|price_splitter }}</span>
         </div>
     </div>
     <!-- end statistics:item -->
 
     <!-- statistics:item -->
-    <button onclick="showFollowers('{{ request.user.id }}', '{{ user.id }}')">
+    <button onclick="showFollowers('{{ request.user.id }}', '{{ owner.id }}')">
         <div class="flex items-center gap-3 bg-secondary rounded-2xl cursor-default p-3">
                                     <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-blue-500">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -53,7 +53,7 @@
                 <span class="font-bold text-xs text-muted line-clamp-1">فالور</span>
                 <div class="flex items-center gap-1">
                                             <span id="follower-count"
-                                                  class="font-bold text-sm text-foreground">{{ user.followers.count }}</span>
+                                                  class="font-bold text-sm text-foreground">{{ owner.followers.count }}</span>
                 </div>
             </div>
         </div>
@@ -62,7 +62,7 @@
 
 
     <!-- statistics:item -->
-    <button onclick="showFollowings('{{ request.user.id }}', '{{ user.id }}')">
+    <button onclick="showFollowings('{{ request.user.id }}', '{{ owner.id }}')">
         <div class="flex items-center gap-3 bg-secondary rounded-2xl cursor-default p-3">
                                     <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-red-500">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -73,7 +73,7 @@
                                     </span>
             <div class="flex flex-col items-start text-right space-y-1">
                 <span class="font-bold text-xs text-muted line-clamp-1">فالویینگ</span>
-                <span class="font-bold text-sm text-foreground line-clamp-1">{{ user.following.count }}</span>
+                <span class="font-bold text-sm text-foreground line-clamp-1">{{ owner.following.count }}</span>
             </div>
         </div>
         <!-- end statistics:item -->
