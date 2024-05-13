@@ -34,8 +34,7 @@ class HomeView(URLStorageMixin, TemplateView):
                                                           "price_after_discount",
                                                           "name",
                                                           "holding_status"
-                                                          ).order_by('-created_at').filter(
-            Q(holding_status="F") | Q(holding_status="IP"))[:6]
+                                                          ).order_by('-created_at')[:6]
 
         latest_pdf_courses = PDFCourse.objects.values(
             "id",
@@ -55,8 +54,7 @@ class HomeView(URLStorageMixin, TemplateView):
             "name",
             "holding_status",
             "what_we_will_learn",
-        ).order_by('-created_at').filter(
-            Q(holding_status="F") | Q(holding_status="IP"))[:6]
+        ).order_by('-created_at')[:6]
 
         intro_banner = IntroBanner.objects.first()
 
