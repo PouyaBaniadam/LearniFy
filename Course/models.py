@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models import Sum
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
-from moviepy.editor import VideoFileClip
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
@@ -231,21 +230,6 @@ class VideoCourseObject(models.Model):
             if letter not in allowed_characters:
                 raise ValidationError(message="نام فایل دانلودی فقط می‌‌تواند شامل حروف انگلیسی و ارقام باشد.")
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        try:
-            # Load the video file
-            video_path = self.video_file.path
-            clip = VideoFileClip(video_path)
-            # Get the duration in seconds and save it
-            self.duration = int(clip.duration)
-            clip.close()
-            # Update the model with the duration
-            super().save(*args, **kwargs)
-        except Exception as e:
-            # Handle any exceptions, such as if the file is not found or is not a valid video file
-            print(f"An error occurred while getting the duration of the video file: {e}")
-
     class Meta:
         db_table = 'course__video_course_object'
         verbose_name = 'قسمت  دوره ویدئویی'
@@ -304,7 +288,7 @@ class PDFCourse(models.Model):
     discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
                                                            validators=[MaxValueValidator(100)])
 
-    price_after_discount = models.PositiveBigIntegerField(default=0,  verbose_name='قیمت بعد از تخفیف')
+    price_after_discount = models.PositiveBigIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
@@ -522,7 +506,8 @@ class PDFExamDetail(models.Model):
 
     answer_4 = models.CharField(max_length=200, verbose_name="گزینه 4")
 
-    correct_answer = models.CharField(max_length=200, verbose_name="گزینه صحیح", help_text="دقیقا متن یکی از فیلد‌‌های بالا")
+    correct_answer = models.CharField(max_length=200, verbose_name="گزینه صحیح",
+                                      help_text="دقیقا متن یکی از فیلد‌‌های بالا")
 
     def __str__(self):
         return f"{self.question}"
@@ -621,7 +606,7 @@ class PDFExamResult(models.Model):
 
 class VideoExam(models.Model):
     video_course_season = models.OneToOneField(to=VideoCourseSeason, on_delete=models.CASCADE,
-                                             verbose_name="فصل آزمون ویدئویی")
+                                               verbose_name="فصل آزمون ویدئویی")
 
     name = models.CharField(max_length=75, verbose_name="نام آزمون")
 
@@ -641,7 +626,7 @@ class VideoExam(models.Model):
 
 class VideoExamDetail(models.Model):
     video_exam = models.ForeignKey(to=VideoExam, on_delete=models.CASCADE, blank=True, null=True,
-                                 verbose_name="آزمون ویدئویی")
+                                   verbose_name="آزمون ویدئویی")
 
     question = models.CharField(max_length=200, verbose_name="صورت سوال")
 
@@ -668,7 +653,7 @@ class VideoExamTempAnswer(models.Model):
     user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
 
     video_exam_detail = models.ForeignKey(to=VideoExamDetail, on_delete=models.CASCADE, verbose_name="آزمون ویدئویی",
-                                        related_name="temp_answers", editable=False)
+                                          related_name="temp_answers", editable=False)
 
     question = models.CharField(max_length=200, verbose_name="صورت سوال")
 
@@ -687,7 +672,7 @@ class VideoExamTimer(models.Model):
     user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
 
     video_exam = models.ForeignKey(to=VideoExam, on_delete=models.CASCADE, blank=True, null=True,
-                                 verbose_name="آزمون ویدئویی")
+                                   verbose_name="آزمون ویدئویی")
 
     started_at = models.DateTimeField(auto_now_add=True, verbose_name="شروع شده در تاریخ")
 
