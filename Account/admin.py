@@ -49,7 +49,7 @@ class WalletAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'title', 'admin', "message", 'mode', 'visibility', 'has_been_read', 'formatted_created_at')
+    list_display = ('uuid', 'title', 'admin', 'mode', 'visibility', 'has_been_read', 'formatted_created_at')
 
     readonly_fields = ('admin',)
 
@@ -69,19 +69,18 @@ class NewsLetterAdmin(admin.ModelAdmin):
     list_display = ('email', 'user')
 
 
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    list_display = ('follower', 'following', 'followed_at')
+# @admin.register(Follow)
+# class FollowAdmin(admin.ModelAdmin):
+#     list_display = ('follower', 'following', 'followed_at')
+#
+#     autocomplete_fields = ('follower', 'following')
+#
+#     search_fields = ('follower__username', 'following__username')
 
-    autocomplete_fields = ('follower', 'following')
-
-    search_fields = ('follower__username', 'following__username')
-
-
-@admin.register(FavoriteVideoCourse)
-class FavoriteVideoCourseAdmin(admin.ModelAdmin):
-    list_display = ('user', 'video_course', 'created_at',)
-    search_fields = ('user__username', 'video_course__name')
+# @admin.register(FavoriteVideoCourse)
+# class FavoriteVideoCourseAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'video_course', 'created_at',)
+#     search_fields = ('user__username', 'video_course__name')
 
 
 @admin.register(Post)

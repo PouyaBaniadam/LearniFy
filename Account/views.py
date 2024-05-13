@@ -370,7 +370,7 @@ class PostListView(FollowersForPVAccountsOnlyMixin, URLStorageMixin, View):
                     "account_status": account_status,
                 }
 
-                return render(request=request, template_name="account/owner_posts.html", context=context)
+                return render(request=request, template_name="Account/owner_posts.html", context=context)
 
             else:
                 posts = Post.objects.filter(user=owner).order_by("-created_at")
@@ -1120,7 +1120,7 @@ class UserTaughtPDFCourseListView(FollowersForPVAccountsOnlyMixin, URLStorageMix
                     "favorite_pdf_courses": favorite_pdf_courses,
                 }
 
-                return render(request=request, template_name="account/owner_taught_pdf_courses.html", context=context)
+                return render(request=request, template_name="Account/owner_taught_pdf_courses.html", context=context)
 
             else:
                 courses = PDFCourse.objects.filter(teacher=owner).order_by("-created_at")
@@ -1205,7 +1205,7 @@ class UserTaughtVideoCourseListView(FollowersForPVAccountsOnlyMixin, URLStorageM
                     "favorite_video_courses": favorite_video_courses,
                 }
 
-                return render(request=request, template_name="account/owner_taught_video_courses.html", context=context)
+                return render(request=request, template_name="Account/owner_taught_video_courses.html", context=context)
 
             else:
                 courses = VideoCourse.objects.filter(teacher=owner).order_by("-created_at")

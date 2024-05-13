@@ -176,11 +176,11 @@ class VideoExamResultAdmin(admin.ModelAdmin):
     list_display = ("user", "video_exam", "percentage")
 
 
-@admin.register(VideoExamTimer)
-class VideoExamTimerAdmin(admin.ModelAdmin):
-    list_display = ("user",)
-
-
-@admin.register(PDFExamTimer)
-class VideoExamTimerAdmin(admin.ModelAdmin):
-    list_display = ("user",)
+# @admin.register(VideoExamTimer)
+# class VideoExamTimerAdmin(admin.ModelAdmin):
+#     list_display = ("user",)
+#
+#
+# @admin.register(PDFExamTimer)
+# class VideoExamTimerAdmin(admin.ModelAdmin):
+#     list_display = ("user",)
