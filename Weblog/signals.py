@@ -16,5 +16,5 @@ def send_weblog_created(sender, instance: Weblog, created, **kwargs):
             emails,
             f'{instance.category.name}',
             # TODO: Change the host name
-            f"127.0.0.1:8000/weblog/detail/{instance.slug}"
+            f"https://learnifyacademy2000.pythonanywhere.com/weblog/detail/{instance.slug}"
         )

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 text: 'جهت افزودن این دوره ویدئویی به لیست علاقه‌مندی‌های خود، ابتدا وارد حساب کاربری خود شوید.',
                 confirmButtonText: 'باشه',
                 // TODO: Change the host name for footer
-                footer: '<a href="http://127.0.0.1:8000/account/login">ورود به حساب کاربری</a>'
+                footer: '<a href="https://learnifyacademy2000.pythonanywhere.com/account/login">ورود به حساب کاربری</a>'
             });
         });
     });

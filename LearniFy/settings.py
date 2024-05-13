@@ -89,9 +89,7 @@ MIDDLEWARE = [
 ]
 
 INTERNAL_IPS = [
-    # ...
     "127.0.0.1",
-    # ...
 ]
 
 ROOT_URLCONF = 'LearniFy.urls'
@@ -278,5 +276,5 @@ ZP_API_REQUEST = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentRequest
 ZP_API_VERIFY = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
 ZP_API_STARTPAY = f"https://{sandbox}.zarinpal.com/pg/StartPay/"
 description = 'خرید از آکادمی LearniFy'
-CartCallbackURL = 'http://127.0.0.1:8000/financial/verify'
-WalletCallbackURL = 'http://127.0.0.1:8000/account/wallet/charge/verify'
+CartCallbackURL = 'https://learnifyacademy2000.pythonanywhere.com/financial/verify'
+WalletCallbackURL = 'https://learnifyacademy2000.pythonanywhere.com/account/wallet/charge/verify'

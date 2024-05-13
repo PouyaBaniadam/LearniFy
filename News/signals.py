@@ -16,5 +16,5 @@ def send_news_created(sender, instance: News, created, **kwargs):
             emails,
             f'{instance.category.name}',
             # TODO: Change the host name
-            f"127.0.0.1:8000/news/detail/{instance.slug}"
+            f"https://learnifyacademy2000.pythonanywhere.com/news/detail/{instance.slug}"
         )
