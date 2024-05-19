@@ -70,6 +70,6 @@ class Contact(URLStorageMixin, FormView):
             form.instance.full_name = full_name
             form.instance.message = message
 
-        messages.success(self.request, "پیام شما با موقیت ثبت شد.")
+        messages.success(self.request, "پیام شما با موفقیت ثبت شد.")
 
         return redirect("us:contact")
