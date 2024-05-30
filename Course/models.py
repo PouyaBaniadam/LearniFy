@@ -200,12 +200,11 @@ class VideoCourseObject(models.Model):
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
     download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی",
-                                          help_text="فقط حروف انگلیسی و ارقام لاتین")
+                                          help_text="فقط حروف انگلیسی، ارقام، '-' و '_'")
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
-    season = models.ForeignKey(to=VideoCourseSeason, on_delete=models.CASCADE, blank=True, null=True,
-                               verbose_name="فصل")
+    season = models.ForeignKey(to=VideoCourseSeason, on_delete=models.CASCADE, verbose_name="فصل")
 
     session = models.PositiveSmallIntegerField(default=1, verbose_name="قسمت")
 
@@ -218,7 +217,7 @@ class VideoCourseObject(models.Model):
 
     can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
 
-    duration = models.PositiveIntegerField(default=0, verbose_name="زمان فیلم")
+    duration = models.DurationField(default=0, verbose_name="زمان فیلم")
 
     def __str__(self):
         return f"{self.title}"
@@ -398,12 +397,11 @@ class PDFCourseObject(models.Model):
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
     download_file_name = models.CharField(max_length=50, verbose_name="نام فایل دانلودی",
-                                          help_text="فقط حروف انگلیسی و ارقام لاتین")
+                                          help_text="فقط حروف انگلیسی، ارقام، '-' و '_'")
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
-    season = models.ForeignKey(to=PDFCourseSeason, on_delete=models.CASCADE, blank=True, null=True,
-                               verbose_name="فصل")
+    season = models.ForeignKey(to=PDFCourseSeason, on_delete=models.CASCADE, verbose_name="فصل")
 
     session = models.PositiveSmallIntegerField(default=1, verbose_name="قسمت")
 

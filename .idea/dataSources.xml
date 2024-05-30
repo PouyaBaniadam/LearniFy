@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="db" uuid="f0216039-c210-4ec8-bf02-66ba06145c0b">
-      <driver-ref>4b7cbc6e-5e37-45c8-8151-ffe9f449a8f8</driver-ref>
+      <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:C:\Users\bania\Documents\Projects\Django\LearniFy\db.sqlite3</jdbc-url>

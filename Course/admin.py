@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoCourseSeason, PDFCourseObject, PDFCourse, \
     PDFCourseSeason, BoughtCourse, PDFCourseObjectDownloadedBy, VideoCourseObjectDownloadedBy, PDFExam, PDFExamDetail, \
-    PDFExamResult, VideoExam, VideoExamResult, VideoExamDetail, VideoExamTimer, PDFExamTimer
+    PDFExamResult, VideoExam, VideoExamResult, VideoExamDetail
 from Home.templatetags.filters import j_date_formatter
 
 
@@ -37,8 +37,6 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
 
     autocomplete_fields = ('video_course', 'season')
 
-    readonly_fields = ('duration',)
-
     inlines = (VideoCourseObjectDownloadedByInline,)
 
 
@@ -66,17 +64,29 @@ class BoughtCourseTabularInline(admin.TabularInline):
 class VideoCourseAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'category',
-        'holding_status', 'payment_type', 'price', 'has_discount',
-        'discount_percentage', 'price_after_discount'
+        'holding_status', 'payment_type', 'formatted_price', 'has_discount',
+        'discount_percentage', 'formatted_price_after_discount'
     )
 
-    search_fields = ('name', 'description', 'teacher')
+    search_fields = ('name',)
 
     autocomplete_fields = ('teacher', 'category')
 
     prepopulated_fields = {'slug': ('name',)}
 
     inlines = (BoughtCourseTabularInline,)
+
+    readonly_fields = ("price_after_discount",)
+
+    def formatted_price_after_discount(self, obj):
+        return "{:,}".format(obj.price_after_discount) + " تومان "
+
+    formatted_price_after_discount.short_description = "قیمت بعد از تخفیف"
+
+    def formatted_price(self, obj):
+        return "{:,}".format(obj.price) + " تومان "
+
+    formatted_price.short_description = "قیمت"
 
 
 @admin.register(VideoCourseSeason)
@@ -119,16 +129,29 @@ class PDFCourseObjectAdmin(admin.ModelAdmin):
 class PDFCourseAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'category', 'holding_status', 'payment_type',
-        'price', 'has_discount', 'discount_percentage', 'price_after_discount'
+        'formatted_price', 'has_discount', 'discount_percentage',
+        'formatted_price_after_discount'
     )
 
-    search_fields = ('name', 'description', 'teacher')
+    search_fields = ('name',)
 
     autocomplete_fields = ('teacher', 'category')
 
     prepopulated_fields = {'slug': ('name',)}
 
     inlines = (BoughtCourseTabularInline,)
+
+    readonly_fields = ("price_after_discount",)
+
+    def formatted_price_after_discount(self, obj):
+        return "{:,}".format(obj.price_after_discount) + " تومان "
+
+    formatted_price_after_discount.short_description = "قیمت بعد از تخفیف"
+
+    def formatted_price(self, obj):
+        return "{:,}".format(obj.price) + " تومان "
+
+    formatted_price.short_description = "قیمت"
 
 
 @admin.register(PDFCourseSeason)
@@ -174,7 +197,6 @@ class VideoExamAdmin(admin.ModelAdmin):
 @admin.register(VideoExamResult)
 class VideoExamResultAdmin(admin.ModelAdmin):
     list_display = ("user", "video_exam", "percentage")
-
 
 # @admin.register(VideoExamTimer)
 # class VideoExamTimerAdmin(admin.ModelAdmin):

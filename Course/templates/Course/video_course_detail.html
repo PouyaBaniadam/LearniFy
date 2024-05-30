@@ -61,7 +61,7 @@
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">مدت دوره</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.calculate_total_duration|format_seconds_to_time }}</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ course.calculate_total_duration }}</span>
                                             </div>
                                         </div>
                                         <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
@@ -256,7 +256,7 @@
                                                                                 </p>
                                                                                 <div class="flex items-center justify-end gap-3 sm:w-auto w-full mr-auto">
                                                                         <span class="flex items-center gap-1 text-muted">
-                                                                            <span class="text-xs">{{ session.duration|format_seconds_to_time }}</span>
+                                                                            <span class="text-xs">{{ session.duration }}</span>
                                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                                  fill="none" viewBox="0 0 24 24"
                                                                                  stroke-width="1.5"
